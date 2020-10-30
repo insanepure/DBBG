@@ -1,0 +1,1334 @@
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+html
+{
+  background-repeat: no-repeat;
+  background-attachment: fixed;  
+}
+body {
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+.maincontainer {
+  width: 1000px;
+  min-height: auto;
+}
+
+.header {
+  width: 100%;
+  height: 150px;
+  position: relative;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
+.logo {
+  top: 20%;
+  width: 330px;
+  height: 84.666px;
+  margin-left: 33%;
+  margin-right: auto;
+  position: absolute;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+.logo2 {
+  top: 20%;
+  width: 330px;
+  height: 84.666px;
+  margin-left: 33%;
+  margin-right: auto;
+  position: absolute;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
+.footer {
+  width: 998px;
+  text-align: center;
+  height: 30px;
+  line-height: 30px;
+  clear: both;
+}
+
+.contentcontainer {
+  width: 100%;
+  height: auto;
+  display: flex;
+}
+
+.sidebar {
+  text-align: left;
+  width: 166px;
+  min-height: 100%;
+}
+
+.leftbar {
+  float: left;
+  min-height: 350px;
+}
+
+.rightbar {
+  float: right;
+  min-height: 350px;
+}
+
+.content {
+  position: relative;
+  height: auto;
+  width: 668px;
+}
+
+.chatcontainer {
+  width: 998px;
+  min-height: 100px;
+  max-height: auto;
+}
+
+@font-face {
+  font-family: Dragonball;
+  src: url(../font/versuch2.otf);
+}
+
+.navigationbar {
+  width: 998px;
+  height: 40px;
+  position: relative;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
+.navigationbarlist {
+  position: absolute;
+  top: 0px;
+  left: 0;
+  width: 100%;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  height: 40px;
+}
+
+.navigationbarbutton {
+  float: left;
+  width:100px;
+  height: 39px;
+}
+
+.navigationbarbuttontext {
+  position: relative;
+  display: block;
+  text-decoration: none;
+  width: 100%;
+  height: 38px;
+  font-size: 13px;
+  font-family: Dragonball;
+  line-height: 35px;
+}
+
+.navigationbarbutton a:hover {
+  text-decoration: none!important;
+}
+
+.SideMenuContainer {
+  width: 160px
+}
+
+.SideMenuContainer2 {
+  width: 90%
+}
+
+.SideMenuBar {
+  text-align: 166px;
+  width: 100%;
+  min-height: 600px;
+  max-height: auto
+}
+
+.SideMenuKat {
+  width: 100%;
+  height: 25px;
+  line-height: 25px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700
+}
+
+.SideMenuButton {
+  font: bold 12px Arial;
+  width: 100%;
+  height: 22px;
+  line-height: 22px
+}
+
+.SideMenuInfo {
+  font: bold 12px Arial;
+  width: 100%;
+  min-height: auto;
+  max-height: auto;
+  line-height: 22px
+}
+
+.SideMenuButton a {
+  font: bold 12px Arial;
+  text-decoration: none
+}
+
+.SideMenuButton a:hover {
+  text-decoration: none!important
+}
+
+.SideMenuButton:hover {
+  text-decoration: none!important
+}
+
+.SideMenuNotification,
+.SideMenuTextNotification,
+.SideMenuImportantTextNotification {
+  float: right;
+  padding-left: 4px;
+  padding-right: 4px;
+  display: inline-block;
+  min-width: 10px;
+  height: 14px;
+  font-size: 10px;
+  line-height: 14px;
+  text-align: center;
+  border-radius: 100px;
+  margin-right: 4px
+}
+
+.SideMenuTextNotification,
+.SideMenuImportantTextNotification {
+  min-width: 16px
+}
+
+.SideMenuImportantTextNotification {
+  margin-right: 4px
+}
+
+a:link {
+  text-decoration: none;
+  text-underline: none
+}
+
+a:active {
+  text-decoration: none;
+  text-underline: none
+}
+
+a:visited {
+  text-decoration: none;
+  text-underline: none
+}
+
+a:hover {
+  text-decoration: none;
+  text-underline: none
+}
+
+.spacer {
+  height: 10px
+}
+
+.spacer2 {
+  height: 30px
+}
+
+.spacer3 {
+  height: 5px
+}
+
+.char_main {
+  min-height: 150px;
+  max-height: auto
+}
+
+.char_image {
+  position: relative;
+  width: 100%;
+  height: 150px;
+  border-style: solid;
+  border-width: 1px
+}
+
+.char_main2 {
+  min-height: 263px;
+  max-height: auto;
+
+}
+
+.char_image2 {
+  position: relative;
+  width: 130px;
+  height: 130px;
+  border-style: solid;
+  border-width: 1px;
+  float: left;
+  left: 5px;
+  border: 1px solid black;
+}
+
+
+.char_live {
+	top:10px;
+  position: relative;
+  width: 90%;
+  height: 50px;
+  float: left;
+  left: 6px;
+}
+
+.lpback {
+  position: relative
+}
+
+.lpbox,
+.lpanzeige,
+.lpanzeige2,
+.lptext {
+  position: absolute
+}
+
+.lpbox {
+  height: 100%;
+  width: 100%
+}
+
+.lpanzeige,
+.lpanzeige2{
+  height: 100%;
+  width: auto;
+  top: 1px;
+  left: 1px
+}
+
+.lptext {
+  height: 100%;
+  width: 100%;
+  top: 1px
+}
+
+.kpback {
+  position: relative
+}
+
+.kpbox,
+.kpanzeige,
+.kpanzeige2,
+.kptext {
+  position: absolute
+}
+
+.kpbox {
+  height: 100%;
+  width: 100%
+}
+
+.kpanzeige,
+.kpanzeige2 {
+  height: 100%;
+  width: auto;
+  top: 1px;
+  left: 1px
+}
+
+.kptext {
+  height: 100%;
+  width: 100%;
+  top: 1px
+}
+
+.epback {
+  position: relative
+}
+
+.epbox,
+.epanzeige,
+.epanzeige2,
+.eptext {
+  position: absolute
+}
+
+.epbox {
+  height: 100%;
+  width: 100%
+}
+
+.epanzeige,
+.epanzeige2 {
+  height: 100%;
+  width: auto;
+  top: 1px;
+  left: 1px
+}
+
+.eptext {
+  height: 100%;
+  width: 100%;
+  top: 1px
+}
+
+.info {
+  min-height: 20px;
+  width: 90%;
+  word-wrap: break-word;
+  overflow: hidden
+}
+
+.select {
+  padding: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+  width: 180px
+}
+
+.chat {
+  width: 100%;
+  min-height: 300px;
+}
+
+.chatfenster {
+  position:absolute;
+  width: 750px;
+  height: 300px;
+}
+
+.chattext {
+  width: 100%;
+  height: 240px;
+  text-align: left;
+  overflow: auto;
+  overflow-x: hidden
+}
+
+.chatchannel {
+  height: 20px
+}
+
+.chatuser {
+  position:relative;
+  width: 250.3px;
+  left:375px;
+  height: 300px;
+  text-align: center
+}
+
+.chatusers {
+  width: 98%;
+  height: 250px;
+  text-align: left;
+  margin-left:3px;
+  overflow: auto;
+  overflow-x: hidden
+}
+
+.chatinput {
+  float: left;
+  width: 100%;
+  height: 40px;
+}
+
+.gbox {
+  width: 90%;
+  height: 70px;
+  position: relative
+}
+
+.gtext {
+  width: 100%;
+  height: 20px
+}
+
+.gbild {
+  top: 4px;
+  position: relative;
+  float: left;
+  left: 10px;
+  width: 40px;
+  height: 40px
+}
+
+.gpm {
+  top: 6px;
+  position: relative;
+  float: left;
+  left: 15px;
+  width: 70px;
+  height: 15px;
+  font-size: 10px
+}
+
+.glp2 {
+  top: 25px;
+  left: 55px;
+  width: 70px;
+  height: 15px
+}
+
+.glp2,
+.glp,
+.glpanzeige {
+  height: 15px;
+  position: absolute
+}
+
+.glp {
+  width: 100%
+}
+
+.glpanzeige {
+  background: #e00f0f;
+  background: -moz-linear-gradient(#ff7a7a, #e00f0f);
+  background: -webkit-linear-gradient(#ff7a7a, #e00f0f);
+  background: linear-gradient(#ff7a7a, #e00f0f);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff7a7a', endColorstr='#e00f0f', GradientType=0);
+  width: 10%
+}
+
+.gkp2 {
+  top: 45px;
+  left: 55px;
+  width: 70px;
+  height: 15px
+}
+
+.gkp2,
+.gkp,
+.gkpanzeige {
+  height: 15px;
+  position: absolute
+}
+
+.gkp {
+  width: 100%
+}
+
+.gkpanzeige {
+  background: #36f967;
+  background: -moz-linear-gradient(#5bff84, #049127);
+  background: -webkit-linear-gradient(#5bff84, #049127);
+  background: linear-gradient(#5bff84, #049127);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#36f967', endColorstr='#049127', GradientType=0);
+  width: 50%
+}
+
+.popup {
+  display: none;
+  position: fixed;
+  z-index: 4000000000;
+  padding-top: 50px;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.75)
+}
+
+.popup-container {
+  position: relative;
+  top: 200px;
+  width: 600px;
+  min-height: 50px;
+  max-height: auto
+}
+
+.popup-content {
+  min-height: 200px;
+  max-height: auto
+}
+
+.popup-close {
+  position: relative;
+  float: right;
+  right: 20px;
+  cursor: pointer
+}
+
+.mutonbox {
+  width: 90%;
+  height: 330px
+}
+
+.muton {
+  position: absolute;
+  width: 200px;
+  height: 330px;
+  background-image: url(../img/muton2.png);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  box-shadow: -1px 2px 5px 6px #888
+}
+
+.muton2 {
+  position: absolute;
+  width: 320px;
+  height: 330px;
+  left: 250px;
+  box-shadow: -1px 2px 5px 6px #888
+}
+
+.newseditbox1 {
+  width: 90%;
+  min-height: 200px;
+  max-height: auto
+}
+
+.newseditbetreff {
+  width: 90%;
+  left: 40px;
+  top: 40px;
+  min-height: 30px;
+  background-color: green
+}
+
+.newsedittext {
+  width: 88.5%;
+  left: 40px;
+  top: 80px;
+  min-height: 350px;
+  background-color: green
+}
+
+.tooltip {
+  z-index: 0;
+  position: absolute;
+  display: inline-block
+}
+
+.tooltip .tooltiptext {
+  min-width: 140px;
+  max-width: auto;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+  transition: opacity 1s;
+  min-height: 15px;
+  max-height: auto;
+  visibility: hidden;
+  opacity: 0
+}
+
+.tooltip .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1
+}
+
+.reise2 {
+  position: relative;
+  width: 95%;
+  height: 330px;
+  background-image: url(../img/hintergrund.png);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  left: 0
+}
+
+.reisebild {
+  position: absolute;
+  width: 250px;
+  height: 150px;
+  background-image: url(../img/hintergrund.png);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  box-shadow: -1px 1px 2px 3px #888;
+  left: 70px;
+  top: 50px
+}
+
+.reisedauer {
+  position: absolute;
+  width: 250px;
+  height: 85px;
+  box-shadow: -1px 1px 2px 3px #888;
+  left: 70px;
+  top: 210px
+}
+
+.reisebeschreibung {
+  position: absolute;
+  width: 180px;
+  height: 245px;
+  box-shadow: -1px 1px 2px 3px #888;
+  left: 330px;
+  top: 50px
+}
+
+.bplayer1 {
+  position: absolute;
+  width: 150px;
+  height: 149px;
+  left: 25%
+}
+
+.bplayer1image {
+  position: absolute;
+  top: 18px;
+  left: 0;
+  width: 150px;
+  height: 125px;
+  background-size: 100% 100%;
+  background-repeat: no-repeat
+}
+
+.bplayer1name {
+  position: absolute;
+  width: 150px;
+  height: 20px;
+  text-align: left
+}
+
+.bplayer2 {
+  position: absolute;
+  width: 150px;
+  height: 149px;
+  right: 120px
+}
+
+.bplayer2image {
+  position: absolute;
+  top: 18px;
+  right: 0;
+  width: 150px;
+  height: 125px;
+  background-size: 100% 100%;
+  background-repeat: no-repeat
+}
+
+.bplayer2name {
+  position: absolute;
+  width: 150px;
+  height: 20px;
+  text-align: right
+}
+
+.bplayervs {
+  z-index: 1;
+  position: absolute;
+  width: 332px;
+  height: 148px;
+  left: 25%;
+  background-image: url(../../img/vs2.png);
+  background-size: 100% 100%;
+  background-repeat: no-repeat
+}
+
+.bplayerkampf {
+  position: absolute;
+  width: 332px;
+  height: 40px;
+  left: 25%;
+  top: 185px
+}
+
+html {
+  line-height: 1.15;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%
+}
+
+body {
+  margin: 0
+}
+
+article,
+aside,
+footer,
+header,
+nav,
+section {
+  display: block
+}
+
+h1 {
+  font-size: 2em;
+  margin: .67em 0
+}
+
+figcaption,
+figure,
+main {
+  display: block
+}
+
+figure {
+  margin: 1em 40px
+}
+
+hr {
+  box-sizing: content-box;
+  height: 0;
+  overflow: visible
+}
+
+pre {
+  font-family: monospace, monospace;
+  font-size: 1em
+}
+
+a {
+  background-color: transparent;
+  -webkit-text-decoration-skip: objects
+}
+
+abbr[title] {
+  border-bottom: none;
+  text-decoration: underline;
+  text-decoration: underline dotted
+}
+
+b,
+strong {
+  font-weight: inherit;
+  font-weight: bolder
+}
+
+code,
+kbd,
+samp {
+  font-family: monospace, monospace;
+  font-size: 1em
+}
+
+dfn {
+  font-style: italic
+}
+
+mark {
+  background-color: #ff0;
+  color: #000
+}
+
+small {
+  font-size: 80%
+}
+
+sub,
+sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline
+}
+
+sub {
+  bottom: -.25em
+}
+
+sup {
+  top: -.5em
+}
+
+audio,
+video {
+  display: inline-block
+}
+
+audio:not([controls]) {
+  display: none;
+  height: 0
+}
+
+img {
+  border-style: none
+}
+
+svg:not(:root) {
+  overflow: hidden
+}
+
+button,
+input,
+optgroup,
+select,
+textarea {
+  font-family: sans-serif;
+  font-size: 100%;
+  line-height: 1.15;
+  margin: 0
+}
+
+button,
+input {
+  overflow: visible
+}
+
+button,
+select {
+  text-transform: none
+}
+
+button,
+html [type="button"],
+/* 1 */
+
+[type="reset"],
+[type="submit"] {
+  -webkit-appearance: button
+}
+
+button::-moz-focus-inner,
+[type="button"]::-moz-focus-inner,
+[type="reset"]::-moz-focus-inner,
+[type="submit"]::-moz-focus-inner {
+  border-style: none;
+  padding: 0
+}
+
+button:-moz-focusring,
+[type="button"]:-moz-focusring,
+[type="reset"]:-moz-focusring,
+[type="submit"]:-moz-focusring {
+  outline: 1px dotted ButtonText
+}
+
+fieldset {
+  padding: .35em .75em .625em
+}
+
+legend {
+  box-sizing: border-box;
+  color: inherit;
+  display: table;
+  max-width: 100%;
+  padding: 0;
+  white-space: normal
+}
+
+progress {
+  display: inline-block;
+  vertical-align: baseline
+}
+
+textarea {
+  overflow: auto
+}
+
+[type="checkbox"],
+[type="radio"] {
+  box-sizing: border-box;
+  padding: 0
+}
+
+[type="number"]::-webkit-inner-spin-button,
+[type="number"]::-webkit-outer-spin-button {
+  height: auto
+}
+
+[type="search"] {
+  -webkit-appearance: textfield;
+  outline-offset: -2px
+}
+
+[type="search"]::-webkit-search-cancel-button,
+[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none
+}
+
+::-webkit-file-upload-button {
+  -webkit-appearance: button;
+  font: inherit
+}
+
+details,
+/* 1 */
+
+menu {
+  display: block
+}
+
+summary {
+  display: list-item
+}
+
+canvas {
+  display: inline-block
+}
+
+template {
+  display: none
+}
+
+[hidden] {
+  display: none
+}
+
+.newsspan {
+  height: 10px;
+  width: 100%
+}
+
+.newsspanbig {
+  height: 25px;
+  width: 100%
+}
+
+.newscontainer {
+  position: relative;
+  width: 600px;
+  border-style: solid;
+  border-width: 1px
+}
+
+.newshead {
+  width: 100%;
+  height: 50px;
+  font-weight: 700;
+  font-size: 22px
+}
+
+.newstitle {
+  position: absolute;
+  top: 10px;
+  left: 220px;
+  width: 300px
+}
+
+.newsimage {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  max-width: 40px
+}
+
+.newsauthortime {
+  position: absolute;
+  top: 5px;
+  left: 50px;
+  text-align: left;
+  font-weight: 400;
+  font-size: 14px
+}
+
+.newscontent {
+  width: 500px;
+  height: 100%
+}
+
+.raumschiffbox {
+  width: 95%;
+  height: 400px;
+  box-shadow: -1px 1px 3px 3px #888;
+  left: 20px;
+}
+
+.raumschiff {
+  width: 100%;
+  height: 375px;
+  background-image: url(../img/Sky.jpg);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.raumschiffteil1 {
+  position: absolute;
+  background-color: #D8D8D8;
+  border: 1px solid #424242;
+  width: 300px;
+  height: 280px;
+  left: 30px;
+  top: 120px;
+  opacity: 0.6;
+  filter: alpha(opacity=60);
+}
+
+.raumschiffteil2 {
+  position: absolute;
+  background-color: #D8D8D8;
+  border: 1px solid #424242;
+  width: 300px;
+  height: 100px;
+  left: 340px;
+  top: 300px;
+  opacity: 0.6;
+  filter: alpha(opacity=60);
+}
+
+.raumschiffteil3 {
+  position: absolute;
+  background-color: #D8D8D8;
+  border: 1px solid #424242;
+  width: 80px;
+  height: 80px;
+  left: 560px;
+  top: 45px;
+  opacity: 0.6;
+  filter: alpha(opacity=60);
+  background-image: url(../img/save.png);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.raumschiffteil4 {
+  position: absolute;
+  background-color: #D8D8D8;
+  border: 1px solid #424242;
+  width: 80px;
+  height: 80px;
+  left: 560px;
+  top: 130px;
+  opacity: 0.6;
+  filter: alpha(opacity=60);
+  background-image: url(../img/power.png);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.raumschiffteil5 {
+  position: absolute;
+  background-color: #D8D8D8;
+  border: 1px solid #424242;
+  width: 80px;
+  height: 80px;
+  left: 475px;
+  top: 45px;
+  opacity: 0.6;
+  filter: alpha(opacity=60);
+  background-image: url(../img/heal.png);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.raumschiffteil6 {
+  position: absolute;
+  background-color: #D8D8D8;
+  border: 1px solid #424242;
+  width: 300px;
+  height: 70px;
+  left: 30px;
+  top: 45px;
+  opacity: 0.6;
+  filter: alpha(opacity=60);
+}
+
+.raumschiffteil7 {
+  position: absolute;
+  width: 300px;
+  height: 70px;
+  left: 30px;
+  top: 45px;
+}
+
+.raumschiffteil8 {
+  position: absolute;
+  width: 300px;
+  height: 100px;
+  left: 340px;
+  top: 300px;
+}
+
+.teil1 {
+  position: absolute;
+  position: absolute;
+  background-color: #D8D8D8;
+  width: 60px;
+  height: 80px;
+  left: 10px;
+  top: 10px;
+  background-image: url(../img/card.png);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.teil2 {
+  position: absolute;
+  position: absolute;
+  background-color: #D8D8D8;
+  width: 60px;
+  height: 80px;
+  left: 80px;
+  top: 10px;
+  background-image: url(../img/card.png);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.teil3 {
+  position: absolute;
+  position: absolute;
+  background-color: #D8D8D8;
+  width: 60px;
+  height: 80px;
+  left: 160px;
+  top: 10px;
+  background-image: url(../img/card.png);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.teil4 {
+  position: absolute;
+  position: absolute;
+  background-color: #D8D8D8;
+  width: 60px;
+  height: 80px;
+  left: 230px;
+  top: 10px;
+  background-image: url(../img/card.png);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.teil5 {
+  position: absolute;
+  position: absolute;
+  background-color: #D8D8D8;
+  width: 60px;
+  height: 80px;
+  left: 10px;
+  top: 100px;
+  background-image: url(../img/card.png);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.teil6 {
+  position: absolute;
+  position: absolute;
+  background-color: #D8D8D8;
+  width: 60px;
+  height: 80px;
+  left: 80px;
+  top: 100px;
+  background-image: url(../img/card.png);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.teil7 {
+  position: absolute;
+  position: absolute;
+  background-color: #D8D8D8;
+  width: 60px;
+  height: 80px;
+  left: 160px;
+  top: 100px;
+  background-image: url(../img/card.png);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.teil8 {
+  position: absolute;
+  position: absolute;
+  background-color: #D8D8D8;
+  width: 60px;
+  height: 80px;
+  left: 230px;
+  top: 100px;
+  background-image: url(../img/card.png);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.teil9 {
+  position: absolute;
+  position: absolute;
+  background-color: #D8D8D8;
+  width: 60px;
+  height: 80px;
+  left: 10px;
+  top: 190px;
+  background-image: url(../img/card.png);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.teil10 {
+  position: absolute;
+  position: absolute;
+  background-color: #D8D8D8;
+  width: 60px;
+  height: 80px;
+  left: 80px;
+  top: 190px;
+  background-image: url(../img/card.png);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.teil11 {
+  position: absolute;
+  position: absolute;
+  background-color: #D8D8D8;
+  width: 60px;
+  height: 80px;
+  left: 160px;
+  top: 190px;
+  background-image: url(../img/card.png);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.teil12 {
+  position: absolute;
+  position: absolute;
+  background-color: #D8D8D8;
+  width: 60px;
+  height: 80px;
+  left: 230px;
+  top: 190px;
+  background-image: url(../img/card.png);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+.clankasse
+{
+    min-height:200px;  
+    max-height:200px; 
+  border:0px solid black;
+  width:90%;
+  overflow-y: auto;
+  
+}
+.clankasse2
+{
+  
+    min-height:230px;  
+    max-height:230px; 
+  border:0px solid black;
+  width:599px;
+}
+.clankasse3
+{  
+    min-height:auto;  
+    max-height:230px; 
+  border:0px solid black;
+  width:599px;
+   overflow-y: auto;
+}
+.clanshoutboxchat
+{
+    overflow-y: scroll;
+    min-height:170px;  
+    max-height:170px;
+    border:0px solid black;
+}
+.clanshoutboxchat2
+{
+    min-height:38px;  
+    max-height:38px;
+    border:0px solid black;
+}

@@ -1,0 +1,48 @@
+.preloader
+{
+		position: absolute;
+		left: -9999px;
+		top:  -9999px;
+}
+
+.regimain
+{
+  width:90%;
+  height:450px;
+  background-size: 100% 100%;
+background-repeat: no-repeat;
+background-image: url("../../img/bg.jpg");
+}
+
+.regiheader
+{
+width:100%;
+height:20px;  
+}
+
+.regchar
+{
+position:relative;
+top:10px;
+width:250px;
+height:400px;
+  background-color:#9c9c9e;
+  filter: alpha(opacity=90);
+  -moz-opacity: 0.9;
+  opacity: 0.9;
+}
+.regimput
+{  
+position:relative;
+top:10px;
+width:310px;
+height:400px;
+}
+
+.regchar, .regimput
+{
+     float: left;
+     margin-left: 2%;
+     padding: 20px;
+     box-sizing: border-box;
+}

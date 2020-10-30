@@ -1,0 +1,207 @@
+.profileBox
+{
+  z-index:400000;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+}
+
+
+.profilecharacter
+{
+  z-index:1;
+  height:500px;
+  width:300px;
+  position:absolute;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
+
+textarea 
+{ 
+    min-width:550px;
+    max-width:550px;
+    resize:both;
+    max-height:300px; 
+    min-height:300px; 
+}
+
+.button {
+    background-color: white;
+    color: black;
+    border: 2px solid #555555;
+}
+
+.button:hover {
+    background-color: #555555;
+    color: white;
+   border: 2px solid #555555;
+}
+
+.kopftest
+{
+z-index:3;
+position:absolute;
+width:300px;
+height:250px;
+background-repeat: no-repeat;
+background-size: 100% 100%;
+top:-15px;
+left:185px;
+}
+.kopftest2
+{
+z-index:3;
+position:absolute;
+width:300px;
+height:500px;
+background-repeat: no-repeat;
+background-size: 100% 100%;
+top:20px;
+left:185px;
+}
+.brusttest
+{
+  z-index:4;
+position:absolute;
+width:295px;
+height:250px;
+background-repeat: no-repeat;
+background-size: 100% 100%;
+top:100px;
+left:190px;
+}
+.brusttest2
+{
+z-index:7;
+position:absolute;
+width:295px;
+height:500px;
+background-repeat: no-repeat;
+background-size: 100% 100%;
+top:20px;
+left:189px;
+}
+.brusttest3
+{
+z-index:5;
+position:absolute;
+width:295px;
+height:500px;
+background-repeat: no-repeat;
+background-size: 100% 100%;
+top:20px;
+left:189px;
+}
+.hosetest
+{
+  z-index:4;
+position:absolute;
+width:300px;
+height:205px;
+background-repeat: no-repeat;
+background-size: 100% 100%;
+top:230px;
+left:185px;
+}
+.schuhetest
+{
+  z-index:2;
+position:absolute;
+width:300px;
+height:200px;
+background-repeat: no-repeat;
+background-size: 100% 100%;
+top:320px;
+left:185px;
+}
+.schuhetest2
+{
+  z-index:3;
+position:absolute;
+width:300px;
+height:510px;
+background-repeat: no-repeat;
+background-size: 100% 100%;
+top:10px;
+left:185px;
+}
+.handtest
+{
+  z-index:4;
+position:absolute;
+width:300px;
+height:200px;
+background-repeat: no-repeat;
+background-size: 100% 100%;
+top:200px;
+left:185px;
+}
+.handtest2
+{
+  z-index:4;
+position:absolute;
+width:300px;
+height:500px;
+background-repeat: no-repeat;
+background-size: 100% 100%;
+top:20px;
+left:185px;
+}
+.hosetest2
+{
+z-index:6;
+position:absolute;
+width:300px;
+height:480px;
+background-repeat: no-repeat;
+background-size: 100% 100%;
+top:33px;
+left:185px;
+}
+.waffetest
+{
+  z-index:1;
+position:absolute;
+width:300px;
+height:450px;
+background-repeat: no-repeat;
+background-size: 100% 100%;
+top:30px;
+left:185px;
+}
+.waffetest2
+{
+  z-index:1;
+position:absolute;
+width:300px;
+height:500px;
+background-repeat: no-repeat;
+background-size: 100% 100%;
+top:20px;
+left:185px;
+}
+.upgrade
+{
+z-index:300;
+position:absolute;
+width:30px;
+height:30px;
+background-repeat: no-repeat;
+background-size: 100% 100%;
+top:270px;
+left:245px;
+}
+.schullogo
+{
+z-index:300;
+position:absolute;
+width:30px;
+height:30px;
+background-image: url("../../img/lod.png");
+background-repeat: no-repeat;
+background-size: 100% 100%;
+top:140px;
+left:30px;
+}

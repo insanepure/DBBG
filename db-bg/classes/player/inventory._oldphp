@@ -1,0 +1,354 @@
+<?php
+if($database == NULL)
+{
+	print 'This File ('.__FILE__.') should be after Datatabase!';
+}
+
+class InventoryItem
+{
+  private $ID;
+  private $amount;
+  private $slot;
+  private $expirationdate;
+  
+  function __construct($id, $amount, $slot=0, $expirationdate=0)
+  {
+    $this->ID = $id;
+    $this->amount = $amount;
+    $this->slot = $slot;
+    $this->expirationdate = $expirationdate;
+  }
+  
+  public function GetID()
+  {
+    return $this->ID;
+  }
+  
+  public function GetAmount()
+  {
+    return $this->amount;
+  }
+  
+  public function GetExpirationDate()
+  {
+    return $this->expirationdate;
+  }
+  
+  public function GetSlot()
+  {
+    return $this->slot;
+  }
+  
+  public function SetSlot($value)
+  {
+    $this->slot = $value;
+  }
+  
+  public function SetAmount($value)
+  {
+    $this->amount = $value;
+  }
+}
+
+class Inventory
+{
+	private $items;
+	private $equippedItems;
+	private $hasRadar;
+	private $attacks;
+	private $radarID = 75;
+	
+	function __construct($items, $db=null, $player=null)
+	{
+    $this->items = array();
+    $this->equippedItems = array();
+		$this->hasRadar = false;
+    $this->Decode($items, $db, $player);
+  }
+  
+  public function GetCount()
+  {
+    return count($this->items);
+  }
+  
+  public function GetHasRadar()
+  {
+    return $this->hasRadar;
+  }
+  
+  public function SetHasRadar($value)
+  {
+    $this->hasRadar = $value;
+  }
+  
+  public function Clear()
+  {
+    $this->items = array();
+    $this->equippedItems = array();
+		$this->hasRadar = false;
+	}
+	
+  private function Decode($items, $database=null, $player=null)
+  {
+    if($items == '')
+    {
+      return;
+    }
+    $itemManager = null;
+    if($database != null)
+    {
+      $itemManager = new ItemManager($database);
+    }
+    
+    $items = explode(';',$items);
+    $i = 0;
+    while(isset($items[$i]))
+    {
+      $itemData = explode('@',$items[$i]);
+			$slot = 0;
+			$valid = true;
+			$expirationdate=0;
+			if(isset($itemData[2]) && $itemData[2] != 0)
+			{
+				$slot = $itemData[2];
+			}
+			if(isset($itemData[3]) && $itemData[3] != 0)
+			{
+				$time = strtotime($itemData[3]);
+				if(($time - time()) < 0)
+				{
+					$valid = false;
+          //Stats des verschwindenden Items austragen
+          if($slot > 0) {
+            //$itemManager = new ItemManager($database);
+            //$itemDatas = $itemManager->GetItem($itemData[0]);
+            //var_dump($player);
+            //$player->UnequipItem($slot, $itemDatas);  
+          }
+				}
+				else
+				{
+					$expirationdate = $itemData[3];
+				}
+			}
+      //var_dump($valid);
+			if($valid)
+			{
+    
+				$item = new InventoryItem($itemData[0], $itemData[1], $slot, $expirationdate);
+        if($itemManager != null)
+        {
+          $itemDB = $itemManager->GetItem($itemData[0]);
+          if($itemData[0] == $this->radarID && $itemDB->GetLevel() <= $player->GetLevel())
+          {
+            $this->SetHasRadar(true);
+          }
+        }
+		if($itemData[0] == 132)
+		{
+
+		}
+        
+				if($slot != null && $slot != -1)
+				{
+					$this->equippedItems[$slot] = $item;
+				}
+				array_push($this->items, $item);
+			}
+			
+      ++$i;
+    }
+  }
+  
+  public function Encode()
+  {
+    $items = '';
+    $i = 0;
+    while(isset($this->items[$i]))
+    {
+      $item = $this->items[$i];
+      if($items != '')
+      {
+        $items = $items.';';
+      }
+      $items = $items.$item->GetID().'@'.$item->GetAmount();
+			if($item->GetSlot() != null)
+			{
+				$items = $items.'@'.$item->GetSlot();
+			}
+			else
+			{
+				$items = $items.'@0';
+			}
+			if($item->GetExpirationDate() != null)
+			{
+				$items = $items.'@'.$item->GetExpirationDate();
+			}
+			else
+			{
+				$items = $items.'@0';
+			}
+      ++$i;
+    }
+    return $items;
+  }
+  
+  public function UnequipItem($slot)
+  {
+		if(!isset($this->equippedItems[$slot]))
+		{
+			return;
+		}
+		$equippedItem = $this->equippedItems[$slot];
+		$equippedItem->SetSlot(0);
+		$this->equippedItems[$slot] = null;
+  }
+  
+  public function EquipItem($id, $slot)
+  {
+		$item = $this->GetItem($id);
+		$item->SetSlot($slot);
+		$this->equippedItems[$slot] = $item;
+  }
+  
+  public function GetItem($id)
+  {
+    if(count($this->items) > $id && $id >= 0)
+    {
+      return $this->items[$id];
+    }
+    return null;
+  }
+	
+	public function HasItem($id)
+	{
+    $i = 0;
+		while(isset($this->items[$i]))
+		{
+			if($this->items[$i]->GetID() == $id)
+			{
+				return true;
+			}
+			++$i;
+		}
+		return false;
+	}
+  
+  public function GetItemAtSlot($slot)
+  {
+		if(isset($this->equippedItems[$slot]))
+		{
+			return $this->equippedItems[$slot];
+		}
+		return null;
+  }
+  
+  public function AddItem($item, $amount)
+  {
+    $i = 0;
+		$inventoryItem = null;
+		$expirationdate = 0;
+		$slot = 0;
+		if($item->GetExpirationDays() != 0)
+		{
+			$expirationdate = date('Y-m-d H:i:s', strtotime('+'.$item->GetExpirationDays().' days'));
+			$slot = 0;
+		}
+		
+		if($item->GetType() != 3 && $item->GetType() != 4 && $item->GetExpirationDays() == 0)
+		{
+			//Item type 3, weapons etc, should always be one
+			while(isset($this->items[$i]))
+			{
+				if($this->items[$i]->GetID() == $item->GetID())
+				{
+					$inventoryItem = $this->items[$i];
+					break;
+				}
+				++$i;
+			}
+		}
+		
+		if($item->GetID() == $this->radarID)
+		{
+			$this->SetHasRadar(true);
+		}
+		
+		if($inventoryItem == null)
+		{
+			
+			$i = 0;
+			//Add only one if type == 3
+			while($i != $amount)
+			{
+				$inventoryItem = null;
+				if($item->GetType() == 3 || $item->GetType() == 4 || $item->GetExpirationDays() != 0)
+				{
+      		$inventoryItem = new InventoryItem($item->GetID(), 1, $slot, $expirationdate);
+					++$i;
+				}
+				else
+				{
+      		$inventoryItem = new InventoryItem($item->GetID(), $amount, $slot, $expirationdate);
+					$i = $amount;
+				}
+     	 array_push($this->items, $inventoryItem);
+			}
+		}
+		else
+		{
+			$inventoryItem->SetAmount($inventoryItem->GetAmount() + $amount);
+		}
+    
+    return $inventoryItem;
+  }
+  
+  public function RemoveItemsByID($id, $amount)
+  {
+		$i = 0;
+		while(isset($this->items[$i]))
+		{
+			$inventoryItem = $this->items[$i];
+			if($inventoryItem->GetID() == $id && $inventoryItem->GetSlot() == 0)
+			{
+				if($inventoryItem->GetAmount() > $amount)
+				{
+					$inventoryItem->SetAmount($inventoryItem->GetAmount()-$amount);
+					$amount = 0;
+				}
+				else
+				{
+					$amount = $amount - $inventoryItem->GetAmount();
+					array_splice($this->items, $i, 1);
+				}
+				if($amount == 0)
+				{
+					return;
+				}
+				else
+				{
+					continue;
+				}
+			}
+			++$i;
+		}
+	}
+	
+  public function RemoveItem($id)
+  {
+    if(count($this->items) > $id && $id >= 0)
+    {
+			if($this->items[$id]->GetID() == $this->radarID)
+			{
+				$this->SetHasRadar(false);
+			}
+			array_splice($this->items, $id, 1);
+    }
+  }
+	
+  public function RemoveItems($item, $amount)
+  {
+		$this->RemoveItemsByID($item->GetID(), $amount);
+  }
+  
+}

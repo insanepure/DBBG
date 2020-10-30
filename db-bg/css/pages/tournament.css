@@ -1,0 +1,21 @@
+.bracketcell
+{
+  position:relative;
+  z-index:2;
+}
+
+.bracketline
+{
+  border-left:2px solid black;
+  border-top:2px solid black;
+  position:absolute;
+  z-index:1;
+}
+
+.bracketimage {
+    -webkit-filter: grayscale(100%);
+       -moz-filter: grayscale(100%);
+         -o-filter: grayscale(100%);
+        -ms-filter: grayscale(100%);
+            filter: grayscale(100%); 
+}

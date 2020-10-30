@@ -1,0 +1,133 @@
+.char
+{
+position:absolute;
+left:185px;
+width:300px;
+height:530px;
+box-shadow: 2px 1px 2px #888888;
+}
+.char2
+{
+position:absolute;
+width:300px;
+height:500px;
+background-repeat: no-repeat;
+background-size: 100% 100%;
+box-shadow: 2px 1px 2px #888888;
+top:30px;
+}
+.hand1
+{
+position:absolute;
+height:50px;
+width:50px;  
+left:5px;
+top:240px;
+}
+.hand2
+{
+position:absolute;
+height:50px;
+width:50px;  
+left:240px;
+top:240px;
+}
+.kopfr
+{
+position:absolute;
+height:160px;
+width:170px;  
+box-shadow: 2px 1px 2px #888888;
+left:10px;
+}
+.brustr
+{
+position:absolute;
+height:160px;
+width:170px;  
+box-shadow: 2px 1px 2px #888888;
+left:490px;
+}
+.handr
+{
+position:absolute;
+height:160px;
+width:170px;  
+box-shadow: 2px 1px 2px #888888;
+left:10px;
+top:175px;
+}
+.reise
+{
+position:absolute;
+height:160px;
+width:170px;  
+box-shadow: 2px 1px 2px #888888;
+left:10px;
+top:505px;
+}
+.waffer
+{
+position:absolute;
+height:160px;
+width:170px;  
+box-shadow: 2px 1px 2px #888888;
+left:490px;
+top:175px;
+}
+.spr
+{
+position:absolute;
+height:160px;
+width:170px;  
+box-shadow: 2px 1px 2px #888888;
+left:10px;
+top:340px;
+}
+.panzr
+{
+position:absolute;
+height:160px;
+width:170px;  
+box-shadow: 2px 1px 2px #888888;
+left:490px;
+top:340px;
+}
+.panzr2
+{
+position:absolute;
+height:120px;
+width:300px;  
+box-shadow: 2px 1px 2px #888888;
+left:185px;
+top:545px;
+}
+.schuhe
+{
+position:absolute;
+height:160px;
+width:170px;  
+box-shadow: 2px 1px 2px #888888;
+left:490px;
+top:505px;
+}
+.ausr
+{
+min-height:150px;
+max-height:auto;
+width:95%;  
+box-shadow: 2px 1px 2px #888888;
+margin-top:665px;
+}
+.schullogo
+{
+z-index:300;
+position:absolute;
+width:30px;
+height:30px;
+background-image: url("../../img/lod.png");
+background-repeat: no-repeat;
+background-size: 100% 100%;
+top:180px;
+left:185px;
+}

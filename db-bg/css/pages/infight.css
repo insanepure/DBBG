@@ -1,0 +1,95 @@
+.fightBox
+{
+  left: 10%;
+  width: 90%;
+  min-height: 100px;
+  max-height: auto;
+}
+
+.attackButton
+{
+  width:51px;
+  height:46px;
+  border:none;
+  background:transparent;
+  border-radius: 5px 5px 5px 5px; 
+  -moz-border-radius: 5px 5px 5px 5px;
+  -webkit-border-radius: 5px 5px 5px 5px; 
+  cursor:pointer;
+}
+
+.attack
+{
+  width:45px;
+  height:45px;
+  position:absolute;
+  left:6px;
+  top:1px;
+}
+
+.attackButton:focus
+{
+    outline:0;
+}
+
+.attacks {
+  left: 5%;
+  width: 60%;
+  min-height: auto;
+  max-height: auto;
+}
+
+.tooltip 
+{
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltiptext 
+{
+  visibility: hidden;
+  width: 120px;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -60px;
+  opacity: 0;
+  transition: opacity 1s;
+}
+
+.tooltip .tooltiptext::after 
+{
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+.tooltip:hover .tooltiptext 
+{
+  visibility: visible;
+  opacity: 1;
+}
+
+.inkampfchat {
+  width: 90%;
+  height: 100px;
+  box-shadow: 2px 1px 2px #888888;
+  overflow-y: auto;
+  text-align: left;
+}
+
+.inkampfchats {
+  width: 80%;
+  height: 40px;
+}

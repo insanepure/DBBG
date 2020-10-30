@@ -1,0 +1,40 @@
+.map 
+{
+  z-index:0;
+  position:relative;
+  width: 650px;
+  height: 490px;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.mapplace
+{
+  position:absolute;
+  width:13px;
+  height:20px;
+  background-image: url("../../img/planets/ort.png");
+  background-size: contain;
+}
+
+.mapplaceevent
+{
+  position:absolute;
+  width:13px;
+  height:20px;
+  background-image: url("../../img/planets/event.png");
+  background-size: contain;
+}
+
+.mapplacestory
+{
+  position:absolute;
+  width:13px;
+  height:20px;
+  background-image: url("../../img/planets/ort.gif");
+  background-size: contain;
+}
+.mapcharacter
+{
+  position:absolute;
+}

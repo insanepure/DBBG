@@ -1,0 +1,1433 @@
+<div class="spacer"></div>
+<div  class="catGradient borderT borderB" style="width:90%;">
+<h2>System Menu</h2>
+</div>
+<script type="text/javascript" src="js/admin.js"></script>
+<div class="spacer"></div>
+<?php
+if($player->GetArank() >= 2) {
+
+  if(!isset($_GET['table']))
+  {
+    ?>
+    <table width="90%">
+    <?php
+    $i = 0;
+    $result = $database->ShowTables();
+    while($tableName = mysqli_fetch_row($result))
+    {
+      if($player->GetArank() < 3 && !in_array($tableName[0], $limitedTables))
+      {
+        continue;
+      }
+      
+      
+      if($i % 2 == 0)
+      {
+        ?><tr><?php
+      }
+        $table = $tableName[0];
+      ?>
+      <td width="50%" height="25px" align="center"><a href="?p=admin&table=<?php echo $table; ?>"><input type="submit" value="<?php echo $table; ?>" style="width:150px;"></a></td>
+      <?php
+      if($i % 2 == 1)
+      {
+      ?></tr><?php
+      }
+      ++$i;
+    }
+    $result->Close();
+    ?>
+    </table>
+    <?php
+  }
+  else if($player->GetArank() < 3 && !in_array($_GET['table'], $limitedTables))
+  {
+    ?>Diese Tabelle ist nicht verfügbar.<br/><?php
+  }
+  else if(isset($_GET['a']) && $_GET['a'] == 'see')
+  {
+    $attacks = null;
+    $npcs = null;
+    $items = null;
+    $actions = null;
+    $places = null;
+
+    $table = $_GET['table'];
+    $id = 0;
+    $where = '';
+    if(isset($_GET['id']))
+    {
+      $id = $_GET['id'];
+      $where = 'id="'.$id.'"';
+    }
+    echo '<h3>' ,$table, '</h3>';
+    $result = $database->Select('*', $table, $where);
+    /* Get field information for all columns */
+    $finfo = $result->fetch_fields();
+    $row = $result->fetch_assoc();
+
+    $action = '?p=admin&table='.$table.'&a=edit';
+    ?>
+    <form method="POST" action="<?php echo $action; ?>">
+    <table width="90%">
+    <?php
+    foreach ($finfo as $val) 
+    {
+      $name = $val->name;
+      $type = $val->type;
+      $value = '';
+      if($id != 0 && isset($row[$name]))
+      {
+        $value = $row[$name];
+      }
+      ?>
+      <tr>
+        <fieldset>
+          <legend><b><?php echo $name; ?></b></legend>
+         <table><tr><td align="center">
+        <?php 
+        if($name == 'titels')
+        {
+          ?>
+          <table width="90%" cellspacing="0" id="playertitels">
+            <tr>
+            <td><b>Titel</b></td>
+            </tr>
+          <?php
+          $titels = explode(';', $value);
+          $i = 0;
+          while($value != '' && $i != count($titels))
+          {
+            if($titels[$i] == 0)
+            {
+              ++$i;
+              continue;
+            }
+            ?>
+            <tr>
+            <td>
+              <select class="select" name="player_titel[<?php echo $i; ?>]" style="width:300px;">
+              <?php
+              if(!isset($titelList) || $titelList == null)
+              {
+                $titelList = new Generallist($database, 'titel', '*', '', '', 99999999999, 'ASC');
+              }
+              $id = 0;
+              $entry = $titelList->GetEntry($id);
+              while($entry != null)
+              {
+              ?>
+                <option value="<?php echo $entry['id']; ?>" <?php if($titels[$i] == $entry['id']) echo 'selected'; ?>> <?php echo '('.$entry['id'].') '.$entry['name']; ?></option>
+                <?php
+                ++$id;
+                $entry = $titelList->GetEntry($id);
+              }
+              ?>
+              </select>
+              </td>
+            </tr>
+            <?php
+            ++$i;
+          }
+          ?>
+          </table>
+          <br/>
+          <a onclick="AddTableRow('playertitels', 1)">Eintrag hinzufügen</a><br/>
+          <br/>
+          <a onclick="RemoveTableRow('playertitels')">Eintrag entfernen</a><br/>
+          <?php
+        } 
+        else if($name == 'patterns')
+        {
+          ?>
+          <table width="90%" cellspacing="0" id="fighterpatterns">
+            <tr>
+            <td><b>Patterns</b></td>
+            </tr>
+          <?php
+          $patterns = explode(';', $value);
+          $i = 0;
+          while($value != '' && $i != count($patterns))
+          {
+            ?>
+            <tr>
+            <td>
+              <select class="select" name="fighter_patterns[<?php echo $i; ?>]" style="width:300px;">
+              <?php
+              if($patternList == null)
+              {
+                $patternList = new Generallist($database, 'patterns', '*', '', '', 99999999999, 'ASC');
+              }
+              $id = 0;
+              $entry = $patternList->GetEntry($id);
+              while($entry != null)
+              {
+              ?>
+                <option value="<?php echo $entry['id']; ?>" <?php if($patterns[$i] == $entry['id']) echo 'selected'; ?>> <?php echo '('.$entry['id'].') '.$entry['name']; ?></option>
+                <?php
+                ++$id;
+                $entry = $patternList->GetEntry($id);
+              }
+              ?>
+              </select>
+              </td>
+            </tr>
+            <?php
+            ++$i;
+          }
+          ?>
+          </table>
+          <br/>
+          <a onclick="AddTableRow('fighterpatterns', 1)">Eintrag hinzufügen</a><br/>
+          <br/>
+          <a onclick="RemoveTableRow('fighterpatterns')">Eintrag entfernen</a><br/>
+          <?php
+        } 
+        else if($name == 'multiaccounts')
+        {
+          ?>
+          <table width="90%" cellspacing="0" id="multiaccs">
+            <tr>
+            <td><b>Charakter</b></td>
+            </tr>
+          <?php
+          $multis = explode(';', $value);
+          $i = 0;
+          while($value != '' && $i != count($multis))
+          {
+            ?>
+            <tr>
+            <td>
+              <select class="select" name="multi_accs[<?php echo $i; ?>]" style="width:300px;">
+              <?php
+              if($accounts == null)
+              {
+                $accounts = new Generallist($database, 'accounts', '*', '', '', 99999999999, 'ASC');
+              }
+              $id = 0;
+              $entry = $accounts->GetEntry($id);
+              while($entry != null)
+              {
+              ?>
+                <option value="<?php echo $entry['name']; ?>" <?php if($multis[$i] == $entry['name']) echo 'selected'; ?>> <?php echo $entry['name']; ?></option>
+                <?php
+                ++$id;
+                $entry = $accounts->GetEntry($id);
+              }
+              ?>
+              </select>
+              </td>
+            </tr>
+            <?php
+            ++$i;
+          }
+          ?>
+          </table>
+          <br/>
+          <a onclick="AddTableRow('multiaccs', 1)">Eintrag hinzufügen</a><br/>
+          <br/>
+          <a onclick="RemoveTableRow('multiaccs')">Eintrag entfernen</a><br/>
+          <?php
+        } 
+        else if(($table == 'npcs' || $table == 'story' || $table == 'fights') && $name == 'items')
+        {
+          ?>
+          <table width="90%" cellspacing="0" id="npcandstoryitems">
+            <tr>
+            <td><b>Item</b></td>
+            <td><b>Chance</b></td>
+            </tr>
+          <?php
+          $npcItems = explode(';', $value);
+          $i = 0;
+          while($value != '' && $i != count($npcItems))
+          {
+            $item = explode('@',$npcItems[$i]);
+            ?>
+            <tr>
+            <td>
+              <select class="select" name="npcandstory_item[<?php echo $i; ?>]" style="width:300px;">
+              <?php
+              if($items == null)
+              {
+                $items = new Generallist($database, 'items', '*', '', '', 99999999999, 'ASC');
+              }
+              $id = 0;
+              $entry = $items->GetEntry($id);
+              while($entry != null)
+              {
+              ?>
+                <option value="<?php echo $entry['id']; ?>" <?php if($item[0] == $entry['id']) echo 'selected'; ?>>(<?php echo $entry['id']; ?>) <?php echo $entry['name']; ?></option>
+                <?php
+                ++$id;
+                $entry = $items->GetEntry($id);
+              }
+              ?>
+              </select>
+              </td>
+            <td><input type="text" name="npcandstory_itemchance[<?php echo $i; ?>]" value="<?php echo $item[1]; ?>" style="width:70px"></td>
+            </tr>
+            <?php
+            ++$i;
+          }
+          ?>
+          </table>
+          <br/>
+          <a onclick="AddTableRow('npcandstoryitems', 2)">Eintrag hinzufügen</a><br/>
+          <br/>
+          <a onclick="RemoveTableRow('npcandstoryitems')">Eintrag entfernen</a><br/>
+          <?php
+        }
+        else if(($table == 'tournaments') && $name == 'items')
+        {
+          ?>
+          <table width="90%" cellspacing="0" id="amountitems">
+            <tr>
+            <td><b>Item</b></td>
+            <td><b>Amount</b></td>
+            </tr>
+          <?php
+          $npcItems = explode(';', $value);
+          $i = 0;
+          while($value != '' && $i != count($npcItems))
+          {
+            $item = explode('@',$npcItems[$i]);
+            ?>
+            <tr>
+            <td>
+              <select class="select" name="amountitems_item[<?php echo $i; ?>]" style="width:300px;">
+              <?php
+              if($items == null)
+              {
+                $items = new Generallist($database, 'items', '*', '', '', 99999999999, 'ASC');
+              }
+              $id = 0;
+              $entry = $items->GetEntry($id);
+              while($entry != null)
+              {
+              ?>
+                <option value="<?php echo $entry['id']; ?>" <?php if($item[0] == $entry['id']) echo 'selected'; ?>>(<?php echo $entry['id']; ?>) <?php echo $entry['name']; ?></option>
+                <?php
+                ++$id;
+                $entry = $items->GetEntry($id);
+              }
+              ?>
+              </select>
+              </td>
+            <td><input type="text" name="amountitems_amount[<?php echo $i; ?>]" value="<?php echo $item[1]; ?>" style="width:70px"></td>
+            </tr>
+            <?php
+            ++$i;
+          }
+          ?>
+          </table>
+          <br/>
+          <a onclick="AddTableRow('amountitems', 2)">Eintrag hinzufügen</a><br/>
+          <br/>
+          <a onclick="RemoveTableRow('amountitems')">Eintrag entfernen</a><br/>
+          <?php
+        }
+        else if($table == 'events' && $name == 'fights')
+        {
+          ?>
+          <table width="90%" cellspacing="0" id="eventfights">
+            <tr>
+            <td width="50%"><b>NPCs</b></td>
+            <td><b>Heal</b></td>
+            <td><b>ST</b></td>
+            <td><b>SR</b></td>
+            <td><b>SW</b></td>
+            <td><b>HR</b></td>
+            <td><b>HRT</b></td>
+            <td><b>HRW</b></td>
+            </tr>
+          <?php
+          $fights = explode('@', $value);
+          $i = 0;
+          while($value != '' && $i != count($fights))
+          {
+            ?><tr><?php
+            $fight = explode(';', $fights[$i]);
+            $fnpcs = explode(':', $fight[0]);
+            if(!isset($fight[1]))
+              $healing = 0;
+            else
+              $healing = $fight[1];
+            
+            if(!isset($fight[2]))
+              $survivalteam = 0;
+            else
+              $survivalteam = $fight[2];
+            
+            if(!isset($fight[3]))
+              $survivalrounds = 0;
+            else
+              $survivalrounds = $fight[3];
+            
+            if(!isset($fight[4]))
+              $survivalWinner = 0;
+            else
+              $survivalWinner = $fight[4];
+            
+            if(!isset($fight[5]))
+              $healthRatio = 0;
+            else
+              $healthRatio = $fight[5];
+            
+            if(!isset($fight[6]))
+              $healthRatioTeam = 0;
+            else
+              $healthRatioTeam = $fight[6];
+            
+            if(!isset($fight[7]))
+              $healthRatioWinner = 0;
+            else
+              $healthRatioWinner = $fight[7];
+            ?>
+           <td><?php 
+              if($npcs == null)
+              {
+                $npcs = new Generallist($database, 'npcs', '*', '', '', 99999999999, 'ASC');
+              }
+              $id = 0;
+              $entry = $npcs->GetEntry($id);
+              while($entry != null)
+              {
+                ?>
+                <div class="tooltip" style="position:relative; height:60px; width:40px; display:inline-block">
+                    <img width="40px" height="40px" src="img/npc/<?php echo $entry['image']; ?>.png" class="attack"></img> 
+                    <input type="checkbox" name="event_npcs[<?php echo $i; ?>][]" value="<?php echo $entry['id']; ?>" <?php if(in_array($entry['id'],$fnpcs)) echo 'checked'; ?>>
+                 <span class="tooltiptext" style="left:-50px; top:-35px;"><?php echo $entry['name']; ?></span>
+                 </div>
+                <?php
+              ++$id;
+              $entry = $npcs->GetEntry($id);
+              }
+             ?></td>
+            <td><input type="checkbox" name="event_fhealing[<?php echo $i; ?>]" <?php if($healing) echo 'checked'; ?>></td>
+            <td><input type="text" name="event_survivalteam[<?php echo $i; ?>]" value="<?php echo $survivalteam; ?>" style="width:50px"></td>
+            <td><input type="text" name="event_survivalrounds[<?php echo $i; ?>]" value="<?php echo $survivalrounds; ?>" style="width:50px"></td>
+            <td><input type="text" name="event_survivalwinner[<?php echo $i; ?>]" value="<?php echo $survivalWinner; ?>" style="width:50px"></td>
+            <td><input type="text" name="event_healthratio[<?php echo $i; ?>]" value="<?php echo $healthRatio; ?>" style="width:50px"></td>
+            <td><input type="text" name="event_healthratioteam[<?php echo $i; ?>]" value="<?php echo $healthRatioTeam; ?>" style="width:50px"></td>
+            <td><input type="text" name="event_healthratiowinner[<?php echo $i; ?>]" value="<?php echo $healthRatioWinner; ?>" style="width:50px"></td>
+            <?php
+            ++$i;
+            ?></tr><?php
+          }
+          ?>
+          </table>
+          <br/>
+          <a onclick="AddTableRow('eventfights', 7)">Eintrag hinzufügen</a><br/>
+          <br/>
+          <a onclick="RemoveTableRow('eventfights')">Eintrag entfernen</a><br/>
+          <?php
+        }
+        else if($name == 'placeandtime')
+        {
+          $pat = explode(';',$value);
+          $weekdays = explode(':',$pat[2]);
+          $monthdays = explode('-',$pat[3]);
+          $months = explode('-',$pat[4]);
+          $yeardays = explode('-',$pat[5]);
+          $years = explode('-',$pat[6]);
+          ?>
+           <b>Planet</b><br/>
+          <input type="text" name="pat_planet" value="<?php echo $pat[0]; ?>" style="width:400px"><br/>
+           <b>Place</b><br/>
+            <select class="select" name="pat_place" style="width:400px;">
+            <?php
+            if($places == null)
+            {
+              $places = new Generallist($database, 'places', '*', '', '', 99999999999, 'ASC');
+            }
+            $id = 0;
+            $entry = $places->GetEntry($id);
+            while($entry != null)
+            {
+            ?>
+              <option value="<?php echo $entry['name']; ?>" <?php if($pat[1] == $entry['name']) echo 'selected'; ?>><?php echo $entry['name']; ?></option>
+              <?php
+              ++$id;
+              $entry = $places->GetEntry($id);
+            }
+            ?>
+            </select><br/>
+           <b>Wochentag</b><br/>
+           <?php
+            $i = 0;
+            while($i != 7)
+            {
+              ++$i;
+              ?>
+            <div style="height:30px; width:30px; display: inline-block;">
+              <?php echo date('D', mktime(20,12,0,1,$i,2018)); ?>
+              <input type="checkbox" name="pat_weekday[]" value="<?php echo $i; ?>" <?php if(in_array($i,$weekdays)) echo 'checked'; ?>>
+              </div>
+              <?php
+            }
+            ?><br/>
+           <b>Tage im Monat</b><br/>
+           <select class="select" name="pat_monthday1" style="width:60px;">
+           <?php
+            $i = 0;
+            while($i != 31)
+            {
+              ++$i;
+              ?>
+              <option value="<?php echo $i; ?>" <?php if($i == $monthdays[0]) echo 'selected'; ?>><?php echo $i; ?></option>
+              <?php
+            }
+            ?>
+          </select>
+           - 
+           <select class="select" name="pat_monthday2" style="width:60px;">
+           <?php
+            $i = 0;
+            while($i != 31)
+            {
+              ++$i;
+              ?>
+              <option value="<?php echo $i; ?>" <?php if($i == $monthdays[1]) echo 'selected'; ?>><?php echo $i; ?></option>
+              <?php
+            }
+            ?>
+          </select><br/>
+           <b>Monate</b><br/>
+           <select class="select" name="pat_months1" style="width:60px;">
+           <?php
+            $i = 0;
+            while($i != 12)
+            {
+              ++$i;
+              ?>
+              <option value="<?php echo $i; ?>" <?php if($i == $months[0]) echo 'selected'; ?>><?php echo $i; ?></option>
+              <?php
+            }
+            ?>
+          </select>
+           - 
+           <select class="select" name="pat_months2" style="width:60px;">
+           <?php
+            $i = 0;
+            while($i != 12)
+            {
+              ++$i;
+              ?>
+              <option value="<?php echo $i; ?>" <?php if($i == $months[1]) echo 'selected'; ?>><?php echo $i; ?></option>
+              <?php
+            }
+            ?>
+          </select><br/>
+           <b>Tage im Jahr</b><br/>
+           <select class="select" name="pat_yeardays1" style="width:70px;">
+           <?php
+            $i = 0;
+            while($i != 365)
+            {
+              ++$i;
+              ?>
+              <option value="<?php echo $i; ?>" <?php if($i == $yeardays[0]) echo 'selected'; ?>><?php echo $i; ?></option>
+              <?php
+            }
+            ?>
+          </select>
+           - 
+           <select class="select" name="pat_yeardays2" style="width:70px;">
+           <?php
+            $i = 0;
+            while($i != 365)
+            {
+              ++$i;
+              ?>
+              <option value="<?php echo $i; ?>" <?php if($i == $yeardays[1]) echo 'selected'; ?>><?php echo $i; ?></option>
+              <?php
+            }
+            ?>
+          </select><br/>
+           <b>Jahre</b><br/>
+          <input type="text" name="pat_years1" value="<?php echo $years[0]; ?>" style="width:100px">
+           - 
+          <input type="text" name="pat_years2" value="<?php echo $years[1]; ?>" style="width:100px">
+          <?php
+        }
+        else if($name == 'race' && $table == 'attacks')
+        {
+          $races = explode(', ', $row[$name]);
+          ?>
+          <table>
+            <tr>
+            <td align="center">Saiyajin<br/><input type="checkbox" value="Saiyajin" name="race[]" <?php if(in_array('Saiyajin', $races)) echo 'checked'; ?>></td>
+            <td align="center">Mensch<br/><input type="checkbox" value="Mensch" name="race[]" <?php if(in_array('Mensch', $races)) echo 'checked'; ?>></td>
+            <td align="center">Freezer<br/><input type="checkbox" value="Freezer" name="race[]" <?php if(in_array('Freezer', $races)) echo 'checked'; ?>></td>
+            <td align="center">Kaioshin<br/><input type="checkbox" value="Kaioshin" name="race[]" <?php if(in_array('Kaioshin', $races)) echo 'checked'; ?>></td>
+            <td align="center">Android<br/><input type="checkbox" value="Android" name="race[]" <?php if(in_array('Android', $races)) echo 'checked'; ?>></td>
+            <td align="center">Majin<br/><input type="checkbox" value="Majin" name="race[]" <?php if(in_array('Majin', $races)) echo 'checked'; ?>></td>
+            <td align="center">Demon<br/><input type="checkbox" value="Demon" name="race[]" <?php if(in_array('Demon', $races)) echo 'checked'; ?>></td>
+            <td align="center">Namekianer<br/><input type="checkbox" value="Namekianer" name="race[]" <?php if(in_array('Namekianer', $races)) echo 'checked'; ?>></td>
+            </tr>
+          </table>
+          <?php
+        }
+        else if($name == 'statstype' || $name == 'defaultstatstype')
+        {
+          ?>
+          <select class="select" name="<?php echo $name; ?>" style="width:400px;">
+            <option value="0" <?php if($row[$name] == 0) echo 'selected'; ?>>Alle</option>
+            <option value="1" <?php if($row[$name] == 1) echo 'selected'; ?>>Attack</option>
+            <option value="2" <?php if($row[$name] == 2) echo 'selected'; ?>>Abwehr</option>
+            <option value="3" <?php if($row[$name] == 3) echo 'selected'; ?>>LP</option>
+            <option value="4" <?php if($row[$name] == 4) echo 'selected'; ?>>KP</option>
+            <option value="5" <?php if($row[$name] == 5) echo 'selected'; ?>>Attack+Abwehr</option>
+            <option value="6" <?php if($row[$name] == 6) echo 'selected'; ?>>Attack+LP</option>
+            <option value="7" <?php if($row[$name] == 7) echo 'selected'; ?>>Attack+KP</option>
+            <option value="8" <?php if($row[$name] == 8) echo 'selected'; ?>>Abwehr+LP</option>
+            <option value="9" <?php if($row[$name] == 9) echo 'selected'; ?>>Abwehr+KP</option>
+            <option value="10" <?php if($row[$name] == 10) echo 'selected'; ?>>LP+KP</option>
+            <option value="11" <?php if($row[$name] == 11) echo 'selected'; ?>>Angriff+Abwehr+LP</option>
+            <option value="12" <?php if($row[$name] == 12) echo 'selected'; ?>>Angriff+Abwehr+KP</option>
+            <option value="13" <?php if($row[$name] == 13) echo 'selected'; ?>>Angriff+LP+KP</option>
+            <option value="14" <?php if($row[$name] == 14) echo 'selected'; ?>>Abwehr+LP+KP</option>
+         </select>
+          <?php
+        }
+        else if($name == 'type' && $table == 'patterns')
+        {
+          ?>
+          <select id="patterntype" class="select" name="<?php echo $name; ?>" style="width:400px;" onChange="loadPatternValueNames();">
+            <option value="0" <?php if($row[$name] == 0) echo 'selected'; ?>>Fighter</option>
+            <option value="1" <?php if($row[$name] == 1) echo 'selected'; ?>>Kampf</option>
+            <option value="2" <?php if($row[$name] == 2) echo 'selected'; ?>>Enemy</option>
+            <option value="3" <?php if($row[$name] == 3) echo 'selected'; ?>>Team</option>
+         </select>
+          <?php
+        }
+        else if($name == 'patterntarget' && $table == 'patterns')
+        {
+          ?>
+          <select class="select" name="<?php echo $name; ?>" style="width:400px;">
+            <option value="0" <?php if($row[$name] == 0) echo 'selected'; ?>>Selbst</option>
+            <option value="1" <?php if($row[$name] == 1) echo 'selected'; ?>>Random Gegner</option>
+            <option value="2" <?php if($row[$name] == 2) echo 'selected'; ?>>Random Team</option>
+            <option value="3" <?php if($row[$name] == 3) echo 'selected'; ?>>Schwächster Team</option>
+            <option value="4" <?php if($row[$name] == 4) echo 'selected'; ?>>Schwächster Gegner</option>
+         </select>
+          <?php
+        }
+        else if($name == 'valuename' && $table == 'patterns')
+        {
+          ?>
+          <select id="patternvaluename" class="select" name="<?php echo $name; ?>" style="width:400px;">
+          </select>
+          
+          <script>
+          function addPatternValueOption(optionName, i)
+          {
+            var sel = document.getElementById("patterntype");
+            var sel = document.getElementById("patternvaluename");
+            var option = document.createElement("option");
+            option.text = optionName;
+            option.value = optionName;
+            sel.add(option);
+            
+            if(optionName == '<?php echo $row[$name]; ?>')
+               sel.value = optionName;
+            
+          } 
+            
+          function loadPatternValueNames()
+          {
+            var sel = document.getElementById("patterntype");
+            var selValue = sel.options[sel.selectedIndex].value;
+            
+            var nameSel = document.getElementById("patternvaluename");
+            var L = nameSel.options.length - 1;
+            for(var i = L; i >= 0; i--) 
+            {
+              nameSel.remove(i);
+            }
+            if(selValue == 0 || selValue == 2)
+            {
+                addPatternValueOption('ki');
+                addPatternValueOption('lp');
+                addPatternValueOption('kp');
+                addPatternValueOption('energy');
+                addPatternValueOption('race');
+                addPatternValueOption('taunt');
+                addPatternValueOption('reflect');
+                addPatternValueOption('loadattack');
+                addPatternValueOption('loadrounds');
+                addPatternValueOption('isnpc');
+            }
+            else if(selValue == 1)
+            {
+                addPatternValueOption('round');
+                addPatternValueOption('place');
+                addPatternValueOption('planet');
+                addPatternValueOption('mode');
+                addPatternValueOption('story');
+                addPatternValueOption('weather');
+                addPatternValueOption('type');
+            }
+          }
+            
+          loadPatternValueNames();
+          </script>
+          <?php
+        }
+        else if($name == 'operator')
+        {
+          ?>
+          <select class="select" name="operator" style="width:400px;">
+            <option value="0" <?php if($row[$name] == 0) echo 'selected'; ?>>Weniger Als</option>
+            <option value="1" <?php if($row[$name] == 1) echo 'selected'; ?>>Weniger Gleich</option>
+            <option value="2" <?php if($row[$name] == 2) echo 'selected'; ?>>Gleich</option>
+            <option value="3" <?php if($row[$name] == 3) echo 'selected'; ?>>Nicht Gleich</option>
+            <option value="4" <?php if($row[$name] == 4) echo 'selected'; ?>>Mehr Als</option>
+            <option value="5" <?php if($row[$name] == 5) echo 'selected'; ?>>Mehr Gleich</option>
+            <option value="6" <?php if($row[$name] == 6) echo 'selected'; ?>>Modulo</option>
+         </select>
+          <?php
+        }
+        else if($name == 'race')
+        {
+          ?>
+          <select class="select" name="race" style="width:400px;">
+            <option value="" <?php if($row[$name] == '') echo 'selected'; ?>>Keine</option>
+            <option value="Saiyajin" <?php if($row[$name] == 'Saiyajin') echo 'selected'; ?>>Saiyajin</option>
+            <option value="Mensch" <?php if($row[$name] == 'Mensch') echo 'selected'; ?>>Mensch</option>
+            <option value="Freezer" <?php if($row[$name] == 'Freezer') echo 'selected'; ?>>Freezer</option>
+            <option value="Kaioshin" <?php if($row[$name] == 'Kaioshin') echo 'selected'; ?>>Kaioshin</option>
+            <option value="Android" <?php if($row[$name] == 'Android') echo 'selected'; ?>>Android</option>
+            <option value="Majin" <?php if($row[$name] == 'Majin') echo 'selected'; ?>>Majin</option>
+            <option value="Demon" <?php if($row[$name] == 'Demon') echo 'selected'; ?>>Demon</option>
+            <option value="Namekianer" <?php if($row[$name] == 'Namekianer') echo 'selected'; ?>>Namekianer</option>
+         </select>
+          <?php
+        }
+        else if($name == 'typesort' && $table == 'titel')
+        {
+          ?>
+          <select class="select" name="typesort" style="width:400px;">
+            <option value="0" <?php if($row[$name] == '0') echo 'selected'; ?>>Siege</option>
+            <option value="1" <?php if($row[$name] == '1') echo 'selected'; ?>>Niederlagen</option>
+            <option value="2" <?php if($row[$name] == '2') echo 'selected'; ?>>Unentschieden</option>
+            <option value="3" <?php if($row[$name] == '3') echo 'selected'; ?>>Total</option>
+            <option value="4" <?php if($row[$name] == '4') echo 'selected'; ?>>Tägliche Siege</option>
+            <option value="5" <?php if($row[$name] == '5') echo 'selected'; ?>>Tägliche Niederlagen</option>
+            <option value="6" <?php if($row[$name] == '6') echo 'selected'; ?>>Tägliche Unentschieden</option>
+            <option value="7" <?php if($row[$name] == '7') echo 'selected'; ?>>Täglich Total</option>
+         </select>
+          <?php
+        }
+        else if($name == 'typefight' && $table == 'titel')
+        {
+          ?>
+          <select class="select" name="typefight" style="width:400px;">
+            <option value="-1" <?php if($row[$name] == -1) echo 'selected'; ?>>Alle</option>
+            <option value="0" <?php if($row[$name] == 0) echo 'selected'; ?>>Spaß</option>
+            <option value="1" <?php if($row[$name] == 1) echo 'selected'; ?>>Wertung</option>
+            <option value="2" <?php if($row[$name] == 2) echo 'selected'; ?>>Tod</option>
+            <option value="3" <?php if($row[$name] == 3) echo 'selected'; ?>>NPC</option>
+            <option value="4" <?php if($row[$name] == 4) echo 'selected'; ?>>Story</option>
+            <option value="5" <?php if($row[$name] == 5) echo 'selected'; ?>>Event</option>
+            <option value="6" <?php if($row[$name] == 6) echo 'selected'; ?>>Tournament</option>
+            <option value="7" <?php if($row[$name] == 7) echo 'selected'; ?>>Dragonball</option>
+            <option value="8" <?php if($row[$name] == 8) echo 'selected'; ?>>Arena</option>
+         </select>
+          <?php
+        }
+        else if($name == 'type' && $table == 'titel')
+        {
+          ?>
+          <select class="select" name="type" style="width:400px;">
+            <option value="0" <?php if($row[$name] == '0') echo 'selected'; ?>>Spezial</option>
+            <option value="1" <?php if($row[$name] == '1') echo 'selected'; ?>>NPC</option>
+            <option value="2" <?php if($row[$name] == '2') echo 'selected'; ?>>Story</option>
+            <option value="3" <?php if($row[$name] == '3') echo 'selected'; ?>>Aktion</option>
+            <option value="4" <?php if($row[$name] == '4') echo 'selected'; ?>>Wunsch</option>
+            <option value="5" <?php if($row[$name] == '5') echo 'selected'; ?>>Rang</option>
+            <option value="6" <?php if($row[$name] == '6') echo 'selected'; ?>>Kampf</option>
+            <option value="7" <?php if($row[$name] == '7') echo 'selected'; ?>>Attacken</option>
+         </select>
+          <?php
+        }
+        else if($name == 'type' && $table == 'story')
+        {
+          ?>
+          <select class="select" name="type" style="width:400px;">
+            <option value="1" <?php if($row[$name] == '1') echo 'selected'; ?>>Reden</option>
+            <option value="2" <?php if($row[$name] == '2') echo 'selected'; ?>>Kampf</option>
+            <option value="3" <?php if($row[$name] == '3') echo 'selected'; ?>>Aktion</option>
+         </select>
+          <?php
+        }
+        else if($name == 'type' && $table == 'actions')
+        {
+          ?>
+          <select class="select" name="type" style="width:400px;">
+            <option value="1" <?php if($row[$name] == '1') echo 'selected'; ?>>Statstraining</option>
+            <option value="2" <?php if($row[$name] == '2') echo 'selected'; ?>>Wiederbelebung</option>
+            <option value="3" <?php if($row[$name] == '3') echo 'selected'; ?>>Heilung</option>
+            <option value="4" <?php if($row[$name] == '4') echo 'selected'; ?>>Reise</option>
+            <option value="5" <?php if($row[$name] == '5') echo 'selected'; ?>>Lernen</option>
+            <option value="6" <?php if($row[$name] == '6') echo 'selected'; ?>>Sonstiges</option>
+            <option value="7" <?php if($row[$name] == '7') echo 'selected'; ?>>ItemGewinn</option>
+         </select>
+          <?php
+        }
+        else if($name == 'type' && $table == 'attacks')
+        {
+          ?>
+          <select class="select" name="type" style="width:400px;">
+            <?php
+            for($i = 1; $i <= 22; ++$i)
+            {
+             ?> <option value="<?php echo $i; ?>" <?php if($row[$name] == $i) echo 'selected'; ?>><?php echo Attack::GetTypeName($i); ?></option><?php
+            }
+            ?>
+         </select>
+          <?php
+        }
+        else if($name == 'category' && $table == 'items')
+        {
+          ?>
+          <select class="select" name="category" style="width:400px;">
+            <option value="1" <?php if($row[$name] == '1') echo 'selected'; ?>>Tränke</option>
+            <option value="2" <?php if($row[$name] == '2') echo 'selected'; ?>>Rüstung</option>
+            <option value="3" <?php if($row[$name] == '3') echo 'selected'; ?>>Waffen</option>
+            <option value="4" <?php if($row[$name] == '4') echo 'selected'; ?>>Sonstiges</option>
+         </select>
+          <?php
+        }
+        else if($name == 'type' && $table == 'items')
+        {
+          ?>
+          <select class="select" name="type" style="width:400px;">
+            <option value="1" <?php if($row[$name] == '1') echo 'selected'; ?>>Heilung</option>
+            <option value="2" <?php if($row[$name] == '2') echo 'selected'; ?>>Heilung Prozentual</option>
+            <option value="3" <?php if($row[$name] == '3') echo 'selected'; ?>>Ausrüstung</option>
+            <option value="4" <?php if($row[$name] == '4') echo 'selected'; ?>>ReiseBonus</option>
+            <option value="5" <?php if($row[$name] == '5') echo 'selected'; ?>>Besondere Items</option>
+            <option value="6" <?php if($row[$name] == '6') echo 'selected'; ?>>Besondere Consumables</option>
+         </select>
+          <?php
+        }
+        else if($name == 'typeaction' || $name == 'action')
+        {
+
+          ?>
+          <select class="select" name="<?php echo $name; ?>" style="width:400px;">
+          <option value="0" <?php if($row[$name] == '') echo 'selected'; ?>>(0) Keine Aktion</option>
+          <?php
+
+          if($actions == null)
+          {
+            $actions = new Generallist($database, 'actions', '*', '', '', 99999999999, 'ASC');
+          }
+          $id = 0;
+          $entry = $actions->GetEntry($id);
+          while($entry != null)
+          {
+          ?>
+            <option value="<?php echo $entry['id']; ?>" <?php if($row[$name] == $entry['id']) echo 'selected'; ?>><?php echo '('.$entry['id'].') '.$entry['name']; ?></option>
+            <?php
+            ++$id;
+            $entry = $actions->GetEntry($id);
+          }
+          ?>
+          </select>
+          <?php
+        }
+        else if($name == 'planet')
+        {
+
+          ?>
+          <select class="select" name="planet" style="width:400px;">
+          <option value="" <?php if($row[$name] == '') echo 'selected'; ?>>(0) No Planet</option>
+          <?php
+
+          if($planets == null)
+          {
+            $planets = new Generallist($database, 'planet', '*', '', '', 99999999999, 'ASC');
+          }
+          $id = 0;
+          $entry = $planets->GetEntry($id);
+          while($entry != null)
+          {
+          ?>
+            <option value="<?php echo $entry['name']; ?>" <?php if($row[$name] == $entry['name']) echo 'selected'; ?>><?php echo $entry['name']; ?></option>
+            <?php
+            ++$id;
+            $entry = $planets->GetEntry($id);
+          }
+          ?>
+          </select>
+          <?php
+        }
+        else if($name == 'place' || $name == 'startingplace')
+        {
+
+          ?>
+          <select class="select" name="<?php echo $name; ?>" style="width:400px;">
+          <option value="" <?php if($row[$name] == '') echo 'selected'; ?>>(0) Kein Ort</option>
+          <?php
+
+          if($places == null)
+          {
+            $places = new Generallist($database, 'places', '*', '', '', 99999999999, 'ASC');
+          }
+          $id = 0;
+          $entry = $places->GetEntry($id);
+          while($entry != null)
+          {
+          ?>
+            <option value="<?php echo $entry['name']; ?>" <?php if($row[$name] == $entry['name']) echo 'selected'; ?>><?php echo $entry['name']; ?></option>
+            <?php
+            ++$id;
+            $entry = $places->GetEntry($id);
+          }
+          ?>
+          </select>
+          <?php
+        }
+        else if($name == 'needattacks')
+        {?>
+          <table width="90%" cellspacing="0" id="needattacks">
+            <tr>
+            <td><b>Attacks</b></td>
+            </tr>
+          <?php
+          $needattacks = explode(';', $value);
+          $i = 0;
+          while($value != '' && $i != count($needattacks))
+          {
+            ?><tr><td>
+            <select class="select" name="needattacks[<?php echo $i; ?>]" style="width:400px;">
+              <option value="0" <?php if($needattacks[$i] == '0') echo 'selected'; ?>>(0) keine Attacke</option>
+            <?php
+
+            if($attacks == null)
+            {
+              $attacks = new Generallist($database, 'attacks', '*', '', '', 99999999999, 'ASC');
+            }
+            $id = 0;
+            $entry = $attacks->GetEntry($id);
+            while($entry != null)
+            {
+            ?>
+              <option value="<?php echo $entry['id']; ?>" <?php if($needattacks[$i] == $entry['id']) echo 'selected'; ?>>(<?php echo $entry['id']; ?>) <?php echo $entry['name']; ?></option>
+              <?php
+              ++$id;
+              $entry = $attacks->GetEntry($id);
+            }
+            ?>
+            </select></td>
+            </tr>
+            <?php
+            ++$i;
+          }
+          ?>
+          </table>
+          <br/>
+          <a onclick="AddTableRow('needattacks', 1)">Eintrag hinzufügen</a><br/>
+          <br/>
+          <a onclick="RemoveTableRow('needattacks')">Eintrag entfernen</a><br/>
+          <?php
+        }
+        else if($name == 'typeattack' || $name == 'loadattack'  || $name == 'playerattack' || $name == 'attack' && $table != 'fighters' && $table != 'actions' && $table != 'accounts' && $table != 'npcs' && $table != 'items' || $name == 'needattack')
+        {
+          ?>
+          <select class="select" name="<?php echo $name; ?>" style="width:400px;">
+          <option value="0" <?php if($row[$name] == 0) echo 'selected'; ?>>(0) Kein Angriff</option>
+          <?php
+
+          if($list == null)
+          {
+            $list = new Generallist($database, 'attacks', '*', '', '', 99999999999, 'ASC');
+          }
+          $id = 0;
+          $entry = $list->GetEntry($id);
+          while($entry != null)
+          {
+          ?>
+            <option value="<?php echo $entry['id']; ?>" <?php if($row[$name] == $entry['id']) echo 'selected'; ?>>(<?php echo $entry['id']; ?>) <?php echo $entry['name']; ?></option>
+            <?php
+            ++$id;
+            $entry = $list->GetEntry($id);
+          }
+          ?>
+          </select>
+          <?php
+        }
+        else if($name == 'titel' && $table == 'titelprogress')
+        {
+          ?>
+          <select class="select" name="<?php echo $name; ?>" style="width:400px;">
+          <?php
+
+          if($titel == null)
+          {
+            $titel = new Generallist($database, 'titel', '*', '', '', 99999999999, 'ASC');
+          }
+          $id = 0;
+          $entry = $titel->GetEntry($id);
+          while($entry != null)
+          {
+          ?>
+            <option value="<?php echo $entry['id']; ?>" <?php if($row[$name] == $entry['id']) echo 'selected'; ?>>(<?php echo $entry['id']; ?>) <?php echo $entry['name']; ?></option>
+            <?php
+            ++$id;
+            $entry = $titel->GetEntry($id);
+          }
+          ?>
+          </select>
+          <?php
+        }
+        else if($name == 'npcid' || $name == 'npc' || $name == 'supportnpc' || $name == 'typenpc')
+        {
+          ?>
+          <select class="select" name="<?php echo $name; ?>" style="width:400px;">
+          <option value="0" <?php if($row[$name] == 0) echo 'selected'; ?>>(0) Kein NPC</option>
+          <?php
+
+          if($npcs == null)
+          {
+            $npcs = new Generallist($database, 'npcs', '*', '', '', 99999999999, 'ASC');
+          }
+          $id = 0;
+          $entry = $npcs->GetEntry($id);
+          while($entry != null)
+          {
+          ?>
+            <option value="<?php echo $entry['id']; ?>" <?php if($row[$name] == $entry['id']) echo 'selected'; ?>>(<?php echo $entry['id']; ?>) <?php echo $entry['name']; ?></option>
+            <?php
+            ++$id;
+            $entry = $npcs->GetEntry($id);
+          }
+          ?>
+          </select>
+          <?php
+        }
+        else if($name == 'userid' && $table == 'accounts')
+        {
+          ?>
+          <select class="select" name="<?php echo $name; ?>" style="width:400px;">
+
+          <?php
+          $spieler = new Generallist($accountDB, 'users', '*', '', '', 99999999999, 'ASC');
+          $id = 0;
+          $entry = $spieler->GetEntry($id);
+          while($entry != null)
+          {
+          ?>
+            <option value="<?php echo $entry['id']; ?>" <?php if($row[$name] == $entry['id']) echo 'selected'; ?>>(<?php echo $entry['id']; ?>) <?php echo $entry['login']; ?></option>
+            <?php
+            ++$id;
+            $entry = $spieler->GetEntry($id);
+          }
+          ?>
+          </select>
+          <?php
+        }
+        else if($name == 'acc' || $name == 'spielerid' || $name == 'ownerid' || $name == 'userid' || $name == 'id' && $table == 'accounts')
+        {
+          ?>
+          <select class="select" name="<?php echo $name; ?>" style="width:400px;">
+
+          <?php
+          $spieler = new Generallist($database, 'accounts', '*', '', '', 99999999999, 'ASC');
+          $id = 0;
+          $entry = $spieler->GetEntry($id);
+          while($entry != null)
+          {
+          ?>
+            <option value="<?php echo $entry['id']; ?>" <?php if($row[$name] == $entry['id']) echo 'selected'; ?>>(<?php echo $entry['id']; ?>) <?php echo $entry['name']; ?></option>
+            <?php
+            ++$id;
+            $entry = $spieler->GetEntry($id);
+          }
+          ?>
+          </select>
+          <?php
+        }
+        else if($name == 'titelid')
+        {
+          ?>
+          <select class="select" name="<?php echo $name; ?>" style="width:400px;">
+
+          <?php
+          $titel = new Generallist($database, 'titel', '*', '', '', 99999999999, 'ASC');
+          $id = 0;
+          $entry = $titel->GetEntry($id);
+          while($entry != null)
+          {
+          ?>
+            <option value="<?php echo $entry['id']; ?>" <?php if($row[$name] == $entry['id']) echo 'selected'; ?>>(<?php echo $entry['id']; ?>) <?php echo $entry['name']; ?></option>
+            <?php
+            ++$id;
+            $entry = $titel->GetEntry($id);
+          }
+          ?>
+          </select>
+          <?php
+        }
+        else if($table == 'events' && $name == 'item')
+        {?>
+          <table width="90%" cellspacing="0" id="eventitems">
+            <tr>
+            <td><b>Items</b></td>
+            </tr>
+          <?php
+          $eventItems = explode(';', $value);
+          $i = 0;
+          while($value != '' && $i != count($eventItems))
+          {
+            ?><tr><td>
+            <select class="select" name="event_items[<?php echo $i; ?>]" style="width:400px;">
+              <option value="0" <?php if($eventItems[$i] == '0') echo 'selected'; ?>>(0) Kein Item</option>
+            <?php
+
+            if($items == null)
+            {
+              $items = new Generallist($database, 'items', '*', '', '', 99999999999, 'ASC');
+            }
+            $id = 0;
+            $entry = $items->GetEntry($id);
+            while($entry != null)
+            {
+            ?>
+              <option value="<?php echo $entry['id']; ?>" <?php if($eventItems[$i] == $entry['id']) echo 'selected'; ?>>(<?php echo $entry['id']; ?>) <?php echo $entry['name']; ?></option>
+              <?php
+              ++$id;
+              $entry = $items->GetEntry($id);
+            }
+            ?>
+            </select></td>
+            </tr>
+            <?php
+            ++$i;
+          }
+          ?>
+          </table>
+          <br/>
+          <a onclick="AddTableRow('eventitems', 1)">Eintrag hinzufügen</a><br/>
+          <br/>
+          <a onclick="RemoveTableRow('eventitems')">Eintrag entfernen</a><br/>
+          <?php
+        }
+        else if($name == 'itemid' || $name == 'item' || $name == 'statsid' || $name == 'visualid' || $name == 'earnitem' || $name == 'upgradeid' || $name == 'needitem')
+        {
+
+          ?>
+          <select class="select" name="<?php echo $name; ?>" style="width:400px;">
+            <option value="0" <?php if($row[$name] == '0') echo 'selected'; ?>>(0) Kein Item</option>
+          <?php
+
+          if($items == null)
+          {
+            $items = new Generallist($database, 'items', '*', '', '', 99999999999, 'ASC');
+          }
+          $id = 0;
+          $entry = $items->GetEntry($id);
+          while($entry != null)
+          {
+          ?>
+            <option value="<?php echo $entry['id']; ?>" <?php if($row[$name] == $entry['id']) echo 'selected'; ?>>(<?php echo $entry['id']; ?>) <?php echo $entry['name']; ?></option>
+            <?php
+            ++$id;
+            $entry = $items->GetEntry($id);
+          }
+          ?>
+          </select>
+          <?php
+        }
+        else if($name == 'items' && $table == 'places')
+        {
+          if($items == null)
+          {
+            $items = new Generallist($database, 'items', '*', '', '', 99999999999, 'ASC');
+          }
+          $values = explode(';',$row[$name]);
+          $id = 0;
+          $entry = $items->GetEntry($id);				
+          while($entry != null)
+          {
+            ?>
+            <div class="tooltip" style="position:relative; height:60px; width:40px; display:inline-block">
+            <img width="40px" height="40px" src="img/items/<?php echo $entry['image']; ?>.png" class="attack"></img> 
+            <input type="checkbox" name="<?php echo $name; ?>[]" value="<?php echo $entry['id']; ?>" <?php if(in_array($entry['id'],$values)) echo 'checked'; ?>>
+             <span class="tooltiptext" style="left:-50px; top:-35px;"><?php echo $entry['name']; ?></span>
+             </div>
+            <?php
+          ++$id;
+          $entry = $items->GetEntry($id);
+          }
+
+        }
+        else if($name == 'actions')
+        {
+          if($actions == null)
+          {
+            $actions = new Generallist($database, 'actions', '*', '', '', 99999999999, 'ASC');
+          }
+          $values = explode(';',$row[$name]);
+          $id = 0;
+          $entry = $actions->GetEntry($id);
+          while($entry != null)
+          {
+            ?>
+            <div class="tooltip" style="position:relative; height:60px; width:40px; display:inline-block">
+            <img width="40px" height="40px" src="img/actions/<?php echo $entry['image']; ?>.png" class="attack"></img> 
+            <input type="checkbox" name="<?php echo $name; ?>[]" value="<?php echo $entry['id']; ?>" <?php if(in_array($entry['id'],$values)) echo 'checked'; ?>>
+             <span class="tooltiptext" style="left:-50px; top:-40px;"><?php echo $entry['name']; ?></span>
+             </div>
+            <?php
+          ++$id;
+          $entry = $actions->GetEntry($id);
+          }
+
+        }
+        else if($name == 'npcs' || $name == 'trainers')
+        {
+          if($npcs == null)
+          {
+            $npcs = new Generallist($database, 'npcs', '*', '', '', 99999999999, 'ASC');
+          }
+          $tableNPCs = explode(';',$row[$name]);
+          $id = 0;
+          $entry = $npcs->GetEntry($id);
+          while($entry != null)
+          {
+            ?>
+            <div class="tooltip" style="position:relative; height:60px; width:40px; display:inline-block">
+            <img width="40px" height="40px" src="img/npc/<?php echo $entry['image']; ?>.png" class="attack"></img> 
+            <input type="checkbox" name="<?php echo $name; ?>[]" value="<?php echo $entry['id']; ?>" <?php if(in_array($entry['id'],$tableNPCs)) echo 'checked'; ?>>
+             <span class="tooltiptext" style="left:-50px; top:-35px;"><?php echo $entry['name']; ?></span>
+             </div>
+            <?php
+          ++$id;
+          $entry = $npcs->GetEntry($id);
+          }
+
+        }
+        else if($name == 'attacks' || $name == 'fightattacks' || $name == 'learnableattacks')
+        {
+          if($attacks == null)
+          {
+            $attacks = new Generallist($database, 'attacks', '*', '', '', 99999999999, 'ASC');
+          }
+          $playerAttacks = explode(';',$row[$name]);
+          $id = 0;
+          $entry = $attacks->GetEntry($id);
+          while($entry != null)
+          {
+            ?>
+            <div class="tooltip" style="position:relative; height:60px; width:40px; display:inline-block">
+                <img width="40px" height="40px" src="img/attacks/<?php echo $entry['image']; ?>.png" class="attack"></img> 
+                <input type="checkbox" name="<?php echo $name; ?>[]" value="<?php echo $entry['id']; ?>" <?php if(in_array($entry['id'],$playerAttacks)) echo 'checked'; ?>> 	
+             <span class="tooltiptext" style="left:-50px; top:-35px;"><?php echo $entry['name']; ?></span>
+             </div>
+            <?php
+          ++$id;
+          $entry = $attacks->GetEntry($id);
+          }
+        }
+        else
+        {
+          switch($type)
+          {
+            case 1: //tinyint
+              ?><input type="checkbox"  name="<?php echo $name; ?>" <?php if($value == 1) echo 'checked'; ?>><?php
+              break;
+            case 3: //int
+            case 4: //float
+              ?><input type="text" name="<?php echo $name; ?>" value="<?php echo $value; ?>" style="width:400px"><?php
+              break;
+            case 253: //varchar
+              ?><input type="text" name="<?php echo $name; ?>" value="<?php echo $value; ?>" style="width:400px"><?php
+              break;
+            case 252: //longtext
+          ?><textarea name="<?php echo $name; ?>" style="width:400px; height:100px;"><?php echo $value; ?></textarea><?php
+              break;
+            case 12: //Datum
+              ?><input type="text" name="<?php echo $name; ?>" value="<?php echo $value; ?>" style="width:400px"><?php
+              break;
+          }
+        }
+        ?>
+  </td></tr>
+         </table>
+  </fieldset>
+      <?php
+    }
+    ?>
+    </table>
+    <input type="submit" value="ändern">
+    </form>
+    <?php
+    $result->Close();
+  }
+  else
+  {
+    $table = $_GET['table'];
+    ?>
+  <div class="spacer"></div>
+    <form method="GET" action="?p=admin">
+      <input type="hidden" name="p" value="admin">
+      <input type="hidden" name="a" value="see">
+      <input type="hidden" name="table" value="<?php echo $table; ?>">
+      <select class="select" name="id">
+      <?php
+      $result = $database->Select('*',$table,'',999999, 'id', 'DESC');
+      if ($result) 
+      {
+        if ($result->num_rows > 0)
+        {
+          while($row = $result->fetch_assoc()) 
+          {
+            $pid = (isset($row['id']))?$row['id']:$row['ID'];
+            ?>
+            <option value="<?php echo $pid; ?>">
+            <?php
+            $id = (isset($row['spielerid'])) ? $row['spielerid'] : 0;
+            if($id != 0)
+            {
+              $spieler = new Generallist($database, 'accounts', 'name', 'id = "'.$id.'"', 1);
+              $spielerid = $spieler->GetEntry(0);
+            }
+            else
+              $spielerid = null;
+
+            $id = (isset($row['userid'])) ? $row['userid'] : 0;
+            if($id != 0)
+            {
+              $users = new Generallist($database, 'accounts', 'name', 'id = "'.$id.'"', 1);
+              $userid = $users->GetEntry(0);
+            }
+            else
+              $userid = null;
+            
+            $id = (isset($row['attack'])) ? $row['attack'] : 0;
+            if($id != 0)
+            {
+              $attacks = new Generallist($database, 'attacks', 'name', 'id = "'.$id.'"', 1);
+              $attack = $attacks->GetEntry(0);
+            }
+            else
+              $attack = null;
+            if(!isset($row['used']))
+            {
+            }
+            else
+            {
+            if($row['used'] == 0)
+            {
+              $genutzt = "Benutzt: Nein";
+            }
+            else
+            {
+              $genutzt = "Benutzt: Ja";
+            }
+            }
+            echo '['.$pid.'] ';
+            if(isset($row['name'])) echo $row['name'];
+            else if(isset($row['title'])) echo $row['title'];
+            else if(isset($row['titel'])) echo $row['titel'];
+            else if(isset($row['topic'])) echo $row['topic'];
+            else if(isset($row['seller'])) echo $row['seller'];
+            else if(isset($row['Betreff'])) echo $row['Betreff'];
+            else if(isset($row['spielerid'])) echo $row['spielerid'].' '.$spielerid['name'];
+            else if(isset($row['userid'])) echo $row['userid'].' '.$userid['name'];
+            else if(isset($row['attack'])) echo $row['attack'].' '.$attack['name'];
+            if(isset($row['col'])) echo ' Col: '.$row['col'];
+            if(isset($row['row'])) echo ' Row: '.$row['row'];
+            if(isset($row['race'])) echo ' Race: '.$row['race'];
+            ?>
+            </option>
+            <?php
+          }
+        }
+        $result->close();
+
+      }
+      ?>
+      </select>
+      <br/>
+      <input type="submit" value="Bearbeiten">
+  </form>
+  <br/>
+  <br/>
+  <br/>
+    <form method="POST" action="?p=admin&a=delete&table=<?php echo $table; ?>">
+      <select class="select" name="id">
+      <?php
+      $result = $database->Select('*',$table,'',999999);
+      if ($result) 
+      {
+        if ($result->num_rows > 0)
+        {
+          while($row = $result->fetch_assoc()) 
+          {
+            $pid = (isset($row['id']))?$row['id']:$row['ID'];
+            ?>
+            <option value="<?php echo $pid; ?>">
+            <?php
+            $id = (isset($row['spielerid']))?$row['spielerid']:0;
+            $spielerid = new Generallist($database, 'accounts', '*', 'id = "'.$id.'"');
+            $spielerid_name = $spielerid->GetEntry(0);
+
+            $id = (isset($row['userid']))?$row['userid']:0;
+            $userid = new Generallist($database, 'accounts', '*', 'id = "'.$id.'"');
+            $userid_name = $userid->GetEntry(0);
+			if(!isset($row['used']))
+			{
+			}
+			else
+			{
+			if($row['used'] == 0)
+			{
+				$genutzt = "Benutzt: Nein";
+			}
+			else
+			{
+				$genutzt = "Benutzt: Ja";
+			}
+			}
+            echo '['.$pid.'] ';
+            if(isset($row['name'])) echo $row['name'];
+            else if(isset($row['title'])) echo $row['title'];
+            else if(isset($row['titel'])) echo $row['titel'];
+            else if(isset($row['Betreff'])) echo $row['Betreff'];
+            else if(isset($row['topic'])) echo $row['topic'];
+			else if(isset($row['betakey'])) echo "Betakey: ".$row['betakey']." | ".$genutzt;
+            else if(isset($row['seller'])) echo $row['seller'];
+            else if(isset($row['spielerid'])) echo $row['spielerid'].' '.$spielerid_name['name'];
+            else if(isset($row['userid'])) echo $row['userid'].' '.$userid_name['name'];
+            ?>
+            </option>
+            <?php
+          }
+        }
+        $result->close();
+
+      }
+      ?>
+      </select>
+      <br/>
+      <input type="submit" value="Löschen">
+  </form>
+  <br/>
+  <br/>
+  <br/>
+    <form method="GET" action="?p=admin">
+      <input type="hidden" name="p" value="admin">
+      <input type="hidden" name="a" value="see">
+      <input type="hidden" name="table" value="<?php echo $table; ?>">
+      <input type="submit" value="Erstellen">
+  </form>
+  <?php
+  }
+}
+?>
