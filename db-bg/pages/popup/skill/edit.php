@@ -10,7 +10,7 @@
     <table width="100%" cellspacing="0" border="0">
       <tr>
         <td colspan=6 height="20px" align="center">
-            <h2>Skillpunkte: <span id="totalStats"><?php echo $player->GetStats(); ?></span></h2>
+            <h2>Statspunkte: <span id="totalStats"><?php echo $player->GetStats(); ?></span></h2>
         </td>
       </tr>
       <tr>

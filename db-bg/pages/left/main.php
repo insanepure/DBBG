@@ -45,9 +45,9 @@ if ($player->IsLogged())
 				<?php if($player->GetStats() != 0)
 {
 ?>
-				<a href="#" id="no-link" onclick="OpenPopupPage('Skillpunkte Verteilen','skill/edit.php')">
+				<a href="#" id="no-link" onclick="OpenPopupPage('Statspunkte Verteilen','skill/edit.php')">
 					<div style="cursor:pointer;" class="SideMenuButton borderB">
-						<font color="red">Skillpunkte:
+						<font color="red">Statspunkte:
 							<?php echo $player->GetStats(); ?>
 						</font>
 					</div>

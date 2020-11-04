@@ -590,7 +590,7 @@ $list = new Generallist($database, $from, $select, $where, $order, 10, 'DESC');
 //preSort the arrays, so that we can easily show them
 $id = 0;
 $entry = $list->GetEntry($id);
-while($entry != null)
+while($entry != null && $displayedPlayer->GetARank() < 2)
 
 {
 ?>

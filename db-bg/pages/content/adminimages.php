@@ -2,7 +2,7 @@
 if($player->GetArank() >= 2) 
 {
   
-$validDirectories = array('actions', 'attacks', 'ausruestung', 'events', 'items', 'npc', 'places', 'storyimages'); 
+$validDirectories = array('actions', 'attacks', 'ausruestung', 'events', 'items', 'npc', 'places', 'storyimages', 'planets', 'space'); 
 ?>
 <div class="spacer"></div>
 <div  class="catGradient borderT borderB" style="width:90%;">

@@ -1,6 +1,6 @@
 <?php
 $timeOut = 30;
-$where = 'TIMESTAMPDIFF(MINUTE, lastaction, NOW()) < '.$timeOut;
+$where = 'titel != 5 AND TIMESTAMPDIFF(MINUTE, lastaction, NOW()) < '.$timeOut;
 $start = 0;
 $limit = 30;
 if(isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 0)

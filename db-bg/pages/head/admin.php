@@ -15,7 +15,7 @@ if(!isset($player) || !$player->IsValid() || $player->GetARank() < 2)
 	exit();  
 }
 
-$limitedTables = array('actions', 'attacks', 'items', 'npcs', 'places', 'story', 'events', 'titel', 'patterns');
+$limitedTables = array('actions', 'attacks', 'items', 'npcs', 'places', 'story', 'events', 'titel', 'patterns', 'planet');
 
 if($player->GetARank() < 3 && isset($_GET['table']) && !in_array($_GET['table'], $limitedTables))
 {
