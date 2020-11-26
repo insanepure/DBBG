@@ -17,6 +17,13 @@
 </table>
 <div class="spacer"></div>
 <?php 
+$start = 0;
+$limit = 30;
+$timeOut = 30;
+if(isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 0)
+{
+  $start = $limit * ($_GET['page']-1);
+}
 if(!isset($_GET['p2']) || isset($_GET['p2']) && $_GET['p2'] == 'inbox')
 {
 ?>
@@ -39,7 +46,7 @@ function toggle_sys(source) {
   }
 }
 </script>
-<form method="POST" action="?p=pm&a=action">
+<form method="POST" action="?p=pm<?php if(isset($_GET['page'])) echo '&page='.$_GET['page']; ?>&a=action">
 <table width="98%" cellspacing="0" border="0">
   <tr>
     <td colspan=6 height="20px">
@@ -57,7 +64,7 @@ function toggle_sys(source) {
     <td width="20%"><b><center>Aktion</center></b></td>
   </tr>
   <?php
-  $PMManager->LoadInbox();
+  $PMManager->LoadInbox($start, $limit, false);
   $i = 0;
   $pm = $PMManager->GetPM($i);
   while($pm != null)
@@ -85,6 +92,25 @@ function toggle_sys(source) {
   }
   ?>
 </table>
+
+<?php
+  $total = $PMManager->LoadPMCount(true, false);
+  $pages = ceil($total / $limit);
+if($pages != 1)
+{
+  ?>
+  <div class="spacer"></div>
+  <?php
+  $i = 0;
+  while($i != $pages)
+  {
+    ?>
+    <a href="?p=pm&page=<?php echo $i+1; if(isset($_GET['p2'])) echo '&p2='.$_GET['p2']; ?>">Seite <?php echo $i+1; ?></a> 
+    <?php
+    ++$i;
+  }
+}
+?>
 <div class="spacer"></div>
 <table width="98%" cellspacing="0" border="0">
   <tr>
@@ -135,7 +161,7 @@ else if(isset($_GET['p2']) && $_GET['p2'] == 'outbox')
     <td width="20%"><b><center>Aktion</center></b></td>
   </tr>
   <?php
-  $PMManager->LoadOutbox();
+  $PMManager->LoadOutbox($start, $limit, false);
   $i = 0;
   $pm = $PMManager->GetPM($i);
   while($pm != null)
@@ -153,6 +179,25 @@ else if(isset($_GET['p2']) && $_GET['p2'] == 'outbox')
   }
   ?>
 </table>
+
+<?php
+  $total = $PMManager->LoadPMCount(false, false);
+  $pages = ceil($total / $limit);
+if($pages != 1)
+{
+  ?>
+  <div class="spacer"></div>
+  <?php
+  $i = 0;
+  while($i != $pages)
+  {
+    ?>
+    <a href="?p=pm&page=<?php echo $i+1; if(isset($_GET['p2'])) echo '&p2='.$_GET['p2']; ?>">Seite <?php echo $i+1; ?></a> 
+    <?php
+    ++$i;
+  }
+}
+?>
 <?php
 }
 else if(isset($_GET['p2']) && $_GET['p2'] == 'send')

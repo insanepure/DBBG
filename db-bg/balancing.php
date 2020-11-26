@@ -418,6 +418,44 @@ if($p == 'items')
     $handschuhe = 208;
     $aura = 210;
     addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //Vegeta
+  
+    $value = 940;
+    $level = 74;
+    $schuhe = 227;
+    $hose = 226;
+    $hemd = 225;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //Nail
+  
+    $value = 1000;
+    $level = 82;
+    $hose = 228;
+    $hemd = 229;
+    $aura = 253;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //Burter
+  
+    $value = 1100;
+    $level = 82;
+    $hose = 232;
+    $hemd = 230;
+    $schuhe = 233;
+    $handschuhe = 231;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //Recoome
+  
+    $value = 1200;
+    $level = 83;
+    $hose = 235;
+    $hemd = 234;
+    $schuhe = 237;
+    $handschuhe = 236;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //Ginyu
+  
+    $value = 1300;
+    $level = 87;
+    $hose = 222;
+    $hemd = 221;
+    $schuhe = 224;
+    $handschuhe = 223;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //Vegeta
     
     while($entry != null)
     {
@@ -573,6 +611,7 @@ else if($p == 'story')
   <td><b>KI</b></td>
   <td><b>LevelUP</b></td>
   <td><b>Level</b></td>
+  <td><b>Stats</b></td>
   <td><b>Zeni</b></td>
   <td><b>Ort</b></td>
   <td><b>OrtTech</b></td>
@@ -597,10 +636,20 @@ else if($p == 'story')
     echo '<td>'.$entry['titel'].'</td>';  
     if($entry['type'] == 2)
     {
-      $npc = new NPC($database, $entry['npc']);
-      echo '<td>'.$npc->GetName().'</td>';  
-      echo '<td>'.$npc->GetKI().'</td>';  
-      $kiNeeded = $npc->GetKI();
+      $npcs = explode(';', $entry['npcs']);
+      $names = '';
+      $kis = 0;
+      foreach($npcs as &$npcid)
+      {
+        $npc = new NPC($database, $npcid);
+        $kis += $npc->GetKI();
+        $names = $names.' '.$npc->GetName();
+      }
+      
+      $kis = $kis / count($npcs);
+      echo '<td>'.$names.'</td>';  
+      echo '<td>'.$kis.'</td>';  
+      $kiNeeded =$kis;
     }
     else
     {
@@ -612,6 +661,16 @@ else if($p == 'story')
     else
       echo '<td></td>';
     echo '<td>'.$level.'</td>';  
+    if($entry['action'] != 0)
+    {
+      
+       $action = $actionManager->GetAction($entry['action']);
+      echo '<td>'.$action->GetName().': '.$action->GetStats().'S - '.($action->GetMinutes()/60).'H</td>';  
+    }
+    else
+    {
+      echo '<td></td>';  
+    }
     echo '<td>'.$entry['zeni'].'</td>';  
     echo '<td>'.$entry['place'].'</td>';  
     

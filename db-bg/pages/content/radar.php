@@ -94,7 +94,7 @@ grecaptcha.ready(function() {
   if($player->CanWish() && count($drops) == 7)
   {
     ?>
-    <a href="?p=wish">Shenlong Rufen</a>
+    <a href="?p=wish"><?php echo $dragon; ?> Rufen</a>
     <?php
   }
 

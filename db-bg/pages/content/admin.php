@@ -230,7 +230,7 @@ if($player->GetArank() >= 2) {
           <a onclick="RemoveTableRow('multiaccs')">Eintrag entfernen</a><br/>
           <?php
         } 
-        else if(($table == 'npcs' || $table == 'story' || $table == 'fights') && $name == 'items')
+        else if(($table == 'npcs' || $table == 'story' || $table == 'fights' ) && $name == 'items')
         {
           ?>
           <table width="90%" cellspacing="0" id="npcandstoryitems">
@@ -279,7 +279,7 @@ if($player->GetArank() >= 2) {
           <a onclick="RemoveTableRow('npcandstoryitems')">Eintrag entfernen</a><br/>
           <?php
         }
-        else if(($table == 'tournaments') && $name == 'items')
+        else if(($table == 'tournaments' || $table == 'wishes') && $name == 'items')
         {
           ?>
           <table width="90%" cellspacing="0" id="amountitems">
@@ -592,6 +592,18 @@ if($player->GetArank() >= 2) {
          </select>
           <?php
         }
+        else if($name == 'type' && $table == 'wishes')
+        {
+          ?>
+          <select class="select" name="<?php echo $name; ?>" style="width:400px;">
+            <option value="0" <?php if($row[$name] == 0) echo 'selected'; ?>>Zeni</option>
+            <option value="1" <?php if($row[$name] == 1) echo 'selected'; ?>>Stats</option>
+            <option value="2" <?php if($row[$name] == 2) echo 'selected'; ?>>Stats Reset</option>
+            <option value="3" <?php if($row[$name] == 3) echo 'selected'; ?>>Skill Reset</option>
+            <option value="4" <?php if($row[$name] == 4) echo 'selected'; ?>>Items</option>
+         </select>
+          <?php
+        }
         else if($name == 'type' && $table == 'patterns')
         {
           ?>
@@ -647,7 +659,7 @@ if($player->GetArank() >= 2) {
             {
               nameSel.remove(i);
             }
-            if(selValue == 0 || selValue == 2)
+            if(selValue == 0 || selValue == 2 || selValue == 3)
             {
                 addPatternValueOption('ki');
                 addPatternValueOption('lp');
@@ -936,7 +948,7 @@ if($player->GetArank() >= 2) {
           <a onclick="RemoveTableRow('needattacks')">Eintrag entfernen</a><br/>
           <?php
         }
-        else if($name == 'typeattack' || $name == 'loadattack'  || $name == 'playerattack' || $name == 'attack' && $table != 'fighters' && $table != 'actions' && $table != 'accounts' && $table != 'npcs' && $table != 'items' || $name == 'needattack')
+        else if($name == 'typeattack' || $name == 'loadattack'  || $name == 'playerattack' || $name == 'blockattack' || $name == 'blockedattack' || $name == 'attack' && $table != 'fighters' && $table != 'actions' && $table != 'accounts' && $table != 'npcs' && $table != 'items' || $name == 'needattack')
         {
           ?>
           <select class="select" name="<?php echo $name; ?>" style="width:400px;">
@@ -985,7 +997,7 @@ if($player->GetArank() >= 2) {
           </select>
           <?php
         }
-        else if($name == 'npcid' || $name == 'npc' || $name == 'supportnpc' || $name == 'typenpc')
+        else if($name == 'npcid' || $name == 'npc' || $name == 'talknpc' || $name == 'supportnpc' || $name == 'typenpc')
         {
           ?>
           <select class="select" name="<?php echo $name; ?>" style="width:400px;">
@@ -1189,7 +1201,29 @@ if($player->GetArank() >= 2) {
           }
 
         }
-        else if($name == 'npcs' || $name == 'trainers')
+        else if($name == 'wishes')
+        {
+            if($wishlist == null)
+            {
+              $wishlist = new Generallist($database, 'wishes', '*', '', '', 99999999999, 'ASC');
+            }
+            $values = explode(';',$row[$name]);
+            $id = 0;
+            $entry = $wishlist->GetEntry($id);
+            while($entry != null)
+            {
+              ?>
+              <div style="float:left; height:50px; width:150px;">
+              <?php echo $entry['name']; ?><br/>
+              <input type="checkbox" name="<?php echo $name; ?>[]" value="<?php echo $entry['id']; ?>" <?php if(in_array($entry['id'],$values)) echo 'checked'; ?>><br/>
+                
+              </div>
+              <?php
+            ++$id;
+            $entry = $wishlist->GetEntry($id);
+            }
+        }
+        else if($name == 'supportnpcs' || $name == 'npcs' || $name == 'trainers')
         {
           if($npcs == null)
           {

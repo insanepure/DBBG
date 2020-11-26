@@ -172,9 +172,9 @@ if ($player->IsLogged())
 				<a href="?p=boss" id="no-link">
 					<div style="cursor:pointer;" class="SideMenuButton borderB">Boss</div>
 				</a>
-				<a href="?p=arena" id="no-link">
+				<!--<a href="?p=arena" id="no-link">
 					<div style="cursor:pointer;" class="SideMenuButton borderB">Arena</div>
-				</a>
+				</a>-->
 				<a href="?p=tournament" id="no-link">
 					<div style="cursor:pointer;" class="SideMenuButton borderB">Turnier</div>
 				</a>

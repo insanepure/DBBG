@@ -52,9 +52,14 @@ class Dragonball
     return $this->data['id'];
   }
   
+  public function GetWishNum()
+  {
+    return $this->data['wishnum'];
+  }
+  
   public function GetWishes()
   {
-    return $this->data['wishes'];
+    return explode(';', $this->data['wishes']);
   }
 	
   public function GetActiveTime()
@@ -105,6 +110,11 @@ class Dragonball
   public function GetStars()
   {
     return $this->data['stars'];
+  }
+  
+  public function GetWishLeft()
+  {
+    return $this->data['wishleft'];
   }
   
   public function GetPlayer()

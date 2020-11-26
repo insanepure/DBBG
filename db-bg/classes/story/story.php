@@ -64,9 +64,28 @@ class Story
     return $this->data['planet'];
   }
   
+  public function GetTalkNPC()
+  {
+    return $this->data['talknpc'];
+  }
+  
+  public function GetNPCs()
+  {
+    if($this->data['npcs'] == '')
+      return array();
+    return explode(';', $this->data['npcs']);
+  }
+  
+  public function GetSupportNPCs()
+  {
+    if($this->data['supportnpcs'] == '')
+      return array();
+    return explode(';', $this->data['supportnpcs']);
+  }
+  
   public function GetNPC()
   {
-    return $this->data['npc'];
+    return 5;
   }
   
   public function GetSupportNPC()

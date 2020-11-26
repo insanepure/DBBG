@@ -290,14 +290,14 @@ class PMManager
 		return true;
 	}
   
-  public function LoadOutbox()
+  public function LoadOutbox($start, $limit)
   {
-    $this->LoadPMs(false);
+    $this->LoadPMs(false, $start, $limit, false);
   }
   
-  public function LoadInbox()
+  public function LoadInbox($start, $limit, $system)
   {
-    $this->LoadPMs(true);
+    $this->LoadPMs(true, $start, $limit, $system);
   }
   
   public function LoadPM($id)
@@ -325,18 +325,26 @@ class PMManager
     return null;
   }
   
-  private function LoadPMs($inbox)
+  private function LoadPMs($inbox, $start, $limit, $system)
   {
     $where = '';
     if($inbox)
     {
       $where = 'receiverid="'.$this->playerID.'"';
+      if($system)
+      {
+        $where = $where.' AND senderid="0"';
+      }
+      else
+      {
+        $where = $where.' AND senderid != "0"';
+      }
     }
     else
     {
       $where = 'senderid="'.$this->playerID.'"';
     }
-		$result = $this->database->Select('*','pms',$where,10000,'time','DESC');
+		$result = $this->database->Select('*','pms',$where,$start.','.$limit,'time','DESC');
 		if ($result) 
 		{
 			if ($result->num_rows > 0)
@@ -349,6 +357,39 @@ class PMManager
 			}
 			$result->close();
 		}
+  }
+  
+  
+  public function LoadPMCount($inbox, $system)
+  {
+    $where = '';
+    if($inbox)
+    {
+      $where = 'receiverid="'.$this->playerID.'"';
+      if($system)
+      {
+        $where = $where.' AND senderid="0"';
+      }
+      else
+      {
+        $where = $where.' AND senderid != "0"';
+      }
+    }
+    else
+    {
+      $where = 'senderid="'.$this->playerID.'"';
+    }
+    $total = 0;
+    //SELECT COUNT(id) as total FROM `pms` WHERE `receiverid` = 1 AND `read` = 0
+    $result = $this->database->Select('COUNT(id) as total','pms', $where);
+		if ($result) 
+		{
+      $row = $result->fetch_assoc();
+	    $total = $row['total'];
+
+			$result->close();
+		}
+    return $total;
   }
   
 }

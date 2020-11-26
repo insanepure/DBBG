@@ -1,4 +1,5 @@
 <?php
+exit();
 include_once 'classes/arena/arena.php';
 include_once 'classes/items/itemmanager.php';
 $itemManager = new ItemManager($database);

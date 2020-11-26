@@ -803,8 +803,10 @@ class Fight
 	
 	private function CheckForWonTeam()
 	{
+    $this->AddDebugLog('CheckForWonTeam');
     if($this->GetHealthRatio() != 0)
     {
+      $this->AddDebugLog('- HealthRatio ('.$this->GetHealthRatio().') != 0');
       $healthTeam = $this->GetHealthRatioTeam();
       $players = $this->teams[$healthTeam];
       $j = 0;
@@ -819,17 +821,20 @@ class Fight
       $hLP = round(($hLP / $j) * 100);
       if($hLP < $this->GetHealthRatio())
       {
+        $this->AddDebugLog('- HealthRatioWinner: '.$this->GetHealthRatioWinner());
         return $this->GetHealthRatioWinner();
       }
     }
     
 		if($this->GetSurvivalRounds() != 0 && $this->GetSurvivalRounds() == $this->GetRound())
 		{
+      $this->AddDebugLog(' - SurvivalRounds ( '.$this->GetSurvivalRounds().') != 0');
       //if rounds are over and we still have no team won, make the winner win
 			return $this->GetSurvivalWinner();
 		}
     
 		$aliveTeam = -2; //Nobody won
+    $this->AddDebugLog(' - Check alive');
 		$i = 0;
     while(isset($this->teams[$i]))
     {
@@ -838,15 +843,18 @@ class Fight
       while(isset($players[$j]))
       {
 				$player = $players[$j];
+        $this->AddDebugLog(' -- Player '.$player->GetName().' LP = '.$player->GetLP());
 				if($player->GetLP() != 0)
 				{
 					if($aliveTeam != -2 && $aliveTeam != $player->GetTeam())
 					{
+            $this->AddDebugLog(' -- AliveTeam: '.$aliveTeam.' != PlayerTeam: '.$player->GetTeam().' => ALIVE');
             return -1;
 					}
 					else
 					{
 						$aliveTeam = $player->GetTeam();
+            $this->AddDebugLog(' -- Set AliveTeam: '.$aliveTeam);
 					}
 				}
 				
@@ -855,6 +863,8 @@ class Fight
 			
 			++$i;
 		}
+    
+    $this->AddDebugLog(' - AliveTeam: '.$aliveTeam);
     
     //if one team is alive only, those lines will be executed
     //so if we are in a survival game, we have to check
@@ -2049,6 +2059,7 @@ class Fight
 		
 		if($wonTeam != -1)
 		{
+      $this->AddDebugLog(' A Team won: '.$wonTeam);
 			$wonTeamText = '';
 			if($wonTeam == -2)
 			{
@@ -2067,6 +2078,7 @@ class Fight
 		
 		if($wonTeam != -1)
 		{
+      $this->AddDebugLog('End Fight');
 		  $this->RemoveFusions(true);
 			$this->UpdatePlayersData($wonTeam);
 			$this->RemoveNPCSpawns();
@@ -2817,6 +2829,7 @@ class Fight
   private function DoGiveUP($player, $action)
 	{
     $this->addAttackTitel($player, $attack);
+    $player->SetLP(0);
 		$result = $this->database->Update('lp="0"','fighters','id = "'.$player->GetID().'"',1);
 		return $action->GetText();
 	}
@@ -4292,11 +4305,50 @@ private function Revive($player, $target, $attack, &$damage)
 			}
 			++$i;
 		}
+    
+		$roundText = '<tr><td align=center colspan=4><h2>Kampf Beginn</h2></td></tr>';
 		
 		if($full)
 		{
+		  $imageLeft = true;
+      $i = 0;
+      while(isset($this->teams[$i]))
+      {
+        $players = $this->teams[$i];
+        $j = 0;
+        while(isset($players[$j]))
+        {
+          $teamPlayer = $players[$j];
+          $trans = $teamPlayer->GetTransformations();
+          $teamPlayer->SetTransformations('');
+          $playerText = '';
+          if($trans != '')
+          {
+            $transformations = explode(';',$trans);
+            $powerup = $transformations[0];
+            $attack = $this->attackManager->GetAttack($powerup);
+			      $attackImage = $attack->GetImage();
+			      $playerText = $this->Transform($teamPlayer, $attack);
+          }
+          else
+          {
+            $playerText = "!source macht sich zum Kampf bereit.";
+            $attackImage = 'img/attacks/fightready.png';
+          }
+          $playerText = $this->ReplaceTextValues($playerText, $teamPlayer, $teamPlayer, 0, 4);
+          $attackText = $this->DisplayAttackText($attackImage, $playerText, $imageLeft);
+          $roundText = $roundText.$attackText;
+          $imageLeft = !$imageLeft;
+          $j++;
+        }
+        ++$i;
+      }
+    
+      $newText = $this->database->EscapeString($roundText.$this->GetText());
+      $this->SetText($newText);
+      
 			$this->SetState(1);
-			$result = $this->database->Update('state="'.$this->GetState().'"','fights','id = "'.$this->GetID().'"',1);		
+			$result = $this->database->Update('state="'.$this->GetState().'",text="'.$newText.'"','fights','id = "'.$this->GetID().'"',1);		
     	$timestamp = date('Y-m-d H:i:s');
 			$result = $this->database->Update('lastaction="'.$timestamp.'"','fighters','fight = "'.$this->GetID().'"',9999999);
 			$this->attackManager = new AttackManager($this->database);
@@ -4799,11 +4851,13 @@ private function Revive($player, $target, $attack, &$damage)
 			$def += $equippedStats[3];
 		}
     
-    $powerup = 0;
+    $attacks = explode(';', $player->GetAttacks());
+    $powerup = '';
     if(!$isNPC)
-    {
       $powerup = $player->GetStartingPowerup();
-    }
+    
+    if(!in_array($powerup, $attacks))
+      $powerup = '';
 		
     $timestamp = date('Y-m-d H:i:s');
 		$row['id'] = $player->GetID();
@@ -4849,7 +4903,7 @@ private function Revive($player, $target, $attack, &$damage)
 		$row['maccuracy'] = $player->GetAccuracy();
 		$row['reflex'] = $player->GetReflex();
 		$row['mreflex'] = $player->GetReflex();
-		$row['transformations'] = '';
+		$row['transformations'] = $powerup;
 		$row['owner'] = $owner;
 		$row['fusedacc'] = $fusion;
 		$row['fusetimer'] = $fusetimer;
@@ -4919,6 +4973,7 @@ private function Revive($player, $target, $attack, &$damage)
 		, owner
 		, lastaction
 		, fusedacc
+		, transformations
 		, buffs
 		, dots
 		, apetail
@@ -4955,6 +5010,7 @@ private function Revive($player, $target, $attack, &$damage)
 		,"'.$row['owner'].'"
 		,"'.$row['lastaction'].'"
 		,"'.$row['fusedacc'].'"
+		,"'.$row['transformations'].'"
 		,"'.$row['buffs'].'"
 		,"'.$row['dots'].'"
 		,"'.$row['apetail'].'"
@@ -4986,16 +5042,6 @@ private function Revive($player, $target, $attack, &$damage)
       $fighters = implode(';', $fighters);
       $this->SetFighters($fighters);
 		  $result = $this->database->Update('fighters="'.$fighters.'"','fights','id = "'.$this->GetID().'"',1);
-    }
-    
-    
-    
-    if($powerup != 0)
-    {
-      $powerupAttack = $this->GetAttack($powerup);
-      $this->AddDebugLog(' - Activate powerup: '.$powerupAttack->GetName());
-      $fighter->Transform($powerupAttack, false);
-		  $this->UpdateTransform($fighter);
     }
 		
 		if(!$isNPC && $fusion == 0)

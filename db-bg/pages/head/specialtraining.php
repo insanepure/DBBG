@@ -66,7 +66,7 @@ if(isset($_GET['a']) && $_GET['a'] == 'train' && isset($_GET['id']) && isset($_G
           }
           else
           {
-            $player->Learn($action, $minutes, $attack->GetName());
+            $player->Learn($action, $minutes, $attack->GetID());
             $message = 'Du lernst nun '.$attack->GetName();
           }
         }

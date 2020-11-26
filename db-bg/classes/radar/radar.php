@@ -46,7 +46,7 @@ class Radar
 		return $this->playerHasDB;
 	}
 	
-	public function EndWish()
+	public function EndWish($wishNum)
 	{
 		$places = array();
 		$result = $this->database->Select('*','places','planet="'.$this->planet.'" AND travelable="1"',99999);
@@ -60,8 +60,6 @@ class Radar
         }
 			}
 		}
-		
-		$wishes = 1;
     
     $oldDate = new DateTime($this->activeTime);
     $hour = $oldDate->format('H');
@@ -82,14 +80,14 @@ class Radar
 			array_splice($places, $placeID, 1);
 			$db->SetPlace($place);
 			$db->SetPlayer(0);
-			$result = $this->database->Update('wishes="'.$wishes.'",place="'.$place.'", player="0", activetime="'.$timestamp.'"','dragonballs','id="'.$db->GetID().'"',1);
+			$result = $this->database->Update('wishleft="'.$wishNum.'",place="'.$place.'", player="0", activetime="'.$timestamp.'"','dragonballs','id="'.$db->GetID().'"',1);
 		}
 	  $result = $this->database->Update('wishcounter=wishcounter-1','accounts','wishcounter != 0',9999999);
 	}
 	
 	public function Wished()
 	{
-		$result = $this->database->Update('wishes=wishes-1','dragonballs','planet="'.$this->planet.'"',7);
+		$result = $this->database->Update('wishleft=wishleft-1','dragonballs','planet="'.$this->planet.'"',7);
 	}
 	
 	public function Drop($player, $db)

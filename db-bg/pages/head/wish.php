@@ -5,16 +5,21 @@ if(!$player->HasRadar() && !$player->HasDBs())
 	exit();  
 }
 include_once 'classes/radar/radar.php';
+include_once 'classes/items/itemmanager.php';
+include_once 'classes/wish/wishmanager.php';
+
+$wishManager = new WishManager($database);
+$itemManager = new ItemManager($database);
+$planet = new Planet($database, $player->GetPlanet());
 $radar = new Radar($database, $player);
 
-
-$dragon = 'Shenlong';
-if($player->GetPlanet() == 'Namek') 
-  $dragon = 'Porunga';
+$dragon = $planet->GetDragon();
+$wishNum = $planet->GetWishNum();
+$wishLeft = 0;
+$wishes = $planet->GetWishes();
 
 $dbCount = $radar->GetDBCount();
 $drops = array();
-$wishes = 0;
 
 for($i = 0; $i < $dbCount; ++$i)
 {
@@ -32,18 +37,18 @@ for($i = 0; $i < $dbCount; ++$i)
 	if($length == 0 && $db->GetPlayer() == $player->GetID())
 	{
 		array_push($drops, $db);
-    $wishes = $db->GetWishes();
+    $wishLeft = $db->GetWishLeft();
 	}
 }
-
-if($player->HasDBs())
-  $wishes += 1;
 
 if(!$player->HasDBs() && count($drops) != 7)
 {
 	header('Location: ?p=radar');
 	exit();  
 }
+
+if($player->HasDBs())
+  $wishLeft += 1;
 
 if(isset($_GET['a']) && $_GET['a'] == 'wish')
 {
@@ -52,64 +57,79 @@ if(isset($_GET['a']) && $_GET['a'] == 'wish')
   {
     $message = 'Du hast keinen gültigen Wunsch gewählt.';
   }
-  if($wishes <= 0)
+  else if(!in_array($_POST['wish'], $wishes))
+  {   
+    $message = 'Du kannst dir das hier nicht wünschen.';
+  }
+  else if($wishLeft <= 0)
   {
-    $message = 'Du hast keinen Wünsche mehr frei.';
+    $message = 'Du hast keinen Wunsch mehr mehr frei.';
   }
   else
   {
-    $wish = $_POST['wish'];
-    $wished = true;
-    $wishZeni = 1000000;
-    $wishStats = 200;
+    $wishID = $_POST['wish'];
+    $wish = $wishManager->GetWish($wishID);
     
-    if($player->HasWish($wish))
+    if($player->HasWish($wishID) && !$wish->isRewishable())
     {
       $message = 'Du hast diesen Wunsch schon gewünscht!';
     }
     else
     {
-      switch($wish)
+      $type = $wish->GetType();
+      if($type == 0) // Zeni
       {
-        case 1: // Zeni
-          $player->AddZeni($wishZeni);
+          $player->AddZeni($wish->GetValue());
           $wished = true;
-          break;
-        case 2: //Stats
-          $player->AddStats($wishStats);
-          $wished = true;
-          break;
-        case 3: //Statspunkte reset
-            $player->ResetStats();
-            $wished = true;
-          break;
-        case 4: //Skillpunkte reset
-            $player->ResetSkills();
-            $wished = true;
-          break;
-        default:
-          $message = 'Du hast keinen gültigen Wunsch gewählt.';
-          break;
       }
+      else if($type == 1) // Stats
+      {
+          $player->AddStats($wish->GetValue());
+          $wished = true;
+      }
+      else if($type == 2) // Stats Reset
+      {
+          $player->ResetStats();
+          $wished = true;
+      }
+      else if($type == 3) // Skills Reset
+      {
+          $player->ResetSkills();
+          $wished = true;
+      }
+      else if($type == 4) // Items
+      {
+          $items = explode(';', $wish->GetItems());
+          foreach($items as &$itemDataArray)
+          {
+            $itemData = explode('@',$itemDataArray);
+            $itemID = $itemData[0];
+            $itemAmount = $itemData[1];
+            $item = $itemManager->GetItem($itemID);
+		        $player->BuyItem($item, $item, 0, 0, $itemAmount, 0);
+          }
+          $wished = true;
+      }
+      
       if($wished)
       {
         $titelManager = new titelManager($database);
-        $titelManager->AddTitelWish($player, $wish);
+        $titelManager->AddTitelWish($player, $wishID);
         
         $message = 'Dein Wunsch wurde gewährt.';
-        $wishes = $wishes-1;
+        $wishLeft = $wishLeft-1;
         
         if(count($drops) == 7)
         {
-          if($wishes == 0)
+          if($wishLeft == 0)
           {
-            $radar->EndWish();
+            $radar->EndWish($wishNum);
           }
           else
           {
             $radar->Wished();
           }
-          $player->UpdateWish($wish, 12); // Block for 12 wishes
+          $player->UpdateWish($wishID, 12); // Block for 12 wishes
         }
         else if($player->HasDBs())
         {
@@ -118,7 +138,7 @@ if(isset($_GET['a']) && $_GET['a'] == 'wish')
           $upgrade = 0;
           $amount = 1;
           $player->RemoveItemsByID($dbID, $dbID, $statstype, $upgrade, $amount);
-          $player->UpdateWish($wish, $player->GetWishCounter());
+          $player->UpdateWish($wishID, $player->GetWishCounter());
         }
       }
     }

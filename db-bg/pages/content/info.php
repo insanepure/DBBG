@@ -284,7 +284,7 @@ else if(isset($_GET['info']) && $_GET['info'] == 'rassen')
    <tr>
    <td><img width="200px" src="img/races/Mensch<?php echo rand(1,4); ?>.png"></td>
    <td valign="top">
-   Menschen sind intelligente Wesen, die auf den Planeten Erde geboren werded.<br/>
+   Menschen sind intelligente Wesen, die auf den Planeten Erde geboren werden.<br/>
    <b>Vorteile:</b><br/>
    Durch ihre Bekanntheit auf den Planeten, erhalten Menschen 10% mehr Zeni nach Kämpfen.<br/><br/>
    </td>

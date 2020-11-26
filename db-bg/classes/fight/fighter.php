@@ -484,6 +484,11 @@ class Fighters
 	{
 		return $this->data['transformations'];
 	}
+  
+	public function SetTransformations($value)
+	{
+		$this->data['transformations'] = $value;
+	}
 	
 	public function AddAttacks($attacks)
 	{

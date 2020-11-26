@@ -773,7 +773,7 @@ else if(isset($_GET['a']) && $_GET['a'] == 'challenge')
 			{
 				$message = 'Dein Gegner befindet sich schon im Kampf.';
 			}
-      else if($player->IsMulti($target))
+      else if($type != 0 && $player->IsMulti($target))
       {
         $message = 'Du kannst mit einen deiner Charaktere nicht kämpfen.';
       }

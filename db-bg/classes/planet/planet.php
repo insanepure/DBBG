@@ -72,6 +72,21 @@ class Planet
     return $this->data['maxstory'];
   }
   
+  public function GetWishNum()
+  {
+    return $this->data['wishnum'];
+  }
+  
+  public function GetWishes()
+  {
+    return explode(';', $this->data['wishes']);
+  }
+  
+  public function GetDragon()
+  {
+    return $this->data['dragon'];
+  }
+  
   public function CanSee($playerStory)
   {
     return ($this->data['minstory'] == 0 || $playerStory >= $this->data['minstory']) && ($this->data['maxstory'] == 0 ||$playerStory <= $this->data['maxstory']);

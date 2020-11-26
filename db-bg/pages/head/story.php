@@ -4,7 +4,12 @@
   include_once 'classes/npc/npc.php';
   include_once 'classes/bbcode/bbcode.php';
   $story = new Story($database, $player->GetStory());
-if(isset($_GET['a']) && $_GET['a'] == 'continue' && $story->GetType() == 1)
+if(isset($_GET['a']) && $_GET['a'] == 'jump' && $player->GetARank() >= 2)
+{
+  $player->JumpStory($_POST['storyid']);
+  $story = new Story($database, $player->GetStory());
+}
+else if(isset($_GET['a']) && $_GET['a'] == 'continue' && $story->GetType() == 1)
 {
   if($player->GetPlanet() != $story->Getplanet())
   {
@@ -104,28 +109,31 @@ else if(isset($_GET['a']) && $_GET['a'] == 'fight' && $story->GetType() == 2)
     
     $gPlayers = array();
     $group = $player->GetGroup();
-    foreach($group as &$gID)
+    if($group != null)
     {
-      $gPlayer = new Player($database, $gID, $actionManager);
-      if($gPlayer->GetPlace() == $player->GetPlace() && $gPlayer->GetPlanet() == $player->GetPlanet() 
-         && $gPlayer->GetLP() > ($gPlayer->GetMaxLP() * 0.2)
-         && $gPlayer->GetFight() == 0
-         && $gPlayer->GetTournament() == 0
-         && $gPlayer->GetID() != $player->GetID()
-        )
+      foreach($group as &$gID)
       {
-        array_push($gPlayers, $gPlayer);
+        $gPlayer = new Player($database, $gID, $actionManager);
+        if($gPlayer->GetPlace() == $player->GetPlace() && $gPlayer->GetPlanet() == $player->GetPlanet() 
+           && $gPlayer->GetLP() > ($gPlayer->GetMaxLP() * 0.2)
+           && $gPlayer->GetFight() == 0
+           && $gPlayer->GetTournament() == 0
+           && $gPlayer->GetID() != $player->GetID()
+          )
+        {
+          array_push($gPlayers, $gPlayer);
+        }
       }
     }
     array_push($gPlayers, $player);
     $difficulty = count($gPlayers);
     
-    if($story->GetSupportNPC() != 0)
-      $difficulty = $difficulty + 1;
+    $supportNPCs = $story->GetSupportNPCs();
+    $difficulty += count($supportNPCs);
+    $npcs = $story->GetNPCs();
     
-    $npc = new NPC($database, $story->GetNPC(), $difficulty);
     $type = 4; //StoryFight
-    $mode = $difficulty.'vs1';
+    $mode = $difficulty.'vs'.count($npcs);
     $name = $story->GetTitel();
     $survivalrounds = $story->GetSurvivalRounds();
     $survivalteam = $story->GetSurvivalTeam();
@@ -142,35 +150,47 @@ else if(isset($_GET['a']) && $_GET['a'] == 'fight' && $story->GetType() == 2)
     $tournament=0;
     $dragonball=0;
     $npcid=0;
-    $difficulty=0;
     /*CreateFight($player, $database, $type, $name, $mode, $levelup=0, $actionManager=null, $zeni=0, 
 															$items=0, $story=0, $challenge=0, $survivalteam=0, $survivalrounds=0, $survivalwinner=0, 
                               $event=0, $healing=0, $eventfight=0, $tournament=0, $dragonball=0, $npcid=0, $difficulty=0,
                               $healthRatio=0, $healthRatioTeam=0, $healthRatioWinner=0)
                               */
+    
     $pLP = $player->GetLP() * ($startingHealthRatioPlayer/100);
     $pLP = floor($pLP);
     $player->SetLP($pLP);
     
+    $difficulty = ceil($difficulty / count($npcs));
+    
+    $npcsArray = array();
+    foreach($npcs as &$npcID)
+    {
+      $npc = new NPC($database, $npcID, $difficulty);
+      $nLP = $npc->GetRawLP() * ($startingHealthRatioEnemy/100);
+      $nLP = floor($nLP);
+      $npc->SetLP($nLP);
+      array_push($npcsArray, $npc);
+      
     if($npc->GetPlayerAttack() != 0)
       $player->AddFightAttack($npc->GetPlayerAttack());
+    }
     
     $createdFight = Fight::CreateFight($player, $database, $type, $name, $mode, $story->GetLevelup(), $actionManager, $story->GetZeni(), $story->GetItems(), 
                                        $story->GetID(), 0, $survivalteam, $survivalrounds, $survivalwinner, $event, $healing, $eventFight, 
                                        $tournament, $dragonball, $npcid, $difficulty, $healthRatio, $healthRatioTeam, $healthRatioWinner);
     
-    $nLP = $npc->GetRawLP() * ($startingHealthRatioEnemy/100);
-    $nLP = floor($nLP);
-    $npc->SetLP($nLP);
-    
-    $createdFight->Join($npc, $team, true);
-    
-    
-    if($story->GetSupportNPC() != 0)
+    foreach($npcsArray as &$npc)
     {
-      $supportNPC = new NPC($database, $story->GetSupportNPC(), 1);
-      
-      $createdFight->Join($supportNPC, 0, true);
+      $createdFight->Join($npc, $team, true);
+    }
+    
+    if(count($supportNPCs) != 0)
+    {
+      foreach($supportNPCs as &$supportNPCID)
+      {
+        $supportNPC = new NPC($database, $supportNPCID, 1);
+        $createdFight->Join($supportNPC, 0, true);
+      }
     }
     
     $charaids = array();

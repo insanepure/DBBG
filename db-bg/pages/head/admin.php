@@ -15,7 +15,7 @@ if(!isset($player) || !$player->IsValid() || $player->GetARank() < 2)
 	exit();  
 }
 
-$limitedTables = array('actions', 'attacks', 'items', 'npcs', 'places', 'story', 'events', 'titel', 'patterns', 'planet');
+$limitedTables = array('actions', 'attacks', 'items', 'npcs', 'places', 'story', 'events', 'titel', 'patterns', 'planet', 'wishes');
 
 if($player->GetARank() < 3 && isset($_GET['table']) && !in_array($_GET['table'], $limitedTables))
 {
@@ -127,7 +127,7 @@ else if(isset($_GET['a']) && $_GET['a'] == 'edit')
 		}
 		
 	}
-	if($table == 'tournaments')
+	if($table == 'tournaments' || $table == 'wishes')
 	{
 		if(isset($_POST['amountitems_item']))
 		{
@@ -164,6 +164,15 @@ else if(isset($_GET['a']) && $_GET['a'] == 'edit')
 			$_POST['race'] = '';
 		}
 	}
+	
+		if(isset($_POST['wishes']))
+		{
+			$_POST['wishes'] = implode(';',$_POST['wishes']);
+		}
+		else
+		{
+			$_POST['wishes'] = '';
+		}
 	
 	if($table == 'events')
 	{
@@ -359,6 +368,15 @@ else if(isset($_GET['a']) && $_GET['a'] == 'edit')
   else
   {
     $_POST['npcs'] = '';
+  }
+  
+  if(isset($_POST['supportnpcs']))
+  {
+    $_POST['supportnpcs'] = implode(';', $_POST['supportnpcs']);
+  }
+  else
+  {
+    $_POST['supportnpcs'] = '';
   }
   
   if(isset($_POST['trainers']))

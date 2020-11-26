@@ -61,3 +61,34 @@ if($story == null)
   <div class="spacer"></div>
 </div>
   <div class="spacer"></div>
+
+<?php
+if($player->GetARank() >= 2)
+{
+$select = "id, titel";
+$where = '';
+$order = 'id';
+$from = 'story';
+$list = new Generallist($database, $from, $select, $where, $order, 1000, 'DESC');
+?>
+<form method="POST" action="?p=story&a=jump">
+<select class="select" name="storyid" id="storyid">
+<?php
+//preSort the arrays, so that we can easily show them
+$id = 0;
+$entry = $list->GetEntry($id);
+while($entry != null)
+{
+?> 
+  <option value="<?php echo $entry['id']; ?>"><?php echo '('.$entry['id'].') '.$entry['titel']; ?></option><?php
+  ++$id;
+  $entry = $list->GetEntry($id);
+}  
+?>
+</select>
+<input type="submit" value="Springen">  
+</form>
+<br/>
+<?php
+}
+?>

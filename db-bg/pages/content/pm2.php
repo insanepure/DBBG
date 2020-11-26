@@ -1,4 +1,12 @@
 <?php
+
+$start = 0;
+$limit = 30;
+$timeOut = 30;
+if(isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 0)
+{
+  $start = $limit * ($_GET['page']-1);
+}
 if(!isset($_GET['p2']) || isset($_GET['p2']) && $_GET['p2'] == 'inbox')
 {
 ?>
@@ -21,7 +29,7 @@ function toggle_sys(source) {
   }
 }
 </script>
-<form method="POST" action="?p=pm2&a=action">
+<form method="POST" action="?p=pm2<?php if(isset($_GET['page'])) echo '&page='.$_GET['page']; ?>&a=action">
 <table width="98%" cellspacing="0" border="0">
   <tr>
     <td colspan=6 height="20px">
@@ -39,17 +47,11 @@ function toggle_sys(source) {
     <td width="20%"><b><center>Aktion</center></b></td>
   </tr>
   <?php
-  $PMManager->LoadInbox();
+  $PMManager->LoadInbox($start, $limit, true);
   $i = 0;
   $pm = $PMManager->GetPM($i);
   while($pm != null)
   {
-	  			if($pm->GetSenderID() > 0)
-			{
-			++$i;
-			$pm = $PMManager->GetPM($i);
-			continue;
-			}
     ?>
     <tr>
          <td width="25%" class="boxSchatten"><center><?php if($pm->GetRead() == 0) echo '<b>'; ?><?php if($pm->GetSenderName() == "Chat" OR $pm->GetSenderName() == "System" ) {echo "<font color='red'>".$pm->GetTime()."</font>";}else{echo $pm->GetTime();} ?><?php if($pm->GetRead() == 0) echo '</b>'; ?></center></td>
@@ -67,6 +69,24 @@ function toggle_sys(source) {
   }
   ?>
 </table>
+<?php
+  $total = $PMManager->LoadPMCount(true, true);
+  $pages = ceil($total / $limit);
+if($pages != 1)
+{
+  ?>
+  <div class="spacer"></div>
+  <?php
+  $i = 0;
+  while($i != $pages)
+  {
+    ?>
+    <a href="?p=pm2&page=<?php echo $i+1; if(isset($_GET['p2'])) echo '&p2='.$_GET['p2']; ?>">Seite <?php echo $i+1; ?></a> 
+    <?php
+    ++$i;
+  }
+}
+?>
 <div class="spacer"></div>
 <table width="98%" cellspacing="0" border="0">
   <tr>
@@ -93,67 +113,6 @@ function toggle_sys(source) {
         Ungelesene als gelesen markieren
         </button>
     </tr>
-</table>
-</form>
-<?php
-}
-else if(isset($_GET['p2']) && $_GET['p2'] == 'outbox')
-{
-?>
-<table width="98%" cellspacing="0" border="0">
-  <tr>
-    <td colspan=6 height="20px">
-    </td>
-  </tr>
-  <tr>
-    <td colspan=6 class="catGradient borderT borderB">
-      <b><center><font color="white"><div class="schatten">Gesendete Nachrichten</div></font></center></b>
-    </td>
-  </tr>
-  <tr class="boxSchatten">
-    <td width="25%"><b><center>Datum</center></b></td>
-    <td width="25%"><b><center>An</center></b></td>
-    <td width="30%"><b><center>Betreff</center></b></td>
-    <td width="20%"><b><center>Aktion</center></b></td>
-  </tr>
-  <?php
-  $PMManager->LoadOutbox();
-  $i = 0;
-  $pm = $PMManager->GetPM($i);
-  while($pm != null)
-  {
-    ?>
-    <tr>
-      <td width="25%" class="boxSchatten"><center><?php if($pm->GetRead() == 0) echo '<b>'; ?><?php echo $pm->GetTime(); ?><?php if($pm->GetRead() == 0) echo '</b>'; ?></center></td>
-      <td width="25%" class="boxSchatten"><center><?php if($pm->GetRead() == 0) echo '<b>'; ?><a href="?p=profil&id=<?php echo $pm->GetReceiverID(); ?>"><?php echo $pm->GetReceiverName(); ?></a><?php if($pm->GetRead() == 0) echo '</b>'; ?></center></td>
-      <td width="30%" class="boxSchatten"><center><?php if($pm->GetRead() == 0) echo '<b>'; ?><?php echo $pm->GetTopic(); ?><?php if($pm->GetRead() == 0) echo '</b>'; ?></center></td>
-      <td width="20%" class="boxSchatten"><center><?php if($pm->GetRead() == 0) echo '<b>'; ?><a href="?p=pm2&p2=read&id=<?php echo $pm->GetID(); ?>">Lesen</a><?php if($pm->GetRead() == 0) echo '</b>'; ?></center></td>
-    </tr>
-    <?php
-    ++$i;
-    $pm = $PMManager->GetPM($i);
-  }
-  ?>
-</table>
-<?php
-}
-else if(isset($_GET['p2']) && $_GET['p2'] == 'send')
-{
-?>
-<form method="POST" action="?p=pm2&a=send">
-<table width="100%" cellspacing="0" border="0">
-  <tr>
-    <td><center><input style="width:500px;" type="text" name="to" placeholder="An" <?php if(isset($_GET['name'])) echo 'value="'.$_GET['name'].'"'; ?>></center></td>
-  </tr>
-  <tr>
-    <td><center><input style="width:500px;" type="text" name="topic" placeholder="Betreff" <?php if(isset($_GET['topic'])) echo 'value="RE: '.$_GET['topic'].'"'; ?>></center></td>
-  </tr>
-  <tr>
-    <td><center><textarea style="width:500px; height:250px;" name="text"></textarea></center></td>
-  </tr>
-  <tr>
-    <td><center><input type="submit" value="senden" style="width:300px;"></center></td>
-  </tr>
 </table>
 </form>
 <?php

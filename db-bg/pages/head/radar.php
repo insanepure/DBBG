@@ -5,6 +5,11 @@ if(!$player->HasRadar())
 	exit();  
 }
 include_once 'classes/radar/radar.php';
+$planet = new Planet($database, $player->GetPlanet());
+
+$dragon = $planet->GetDragon();
+$wishNum = $planet->GetWishNum();
+$wishes = $planet->GetWishes();
 
 function GetStarName($stars)
 {

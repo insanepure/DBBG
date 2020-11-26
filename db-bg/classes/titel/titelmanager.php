@@ -67,62 +67,68 @@ class TitelManager
   
   public function AddTitelWish($player, $wish)
   {
+    $titels = $player->GetTitels();
     foreach($this->titels as &$titel)
     {
       if(!$player->HasTitel($titel->GetID()) && $titel->GetType() == 4 && $titel->GetCondition()  == $wish)
       {
-        $this->AddTitelWithProgress($player->GetID(), $player->GetTitels(), $progress, $titel);
+        $this->AddTitelWithProgress($player->GetID(), $titels, $progress, $titel);
       }
     }
   }
   
   public function AddTitelStory($player, $story)
   {
+    $titels = $player->GetTitels();
     foreach($this->titels as &$titel)
     {
       if(!$player->HasTitel($titel->GetID()) && $titel->GetType() == 2 && $titel->GetCondition() < $story)
       {
-        $this->AddTitelWithProgress($player->GetID(), $player->GetTitels(), $titel->GetCondition(), $titel);
+        $this->AddTitelWithProgress($player->GetID(), $titels, $titel->GetCondition(), $titel);
       }
     }
   }
   
   public function AddTitelAction($player, $progress, $action)
   {
+    $titels = $player->GetTitels();
     foreach($this->titels as &$titel)
     {
       if(!$player->HasTitel($titel->GetID()) && $titel->GetType() == 3 && $titel->GetAction() == $action)
       {
-        $this->AddTitelWithProgress($player->GetID(), $player->GetTitels(), $progress, $titel);
+        $this->AddTitelWithProgress($player->GetID(), $titels, $progress, $titel);
       }
     }
   }
   
   public function AddTitelFight($player, $progress, $fight, $sort)
   {
+    $titels = $player->GetTitels();
     foreach($this->titels as &$titel)
     {
       //TitleSort = 3 == Total
       if(!$player->HasTitel($titel->GetID()) && $titel->GetType() == 6 && ($titel->GetFight() == $fight || $titel->GetFight() == -1) && ($titel->GetSort() == $sort || $titel->GetSort() == 3))
       {
-        $this->AddTitelWithProgress($player->GetID(), $player->GetTitels(), $progress, $titel);
+        $this->AddTitelWithProgress($player->GetID(), $titels, $progress, $titel);
       }
     }
-  }
+   }
+  
   
   public function AddTitelNPC($player, $progress, $npc, $fight, $sort)
   {
+    $titels = $player->GetTitels();
     foreach($this->titels as &$titel)
     {
       //TitleSort = 3 == Total
       if(!$player->HasTitel($titel->GetID()) && $titel->GetType() == 1 && $titel->GetNPC() == $npc && ($titel->GetFight() == $fight || $titel->GetFight() == -1) && ($titel->GetSort() == $sort || $titel->GetSort() == 3))
       {
-        $this->AddTitelWithProgress($player->GetID(), $player->GetTitels(), $progress, $titel);
+        $this->AddTitelWithProgress($player->GetID(), $titels, $progress, $titel);
       }
     }
   }
   
-  private function AddTitelWithProgress($playerid, $playertitels, $progress, $titel)
+  private function AddTitelWithProgress($playerid, &$playertitels, $progress, $titel)
   {
     if(in_array($titel->GetID(), $playertitels))
       return;
@@ -167,13 +173,13 @@ class TitelManager
     return $titleprogress['progress'];
   }
   
-  private function AddTitel($playerid, $playertitels, $titel)
+  private function AddTitel($playerid, &$playertitels, $titel)
   {
 	  $result = $this->database->Delete('titelprogress','acc = "'.$playerid.'" AND title="'.$titel->GetID().'"',1);
     
     array_push($playertitels, $titel->GetID());
-    $playertitels = implode(';',$playertitels);
-		$set = 'titels="'.$playertitels.'"';
+    $playerTitelStr = implode(';',$playertitels);
+    $set = 'titels = "'.$playerTitelStr.'"';
 		$result = $this->database->Update($set,'accounts','id = "'.$playerid.'"',1);
   }
   

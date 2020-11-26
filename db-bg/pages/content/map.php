@@ -13,7 +13,7 @@ grecaptcha.ready(function() {
   /*if($player->GetARank() >=3) {
     $database->Debug();
   }*/
-  $places = new Generallist($database, 'places', 'id,name,description,display,x,y,image,planet,travelable', 'planet = "'.$player->GetPlanet().'"', '', 99999, 'ASC');
+  $places = new Generallist($database, 'places', 'id,name,description,display,x,y,image,planet,travelable, adminplace', 'planet = "'.$player->GetPlanet().'"', '', 99999, 'ASC');
   $id = 0;
   $entry = $places->GetEntry($id);
   $x = 0;
@@ -63,7 +63,7 @@ grecaptcha.ready(function() {
     if($story->GetPlace() == $entry['name'] && $story->GetPlanet() == $player->GetPlanet())
       $placeCSS = 'mapplacestory';
     
-		if($entry['display'] == 1 || $player->GetArank() >= 2 && $entry['id'] == 10)
+		if($entry['display'] == 1 || $player->GetArank() >= 2 && $entry['adminplace'] == 1)
 		{
 				?>
 			<div class="tooltip" style="position:absolute; left:<?php echo $entry['x']; ?>px; top:<?php echo $entry['y']; ?>px;"> 

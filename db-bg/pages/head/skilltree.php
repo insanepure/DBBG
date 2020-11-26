@@ -74,7 +74,7 @@ if(isset($_GET['a']) && $_GET['a'] == 'learn' && isset($_GET['attack']) && is_nu
       $message = 'Du tust bereits etwas.';
     else
     {
-      $player->Learn($action, $minutes, $attack->GetName(), $skill->GetNeededPoints());
+      $player->Learn($action, $minutes, $attack->GetID(), $skill->GetNeededPoints());
       $message = 'Du lernst nun '.$attack->GetName();
     }
   }

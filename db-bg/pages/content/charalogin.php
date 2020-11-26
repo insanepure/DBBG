@@ -53,7 +53,16 @@ if ($account->IsLogged() && $userLoginActive)
 						<?php 
             if($action->GetType() == 5)
             {
-            echo $displayedPlayer->GetLearningAttack().' ';
+			        $attackName = 'invalidAttack';
+              $result = $database->Select('id, name','attacks','id = "'.$displayedPlayer->GetLearningAttack().'"',1);
+              $attackID = 0;
+              if ($result) 
+              {
+                $row = $result->fetch_assoc();
+                $attackName = $row['name'];
+                $result->close();
+              }
+              echo $attackName.' ';
             }
             echo $action->GetName();
             if($action->GetType() == 4)

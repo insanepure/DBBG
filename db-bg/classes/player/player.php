@@ -1264,13 +1264,13 @@ class Player
 	static public function CalculateSparringWin($database, $player1, $player2)
 	{
 		$attackManager = new AttackManager($database);
+		$actionManager = new ActionManager($database);
     
     if(!$player2->IsValid()) $player2 = $player1;
-		$ki = Player::GetSparringKI($player2->GetKI(), $player2->GetTotalStatsFights(), $player2->GetLevel(), $player2->GetStats(), $player2->GetWishes(), $player2->GetStory(), $player2->GetAttacks(), $attackManager);
+		$ki = Player::GetSparringKI($player2->GetKI(), $player2->GetTotalStatsFights(), $player2->GetLevel(), $player2->GetStats(), $player2->GetWishes(), $player2->GetStory(), $player2->GetAttacks(), $attackManager, $actionManager, $database);
 
     if(!$player1->IsValid()) $player1 = $player2;
-		$playerKI = Player::GetSparringKI($player1->GetKI(), $player1->GetTotalStatsFights(), $player1->GetLevel(), $player1->GetStats(), $player1->GetWishes(), $player1->GetStory(), $player1->GetAttacks(), $attackManager);
-
+		$playerKI = Player::GetSparringKI($player1->GetKI(), $player1->GetTotalStatsFights(), $player1->GetLevel(), $player1->GetStats(), $player1->GetWishes(), $player1->GetStory(), $player1->GetAttacks(), $attackManager, $actionManager, $database);
     
 		$kiDiff = ($ki - $playerKI);
 		$statsWin = round($kiDiff * 0.015); //Aim KI is 100, 100 x 0.015 = 1.5 Stats
@@ -1282,7 +1282,7 @@ class Player
 		return $statsWin;
 	}
 	
-	static public function GetSparringKI($ki, $totalStatsFights, $level, $stats, $wishes, $story, $attacks, $attackManager)
+	static public function GetSparringKI($ki, $totalStatsFights, $level, $stats, $wishes, $story, $attacks, $attackManager, $actionManager, $database)
 	{
     $attacks = explode(';',$attacks);
     $learnTime = 0;
@@ -1297,8 +1297,6 @@ class Player
       $ki = $ki + floor($learnTime/4);
     }
     
-    $wishes = explode(';',$wishes);
-    $statsWish = 2;
 
 		$WKStats = floor($totalStatsFights/10)*10;
 
@@ -1308,32 +1306,35 @@ class Player
 
 		$ki = $ki - floor($levelStats/4) - floor($WKStats/4);
 		$ki = $ki + floor($leftStats/4);
-    if(in_array($statsWish, $wishes))
-      $ki = $ki - 50;
-    if($story > 48) //in Story 48, we are getting 48 Stats for 24 Hours, so we subtract those stats
+    
+    $wishes = explode(';',$wishes);
+    $wishStatsErde = 200;
+    $wishStatsNamek = 400;
+    $statsWishErde = 2;
+    $statsWishNamek = 5;
+    
+    if(in_array($statsWishErde, $wishes))
+      $ki = $ki - $wishStatsErde/4;
+    if(in_array($statsWishNamek, $wishes))
+      $ki = $ki - $wishStatsNamek/4;
+    
+    $storyGain = 0;
+    $result = $database->Select('*', 'story', 'action != 0 AND id < '.$story, 99999, 'id', 'ASC');
+    if ($result) 
     {
-      $ki = $ki - (48/4);
+      if ($result->num_rows > 0)
+      {
+         while($row = $result->fetch_assoc()) 
+         {
+            $action = $actionManager->GetAction($row['action']);
+            $storyGain += $action->GetStats();
+         }
+      }
+      $result->close();
     }
-    if($story > 95) //in Story 95, we are getting 100 Stats for 24 Hours, so we subtract those stats
-    {
-      $ki = $ki - (100/4);
-    }
-    if($story > 138) //in Story 138, we are getting 120 Stats for 24 Hours, so we subtract those stats
-    {
-      $ki = $ki - (160/4);
-    }
-    if($story > 146) //in Story 146, we are getting 80 Stats for 24 Hours, so we subtract those stats
-    {
-      $ki = $ki - (80/4);
-    }
-    if($story > 148) //in Story 148, we are getting 80 Stats for 24 Hours, so we subtract those stats
-    {
-      $ki = $ki - (80/4);
-    }
-    if($story > 171)
-    {
-      $ki = $ki - (200/4);
-    }
+    
+    $storyGain = ceil($storyGain/4);
+    $ki = $ki - $storyGain;
 		
 		return $ki;
 	}
@@ -1696,16 +1697,7 @@ class Player
 		else if($countdown <= 0 && $action->GetType() == 5 && !$force)
 		{
 			$attacks = $this->GetAttacks();
-			$attack = $this->GetLearningAttack();
-			
-			$result = $this->database->Select('id, name','attacks','name = "'.$attack.'"',1);
-			$attackID = 0;
-			if ($result) 
-			{
-				$row = $result->fetch_assoc();
-				$attackID = $row['id'];
-				$result->close();
-			}
+			$attackID = $this->GetLearningAttack();
 			
       $this->AddDebugLog(' - add Attack '.$attackID.' to '.$attacks);
 			$attacks = $attacks.';'.$attackID;
@@ -1715,7 +1707,13 @@ class Player
 		}
 		else if($times != 0 && $action->GetType() == 6)
 		{
-			if($action->GetID() == 48) //Affenschwanz ab
+			if($action->GetID() == 30) //KI Unterdrücken
+			{
+        $this->AddDebugLog(' - KI Unterdrücken');
+        $this->SetCanFakeKI(1);
+			  $update = $update.',canfakeki="1"';
+      }
+			else if($action->GetID() == 48) //Affenschwanz ab
 			{
         $this->AddDebugLog(' - Apetail off');
         $this->SetApeTail(0);
@@ -2166,6 +2164,12 @@ class Player
 		$this->SetAttacks($attacks);
 		$result = $this->database->Update('attacks="'.$attacks.'"','accounts','id = "'.$this->data['id'].'"',1);
 		return true;
+	}
+	
+	public function JumpStory($story)
+	{
+		$this->SetStory($story);
+		$result = $this->database->Update('story="'.$this->GetStory().'"','accounts','id = "'.$this->data['id'].'"',1);
 	}
 	
 	public function ContinueStory($levelup, $zeni, $items, $skillpoints, $itemManager)
