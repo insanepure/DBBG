@@ -1308,15 +1308,21 @@ class Player
 		$ki = $ki + floor($leftStats/4);
     
     $wishes = explode(';',$wishes);
-    $wishStatsErde = 200;
-    $wishStatsNamek = 400;
-    $statsWishErde = 2;
-    $statsWishNamek = 5;
-    
-    if(in_array($statsWishErde, $wishes))
-      $ki = $ki - $wishStatsErde/4;
-    if(in_array($statsWishNamek, $wishes))
-      $ki = $ki - $wishStatsNamek/4;
+    $result = $database->Select('*', 'wishes', '', 99999, 'id', 'ASC');
+    if ($result) 
+    {
+      if ($result->num_rows > 0)
+      {
+         while($row = $result->fetch_assoc()) 
+         {
+           if($row['type'] == 2 && in_array($row['id'], $wishes))
+           {
+              $ki = $ki - $row['value']/4;
+           }
+         }
+      }
+      $result->close();
+    }
     
     $storyGain = 0;
     $result = $database->Select('*', 'story', 'action != 0 AND id < '.$story, 99999, 'id', 'ASC');
