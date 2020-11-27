@@ -115,6 +115,12 @@ class PatternManager
   {
     $fight->AddDebugLog(' - - Testing Pattern: '.$pattern->GetName());
     
+    if($pattern->GetPatternNeed() != $fighter->GetPatternID())
+    {
+      $fight->AddDebugLog(' - - - PatternID ('.$fighter->GetPatternID().') != Need ('.$pattern->GetPatternNeed().')');
+      return false;
+    }
+    
     $patternAttack = $pattern->GetAttack();
     
 		//$attacks = explode(';',$fighter->GetAttacks());

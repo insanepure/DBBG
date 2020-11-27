@@ -69,6 +69,16 @@ class Fighters
     $this->data['buffs'] = $value;
   }
   
+  public function GetPatternID()
+  {
+    return $this->data['patternid'];
+  }
+  
+  public function SetPatternID($value)
+  {
+    $this->data['patternid'] = $value;
+  }
+  
   public function GetApeTail()
   {
     return $this->data['apetail'];

@@ -517,17 +517,19 @@ class Fight
       }
     }
     
+    $patternid = 0;
+    
     //0 = self
     //1 = Random Enemy
     //2 = Random Team
     //3 = Schwächster Team
     //4 = Schwächster Gegner
     $targetType = 0;
-    
     if($pattern != null)
     {
       $attack = $this->GetAttack($pattern->GetAttack());
       $targetType = $pattern->GetPatternTarget();
+      $patternid = $pattern->GetPatternSet();
     }
     else
     {
@@ -555,8 +557,9 @@ class Fight
 		$fighter->SetAction($aid);
 		$fighter->SetTarget($tID);
 		$fighter->SetPreviousTarget($tID);
+    $fighter->SetPatternID($patternid);
     $timestamp = date('Y-m-d H:i:s');
-		$result = $this->database->Update('action="'.$aid.'", target="'.$tID.'", previoustarget="'.$tID.'", lastaction="'.$timestamp.'"','fighters','id = "'.$fighter->GetID().'"',1);
+		$result = $this->database->Update('action="'.$aid.'", target="'.$tID.'", previoustarget="'.$tID.'", lastaction="'.$timestamp.'", patternid="'.$patternid.'"','fighters','id = "'.$fighter->GetID().'"',1);
 		
 	}
   
@@ -2836,7 +2839,26 @@ class Fight
   
 	private function DoMiscAttacks($player, $target, $attack)
 	{
-    if($attack->GetID() == 337) // Saibaman Explosion
+    if($attack->GetID() == 457) // Freezer 100% Todesball
+    {
+      for($i = 0; $i < count($this->teams); ++$i)
+      {
+        $team = $this->teams[$i];
+        if($i == $player->GetTeam())
+          continue;
+        
+        for($j = 0; $j < count($team); ++$j)
+        {
+          $fighter = $team[$j];
+          $this->AddDebugLog(' - '.$fighter->GetName().' is using: '.$fighter->GetAction());
+          $fighter->SetLP(0);
+          $this->AddDebugLog(' - '.$fighter->GetName().' is dead.');
+          
+        }
+      }
+			return $attack->GetText();
+    }
+    else if($attack->GetID() == 337) // Saibaman Explosion
     {
       for($i = 0; $i < count($this->teams); ++$i)
       {
@@ -2870,22 +2892,23 @@ class Fight
       }
     }
     
-    
-		$miss = rand(0,100);
-		$hit = $attack->GetAccuracy() * ($player->GetAccuracy() / $target->GetReflex());
-		
-		if($target->GetLP() > 0 && $target->GetParalyzed() == 0 && $hit < $miss)
-		{
-			return $attack->GetMissText();
-		}
-    
 		if($attack->GetID() == 296) //Affenschwanz abtrennen
 		{
+      $miss = rand(0,100);
+      $hit = $attack->GetAccuracy() * ($player->GetAccuracy() / $target->GetReflex());
+      
+      if($target->GetLP() > 0 && $target->GetParalyzed() == 0 && $hit < $miss)
+      {
+        return $attack->GetMissText();
+      }
+      
       $target->SetApeTail(1);
 			$result = $this->database->Update('apetail="1"','fighters','id = "'.$target->GetID().'"',1);
       $this->addAttackTitel($player, $attack);
 			return $attack->GetText();
 		}
+    
+	  return $attack->GetText();
 	}
   
 	private function Fuse($player, $target, $action)
@@ -3422,7 +3445,6 @@ class Fight
 		$result = $this->database->Update($update,'fighters','id = "'.$target->GetID().'"',1);
     
     $this->addAttackTitel($player, $attack);
-    
 		return $returnText;
 	}
 	

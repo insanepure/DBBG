@@ -57,4 +57,14 @@ class Pattern
   {
     return $this->data['patterntarget'];
   }
+  
+  public function GetPatternNeed()
+  {
+    return $this->data['patternneed'];
+  }
+  
+  public function GetPatternSet()
+  {
+    return $this->data['patternset'];
+  }
 }
