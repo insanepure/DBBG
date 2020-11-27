@@ -811,6 +811,8 @@ class Player
 	{
 		$result = $this->database->Delete('accounts','id = "'.$this->GetID().'"',1);
 		$result = $this->database->Delete('market','sellerid = "'.$this->GetID().'"',999999999);
+		$result = $this->database->Delete('statslist','acc = "'.$this->GetID().'"',999999999);
+		$result = $this->database->Delete('inventory','ownerid = "'.$this->GetID().'"',999999999);
 	}
   
   public function UpgradeChip()
