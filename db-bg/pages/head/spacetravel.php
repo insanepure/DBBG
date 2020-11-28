@@ -32,10 +32,10 @@ if(isset($_GET['a']) && $_GET['a'] == 'travel')
 				{
 					$message = 'Du tust bereits etwas.';
 				}
-        else if($player->GetARank() < 2)
-        {
-          $message = 'Dies ist noch nicht möglich.';
-        }
+
+        
+
+
         else
         {
 					$playerPlanet = new Planet($database, $player->GetPlanet());
