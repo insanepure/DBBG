@@ -3206,8 +3206,6 @@ class Fight
 		$returnText = $attack->GetText();
     
 		$atkVal = $player->GetAttack() / $target->GetDefense();
-    if(!$useAtkVal)
-		$atkVal = 1;
 		
 		$damage = $player->GetLoadValue() * ($attack->GetValue()/100) * $atkVal;
 		
