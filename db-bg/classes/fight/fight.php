@@ -3204,8 +3204,12 @@ class Fight
 		}
 		
 		$returnText = $attack->GetText();
+    
+		$atkVal = $player->GetAttack() / $target->GetDefense();
+    if(!$useAtkVal)
+		$atkVal = 1;
 		
-		$damage = $player->GetLoadValue() * ($attack->GetValue()/100);
+		$damage = $player->GetLoadValue() * ($attack->GetValue()/100) * $atkVal;
 		
 		//if($player->GetRace() == 'Mensch')
     //  $crit = rand(0,1);
