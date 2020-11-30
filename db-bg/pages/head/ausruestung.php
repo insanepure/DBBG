@@ -7,11 +7,11 @@ if(isset($_GET['a']) && $_GET['a'] == 'combine')
 {
   if(!isset($_POST['visualitem']) || !is_numeric($_POST['visualitem']))
   {
-    $message = 'Diese ID ist ungültig.';
+    //$message = 'Diese ID ist ungültig.';
   }
   else if(!isset($_POST['statsitem']) || !is_numeric($_POST['statsitem']))
   {
-    $message = 'Diese ID ist ungültig.';
+    //$message = 'Diese ID ist ungültig.';
   }
   else
   {

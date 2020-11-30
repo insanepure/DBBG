@@ -6,7 +6,7 @@ if(isset($_GET['a']) && $_GET['a'] == 'use')
 {
   if(!isset($_POST['id']) || !is_numeric($_POST['id']))
   {
-    $message = 'Diese ID ist ungültig.';
+    //$message = 'Diese ID ist ungültig.';
   }
   else if($player->GetFight() != 0)
   {
