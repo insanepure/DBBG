@@ -143,6 +143,32 @@ else if(isset($_GET['a']) && $_GET['a'] == 'promote' && $clan->GetLeader() == $p
 		}
 	}
 }
+else if(isset($_GET['a']) && $_GET['a'] == 'payout' && ($clan->GetLeader() == $player->GetID() || $clan->GetCoLeader() == $player->GetID()))
+{
+	if(isset($_POST['playerid']) && is_numeric($_POST['playerid']))
+	{
+		$otherPlayer = new Player($database, $_POST['playerid'], $actionManager);
+		if($otherPlayer->GetClan() != $clan->GetID())
+		{
+			$message = 'Dieser Spieler ist nicht in deinen Clan.';
+		}
+		else if(isset($_POST['zeni']) && is_numeric($_POST['zeni']) && $_POST['zeni'] > 0)
+		{
+        $zeni = $_POST['zeni'];
+        if($clan->GetZeni() < $zeni)
+        {
+          $message = 'Der Clan hat nicht genügend Zeni.';
+        }
+        else
+        {
+          //$byacc, $byname, $toacc, $toname
+          $clan->RemoveZeni($zeni, $player->GetID(), $player->GetName(), $otherPlayer->GetID(), $otherPlayer->GetName());
+          $otherPlayer->RemoveZeni($zeni);
+          $message = 'Du hast '.$zeni.' Zeni an '.$otherPlayer->GetName().' gezahlt.';
+        }
+		}
+	}
+}
 else if(isset($_GET['a']) && $_GET['a'] == 'kick' && ($clan->GetLeader() == $player->GetID() || $clan->GetCoLeader() == $player->GetID()))
 {
 	if(isset($_GET['id']) && is_numeric($_GET['id']))

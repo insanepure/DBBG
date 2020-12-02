@@ -204,6 +204,32 @@ Clan Kasse Infos
 	<td width="50%"><center><input type="submit" value="Einzahlen"></center></td>
   </form>
   </tr>
+<?php 
+if($clan->GetLeader() == $player->GetID() || $clan->GetCoLeader() == $player->GetID())
+{ 
+?>
+  <tr>
+  <form method="POST" action="?p=clanmanage&a=payout">
+	<td width="50%"><center><input type="number" name="zeni" placeholder="0"></center></td>
+		<td width="50%"><center><select name="playerid">
+      <?php
+      $list = new Generallist($database, 'accounts', '*', 'clan="'.$clan->GetID().'"', 'rank', 30, 'ASC');
+      $id = 0;
+      $entry = $list->GetEntry($id);
+      while($entry != null)
+      {
+        ?><option value="<?php echo $entry['id']; ?>"><?php echo $entry['name']; ?></option><?php
+        ++$id;
+        $entry = $list->GetEntry($id);
+      }
+      ?>
+      </select></center></td>
+	<td width="50%"><center><input type="submit" value="Auszahlen"></center></td>
+  </form>
+  </tr>
+<?php 
+}
+?>
 </table>
 <?php 
 if($clan->GetLeader() == $player->GetID() || $clan->GetCoLeader() == $player->GetID())
