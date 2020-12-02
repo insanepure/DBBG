@@ -68,7 +68,7 @@ grecaptcha.ready(function() {
 				?>
 			<div class="tooltip" style="position:absolute; left:<?php echo $entry['x']; ?>px; top:<?php echo $entry['y']; ?>px;"> 
 			<a style="cursor:pointer;" onclick="OpenPopupPage('<?php echo $entry['name']; ?>','map/place.php?name=<?php echo $entry['name']; ?>&planet=<?php echo $entry['planet']; ?>')"><div class="<?php echo $placeCSS; ?>" style="left:59px; top:30px;"></div></a>
-			<span class="tooltiptext" style="width:180px; left:-23px;"><?php echo $entry['name']; ?></span>
+			<span class="tooltiptext" style="width:200px; left:-35px;"><?php echo $entry['name']; ?></span>
 			</div> 
 			<?php
 		}
