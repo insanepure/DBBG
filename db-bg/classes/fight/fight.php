@@ -2265,6 +2265,8 @@ class Fight
       $damage += $lpDamage;
       if($newLP < 0)
         $newLP = 0;
+      else if($fighter->GetLP() > $fighter->GetIncreasedLP() && $lpDamage > 0)
+        $newLP = $fighter->GetLP();
       else if($newLP > $fighter->GetIncreasedLP()) 
         $newLP = $fighter->GetIncreasedLP();
       
@@ -2273,6 +2275,8 @@ class Fight
       $damage += $kpDamage;
       if($newKP < 0)
         $newKP = 0;
+      else if($fighter->GetKP() > $fighter->GetIncreasedKP() && $kpDamage > 0)
+        $newKP = $fighter->GetKP();
       else if($newKP > $fighter->GetIncreasedKP()) 
         $newKP = $fighter->GetIncreasedKP();
       
@@ -2282,6 +2286,8 @@ class Fight
       $damage += $epDamage;
       if($newEP < 0)
         $newEP = 0;
+      else if($fighter->GetEnergy() > $fighter->GetMaxEnergy() && $epDamage > 0)
+        $newEP = $fighter->GetEnergy();
       else if($newEP > $fighter->GetMaxEnergy()) 
         $newEP = $fighter->GetMaxEnergy();
       
@@ -2681,7 +2687,7 @@ class Fight
 			$kp = $player->GetKP() - $kpminus;
       
 			if($kp < 0) $kp = 0;
-			else if($kp > $player->GetIncreasedKP()) $kp = $player->GetIncreasedKP();
+      else if($player->GetKP() <= $player->GetIncreasedKP() && $kp > $player->GetIncreasedKP()) $kp = $player->GetIncreasedKP();
 			$player->SetKP($kp);
 			if($revertKP && $kp == 0)
 			{
@@ -2692,7 +2698,7 @@ class Fight
 		{
 			$lp = $player->GetLP() - $lpminus;
 			if($lp < 0) $lp = 0;
-			else if($lp > $player->GetIncreasedLP()) $lp = $player->GetIncreasedLP();
+      else if($player->GetLP() <= $player->GetIncreasedLP() && $lp > $player->GetIncreasedLP()) $lp = $player->GetIncreasedLP();
 			$player->SetLP($lp);
 			if($revertLP && $lp == 0)
 			{
@@ -3235,7 +3241,10 @@ class Fight
 		}
 		
 		$target->SetLP($lp);
+		$player->SetLoadValue(0);
+		$player->SetLoadAttack(0);
 		$result = $this->database->Update('lp="'.$lp.'"','fighters','id = "'.$target->GetID().'"',1);
+		$result = $this->database->Update('loadvalue="0", loadattack="0"','fighters','id = "'.$player->GetID().'"',1);
 		
     $this->addAttackTitel($player, $attack);
 		return $returnText;
@@ -3402,6 +3411,8 @@ class Fight
     if($target->GetReflect() != 0)
     {
       $reflectVal = $target->GetDefense() / $player->GetAttack();
+      if(!$useAtkVal)
+        $reflectVal = 1;
       $reflectLP = round($lpDamage * $reflectVal * $target->GetReflect()/100);
       $reflectKP = round($kpDamage * $reflectVal * $target->GetReflect()/100);
       $reflectEP = round($epDamage * $reflectVal * $target->GetReflect()/100);
@@ -3410,6 +3421,9 @@ class Fight
       if($totalReflect != 0)
       {
         $this->AddDebugLog(' - '.$target->GetName().' reflected <b>'.$totalReflect.'</b> DMG.');
+        $this->AddDebugLog(' - - Reflect - LP: '.$reflectLP.' - KP: '.$reflectKP.' - EP: '.$reflectEP);
+        $this->AddDebugLog(' - - ReflectVal: '.$reflectVal);
+        $this->AddDebugLog(' - - Target Reflect: '.$target->GetReflect());
 			  $returnText = $returnText.'<br/>!target reflektiert <b>'.$totalReflect.'</b> Schaden.';
       }
       
@@ -3599,19 +3613,28 @@ class Fight
 	private function AbsoluteHeal($player, $damage, $attack)
 	{
 		$lp = $player->GetLP();
-		$lp = $lp + round($damage * ($attack->GetLPValue()/100));
-		if($lp >= $player->GetIncreasedLP()) $lp = $player->GetIncreasedLP();
-		$player->SetLP($lp);
+		if($lp < $player->GetIncreasedLP())
+    {
+		  $lp = $lp + round($damage * ($attack->GetLPValue()/100));
+      $lp = min($lp, $player->GetIncreasedLP());
+		  $player->SetLP($lp);
+    }
     
 		$kp = $player->GetKP();
-		$kp = $kp + round($damage * ($attack->GetKPValue()/100));
-		if($kp >= $player->GetIncreasedKP()) $kp = $player->GetIncreasedKP();
-		$player->SetKP($kp);
+		if($kp < $player->GetIncreasedKP())
+    {
+		  $kp = $kp + round($damage * ($attack->GetKPValue()/100));
+      $kp = min($kp, $player->GetIncreasedKP());
+		  $player->SetKP($kp);
+    }
     
 		$ep = $player->GetEnergy();
-		$ep = $ep + round($damage * ($attack->GetEPValue()/100));
-		if($ep >= $player->GetMaxEnergy()) $ep = $player->GetMaxEnergy();
-		$player->SetEnergy($ep);
+		if($ep < $player->GetMaxEnergy())
+    {
+		  $ep = $ep + round($damage * ($attack->GetEPValue()/100));
+      $ep = min($ep, $player->GetMaxEnergy());
+		  $player->SetEnergy($ep);
+    }
     
     $this->addAttackTitel($player, $attack);
     
@@ -3701,11 +3724,14 @@ class Fight
     if($lpVal != 0)
     {
       $lpDamage = round($atkVal * ($lpVal/100));
-      $damage += $lpDamage;
-      $lp = $lp + $lpDamage;
-      if($lp >= $target->GetIncreasedLP()) $lp = $target->GetIncreasedLP();
-      $target->SetLP($lp);
-      $count++;
+      if($lp < $target->GetIncreasedLP() || $lpDamage < 0)
+      {
+        $damage += $lpDamage;
+        $lp = $lp + $lpDamage;
+        $lp = min($lp, $target->GetIncreasedLP());
+        $target->SetLP($lp);
+        $count++;
+      }
     }
     
     $kpVal = $attack->GetKPValue();
@@ -3714,11 +3740,14 @@ class Fight
     if($kpVal != 0)
     {
       $kpDamage = round($atkVal * ($kpVal/100));
-      $damage += $kpDamage;
-      $kp = $kp + $kpDamage;
-      if($kp >= $target->GetIncreasedKP()) $kp = $target->GetIncreasedKP();
-      $target->SetKP($kp);
-      $count++;
+      if($kp < $target->GetIncreasedKP() || $kpDamage < 0)
+      {
+        $damage += $kpDamage;
+        $kp = $kp + $kpDamage;
+        $kp = min($kp, $target->GetIncreasedKP());
+        $target->SetKP($kp);
+        $count++;
+      }
     }
     
     $epVal = $attack->GetEPValue();
@@ -3727,11 +3756,14 @@ class Fight
     if($epVal != 0)
     {
       $epDamage = round($atkVal * ($epVal/100));
-      $damage += $epDamage;
-      $ep = $ep + $epDamage;
-      if($ep >= $target->GetMaxEnergy()) $ep = $target->GetMaxEnergy();
-      $target->SetEnergy($ep);
-      $count++;
+      if($ep < $target->GetMaxEnergy() || $epDamage < 0)
+      {
+        $damage += $epDamage;
+        $ep = $ep + $epDamage;
+        $ep = min($ep, $target->GetMaxEnergy());
+        $target->SetEnergy($ep);
+        $count++;
+      }
     }
 		
 		//if($player->GetRace() == 'Mensch')
@@ -3797,11 +3829,14 @@ class Fight
     if($lpVal != 0)
     {
       $lpDamage = round($atkVal * ($lpVal/100));
-      $damage += $lpDamage;
-      $lp = $lp + $lpDamage;
-      if($lp >= $player->GetIncreasedLP()) $lp = $player->GetIncreasedLP();
-      $player->SetLP($lp);
-      $count++;
+      if($lp < $player->GetIncreasedLP() || $lpDamage < 0)
+      {
+        $damage += $lpDamage;
+        $lp = $lp + $lpDamage;
+        $lp = min($lp, $player->GetIncreasedLP());
+        $player->SetLP($lp);
+        $count++;
+      }
     }
     
     $kpVal = $attack->GetKPValue();
@@ -3810,11 +3845,14 @@ class Fight
     if($kpVal != 0)
     {
       $kpDamage = round($atkVal * ($kpVal/100));
-      $damage += $kpDamage;
-      $kp = $kp + $kpDamage;
-      if($kp >= $player->GetIncreasedKP()) $kp = $player->GetIncreasedKP();
-      $player->SetKP($kp);
-      $count++;
+      if($kp < $player->GetIncreasedKP() || $kpDamage < 0)
+      {
+        $damage += $kpDamage;
+        $kp = $kp + $kpDamage;
+        $kp = min($kp, $player->GetIncreasedKP());
+        $player->SetKP($kp);
+        $count++;
+      }
     }
     
     $epVal = $attack->GetEPValue();
@@ -3823,17 +3861,21 @@ class Fight
     if($epVal != 0)
     {
       $epDamage = round($atkVal * ($epVal/100));
-      $damage += $epDamage;
-      $ep = $ep + $epDamage;
-      if($ep >= $player->GetMaxEnergy()) $ep = $player->GetMaxEnergy();
-      $player->SetEnergy($ep);
-      $count++;
+      if($ep < $player->GetMaxEnergy() || $epDamage < 0)
+      {
+        $damage += $epDamage;
+        $ep = $ep + $epDamage;
+        $ep = min($ep, $player->GetMaxEnergy());
+        $player->SetEnergy($ep);
+        $count++;
+      }
     }
     
-    $damage = round($damage/$count);
-    
-    
-		$result = $this->database->Update('lp="'.$lp.'",kp="'.$kp.'",energy="'.$ep.'"','fighters','id = "'.$player->GetID().'"',1);
+    if($count != 0)
+    {
+      $damage = round($damage/$count);
+		  $result = $this->database->Update('lp="'.$lp.'",kp="'.$kp.'",energy="'.$ep.'"','fighters','id = "'.$player->GetID().'"',1);
+    }
     
     $this->addAttackTitel($player, $attack);
 		

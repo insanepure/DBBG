@@ -65,6 +65,10 @@ if(isset($_GET['a']) && $_GET['a'] == 'wish')
   {
     $message = 'Du hast keinen Wunsch mehr mehr frei.';
   }
+  else if($player->GetFight() != 0)
+  {
+    $message = 'Du kannst dir während eines Kampfes nichts wünschen.';
+  }
   else
   {
     $wishID = $_POST['wish'];

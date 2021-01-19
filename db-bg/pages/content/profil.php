@@ -1,4 +1,20 @@
 <?php
+$zorders = array();
+$zorders['aura'] = 0;
+$zorders['weapon'] = 1;
+$zorders['saiyatail'] = 2;
+$zorders['holyshine'] = 3;
+$zorders['body'] = 4;
+$zorders['schuhe'] = 5;
+$zorders['hose'] = 6;
+$zorders['hand'] = 6;
+$zorders['brust'] = 7;
+$zorders['reise'] = 8;
+$zorders['accessoire'] = 8;
+$zorders['clan'] = 9;
+$zorders['tooltip'] = 10;
+
+
 $displayedPlayer = null;
 $isLocalPlayer = false;
 if(isset($_GET['id']) && is_numeric($_GET['id']) && $_GET['id'] != 0)
@@ -151,12 +167,12 @@ if($clan != null)
 </center>
 </div>
 <?php } ?>
-<div class="profilecharacter" style="top:20px; left:185px; z-index:3; background-image: url('img/races/<?php echo $displayedPlayer->GetRaceImage(); ?>.png'"></div>
+<div class="profilecharacter" style="top:20px; left:185px; z-index:<?php echo $zorders['body']; ?>; background-image: url('img/races/<?php echo $displayedPlayer->GetRaceImage(); ?>.png'"></div>
 <?php if($clan != null && $clan->GetBanner() != '')
 {
 ?>
- <div class="tooltip" style="z-index:7; position:absolute; left:305px; top:145px;"> 
-	 <img src="<?php echo $clan->GetBanner(); ?>" style="z-index:5; position:absolute; left:50px; top:50px;" width="30px" height="30px"></img>
+ <div class="tooltip" style="z-index:<?php echo $zorders['tooltip']; ?>; position:absolute; left:305px; top:145px;"> 
+	 <img src="<?php echo $clan->GetBanner(); ?>" style="z-index:<?php echo $zorders['clan']; ?>; position:absolute; left:50px; top:50px;" width="30px" height="30px"></img>
     <span class="tooltiptext"><?php echo $clan->GetName(); ?></span>
     </div> 
 <?php
@@ -164,20 +180,20 @@ if($clan != null)
 
   if($displayedPlayer->GetPlanet() == 'Jenseits')
   {
-    ?><div class="profilecharacter" style="top:20px; left:185px; z-index:1; background-image: url('img/ausruestung/heiligenschein.png'"></div><?php
+    ?><div class="profilecharacter" style="top:20px; left:185px; z-index:<?php echo $zorders['holyshine']; ?>; background-image: url('img/ausruestung/heiligenschein.png'"></div><?php
   }
   if($displayedPlayer->GetApeTail() == 3)
   {
-    ?><div class="profilecharacter" style="top:20px; left:185px; z-index:2; background-image: url('img/races/saiyajintail.png'"></div><?php
+    ?><div class="profilecharacter" style="top:20px; left:185px; z-index:<?php echo $zorders['saiyatail']; ?>; background-image: url('img/races/saiyajintail.png'"></div><?php
   }
-	ShowSlotEquippedImage(6, $inventory, 1);
-	ShowSlotEquippedImage(1, $inventory, 0); 
-	ShowSlotEquippedImage(5, $inventory, 6);
-	ShowSlotEquippedImage(8, $inventory, 5);
-	ShowSlotEquippedImage(2, $inventory, 6); 
-	ShowSlotEquippedImage(3, $inventory, 5); 
-	ShowSlotEquippedImage(7, $inventory, 4);
-	ShowSlotEquippedImage(4, $inventory, 5);
+	ShowSlotEquippedImage(6, $inventory, $zorders['weapon']); //Waffe
+	ShowSlotEquippedImage(1, $inventory, $zorders['aura']); //Aura 
+	ShowSlotEquippedImage(5, $inventory, $zorders['brust']); // Brust
+	ShowSlotEquippedImage(8, $inventory, $zorders['accessoire']); //Accessoire
+	ShowSlotEquippedImage(2, $inventory, $zorders['hand']); //Hände
+	ShowSlotEquippedImage(3, $inventory, $zorders['hose']); //Hose
+	ShowSlotEquippedImage(7, $inventory, $zorders['schuhe']); //Schuhe
+	ShowSlotEquippedImage(4, $inventory, $zorders['reise']); //Reise
 ?>
 
 <div class="profileBox boxSchatten"  style="position:absolute; right:10px; top:25px; width:240px; height:120px;"> 

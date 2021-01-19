@@ -4,7 +4,7 @@
   include_once 'classes/npc/npc.php';
   include_once 'classes/bbcode/bbcode.php';
   $story = new Story($database, $player->GetStory());
-if(isset($_GET['a']) && $_GET['a'] == 'jump' && $player->GetARank() >= 2)
+if(isset($_GET['a']) && $_GET['a'] == 'jump' && $player->GetARank() >= 2 && is_numeric($_POST['storyid']))
 {
   $player->JumpStory($_POST['storyid']);
   $story = new Story($database, $player->GetStory());
@@ -29,7 +29,11 @@ else if(isset($_GET['a']) && $_GET['a'] == 'continue' && $story->GetType() == 1)
 else if(isset($_GET['a']) && $_GET['a'] == 'train' && $story->GetType() == 3)
 {
   $itemManager = new ItemManager($database);
-  if($player->GetPlanet() != $story->Getplanet())
+  if($player->HasDBs())
+  {
+    $message = 'Du musst dir zuerst etwas wünschen.';
+  }
+  else if($player->GetPlanet() != $story->Getplanet())
   {
     $message = 'Du befindest dich auf den falschen Planeten.';
   }

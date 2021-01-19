@@ -163,7 +163,7 @@ else if(isset($_GET['a']) && $_GET['a'] == 'payout' && ($clan->GetLeader() == $p
         {
           //$byacc, $byname, $toacc, $toname
           $clan->RemoveZeni($zeni, $player->GetID(), $player->GetName(), $otherPlayer->GetID(), $otherPlayer->GetName());
-          $otherPlayer->RemoveZeni($zeni);
+          $otherPlayer->AddZeni($zeni);
           $message = 'Du hast '.$zeni.' Zeni an '.$otherPlayer->GetName().' gezahlt.';
         }
 		}

@@ -470,6 +470,11 @@ class Fighters
 		$this->data['action'] = $action;
 	}
   
+	public function GetFireLoadValue()
+	{
+		return $this->data['fireloadvalue'];
+	}
+  
 	public function GetLoadAttack()
 	{
 		return $this->data['loadattack'];
@@ -589,14 +594,22 @@ class Fighters
 	public function Transform($transAttack, $revert)
 	{
 		$value = $transAttack->GetValue() / 100;
+    $lpkpValue = 1 + $value;
 		if($revert)
 		{
 			$value = -$value;
 		}
-		$lp = $this->GetLP() + round($this->GetMaxLP() * $value * ($transAttack->GetLPValue()/100));
-		$ilp = $this->GetIncreasedLP() + round($this->GetMaxLP() * $value * ($transAttack->GetLPValue()/100));
-		$kp = $this->GetKP() + round($this->GetMaxKP() * $value * ($transAttack->GetKPValue()/100));
-		$ikp = $this->GetIncreasedKP() + round($this->GetMaxKP() * $value * ($transAttack->GetKPValue()/100));
+    
+    if($revert)
+    {
+      $lpkpValue = 1 / $lpkpValue;
+    }
+    $lp = round($this->GetLP() * $lpkpValue * ($transAttack->GetLPValue()/100));
+    $kp = round($this->GetKP() * $lpkpValue * ($transAttack->GetKPValue()/100));
+		//$lp = $this->GetLP() + round($this->GetMaxLP() * $value * ($transAttack->GetLPValue()/100));
+		$ilp = round($this->GetIncreasedLP() * $lpkpValue * ($transAttack->GetLPValue()/100));
+		//$kp = $this->GetKP() + round($this->GetMaxKP() * $value * ($transAttack->GetKPValue()/100));
+		$ikp = round($this->GetIncreasedKP() * $lpkpValue * ($transAttack->GetKPValue()/100));
 		$attack = $this->GetAttack() + round($this->GetMaxAttack() * $value * ($transAttack->GetAtkValue()/100));
 		$defense = $this->GetDefense() + round($this->GetMaxDefense() * $value * ($transAttack->GetDefValue()/100));
 		$ki = $this->GetKI() + round($this->GetMaxKI() * $value);

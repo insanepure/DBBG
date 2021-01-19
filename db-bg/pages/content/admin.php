@@ -1308,6 +1308,12 @@ if($player->GetArank() >= 2) {
     $table = $_GET['table'];
     ?>
   <div class="spacer"></div>
+      <hr>
+<h2>
+  Bearbeiten
+</h2>
+Wenn du das ID Feld leer lässt, dann wird mit den Werten ein neuer Eintrag erstellt.<br/>
+<br/>
     <form method="GET" action="?p=admin">
       <input type="hidden" name="p" value="admin">
       <input type="hidden" name="a" value="see">
@@ -1328,7 +1334,7 @@ if($player->GetArank() >= 2) {
             $id = (isset($row['spielerid'])) ? $row['spielerid'] : 0;
             if($id != 0)
             {
-              $spieler = new Generallist($database, 'accounts', 'name', 'id = "'.$id.'"', 1);
+              $spieler = new Generallist($database, 'accounts', 'name, id', 'id = "'.$id.'"', 1);
               $spielerid = $spieler->GetEntry(0);
             }
             else
@@ -1337,20 +1343,39 @@ if($player->GetArank() >= 2) {
             $id = (isset($row['userid'])) ? $row['userid'] : 0;
             if($id != 0)
             {
-              $users = new Generallist($database, 'accounts', 'name', 'id = "'.$id.'"', 1);
+              $users = new Generallist($database, 'accounts', 'name, id', 'id = "'.$id.'"', 1);
               $userid = $users->GetEntry(0);
             }
             else
               $userid = null;
             
+            $id = (isset($row['ownerid'])) ? $row['ownerid'] : 0;
+            if($id != 0)
+            {
+              $users = new Generallist($database, 'accounts', 'name, id', 'id = "'.$id.'"', 1);
+              $ownerid = $users->GetEntry(0);
+            }
+            else
+              $ownerid = null;
+            
             $id = (isset($row['attack'])) ? $row['attack'] : 0;
             if($id != 0)
             {
-              $attacks = new Generallist($database, 'attacks', 'name', 'id = "'.$id.'"', 1);
+              $attacks = new Generallist($database, 'attacks', 'name, id', 'id = "'.$id.'"', 1);
               $attack = $attacks->GetEntry(0);
             }
             else
               $attack = null;
+            
+            $id = (isset($row['statsid'])) ? $row['statsid'] : 0;
+            if($id != 0)
+            {
+              $items = new Generallist($database, 'items', 'name, id', 'id = "'.$id.'"', 1);
+              $item = $items->GetEntry(0);
+            }
+            else
+              $item = null;
+            
             if(!isset($row['used']))
             {
             }
@@ -1365,19 +1390,24 @@ if($player->GetArank() >= 2) {
               $genutzt = "Benutzt: Ja";
             }
             }
-            echo '['.$pid.'] ';
             if(isset($row['name'])) echo $row['name'];
             else if(isset($row['title'])) echo $row['title'];
+            else if(isset($row['stars'])) echo 'Stars: '.$row['stars'];
             else if(isset($row['titel'])) echo $row['titel'];
             else if(isset($row['topic'])) echo $row['topic'];
-            else if(isset($row['seller'])) echo $row['seller'];
+            else if(isset($row['seller'])) echo $item['name'].' x'.$row['amount'].' | '.$row['seller'].' ('.$row['sellerid'].')';
             else if(isset($row['Betreff'])) echo $row['Betreff'];
             else if(isset($row['spielerid'])) echo $row['spielerid'].' '.$spielerid['name'];
             else if(isset($row['userid'])) echo $row['userid'].' '.$userid['name'];
             else if(isset($row['attack'])) echo $row['attack'].' '.$attack['name'];
-            if(isset($row['col'])) echo ' Col: '.$row['col'];
-            if(isset($row['row'])) echo ' Row: '.$row['row'];
-            if(isset($row['race'])) echo ' Race: '.$row['race'];
+            else if(isset($row['ownerid'])) echo $item['name'].' x'.$row['amount'].' | '.$ownerid['name'].' ('.$ownerid['id'].')';
+            if(isset($row['col'])) echo ' | Col: '.$row['col'];
+            if(isset($row['row'])) echo ' | Row: '.$row['row'];
+            if(isset($row['race'])) echo ' | Race: '.$row['race'];
+            if(isset($row['planet'])) echo ' | Planet: '.$row['planet'];
+            if(isset($row['player'])) echo ' | Player: '.$row['player'];
+            if(isset($row['price'])) echo ' | Preis: '.$row['price'];
+            echo ' | ['.$pid.']';
             ?>
             </option>
             <?php
@@ -1388,12 +1418,20 @@ if($player->GetArank() >= 2) {
       }
       ?>
       </select>
-      <br/>
+      <br/><br/>
       <input type="submit" value="Bearbeiten">
   </form>
   <br/>
   <br/>
-  <br/>
+      <hr>
+<h2>
+  Löschen
+</h2>
+  Du solltest nur Einträge löschen, wenn diese wirklich nicht mehr benötigt werden!<br/>
+  Dies kann nämlich zu Problemen führen, wenn der Eintrag in einer anderen Tabelle genutzt wird.<br/>
+<br/>
+  Man kann auch nicht mehr benötigte Einträge später auf die Werte eines neuen Eintrages anpassen, statt einen neuen Eintrag zu nutzen.<br/>
+<br/>
     <form method="POST" action="?p=admin&a=delete&table=<?php echo $table; ?>">
       <select class="select" name="id">
       <?php
@@ -1408,37 +1446,83 @@ if($player->GetArank() >= 2) {
             ?>
             <option value="<?php echo $pid; ?>">
             <?php
-            $id = (isset($row['spielerid']))?$row['spielerid']:0;
-            $spielerid = new Generallist($database, 'accounts', '*', 'id = "'.$id.'"');
-            $spielerid_name = $spielerid->GetEntry(0);
+            $id = (isset($row['spielerid'])) ? $row['spielerid'] : 0;
+            if($id != 0)
+            {
+              $spieler = new Generallist($database, 'accounts', 'name, id', 'id = "'.$id.'"', 1);
+              $spielerid = $spieler->GetEntry(0);
+            }
+            else
+              $spielerid = null;
 
-            $id = (isset($row['userid']))?$row['userid']:0;
-            $userid = new Generallist($database, 'accounts', '*', 'id = "'.$id.'"');
-            $userid_name = $userid->GetEntry(0);
-			if(!isset($row['used']))
-			{
-			}
-			else
-			{
-			if($row['used'] == 0)
-			{
-				$genutzt = "Benutzt: Nein";
-			}
-			else
-			{
-				$genutzt = "Benutzt: Ja";
-			}
-			}
-            echo '['.$pid.'] ';
+            $id = (isset($row['userid'])) ? $row['userid'] : 0;
+            if($id != 0)
+            {
+              $users = new Generallist($database, 'accounts', 'name, id', 'id = "'.$id.'"', 1);
+              $userid = $users->GetEntry(0);
+            }
+            else
+              $userid = null;
+            
+            $id = (isset($row['ownerid'])) ? $row['ownerid'] : 0;
+            if($id != 0)
+            {
+              $users = new Generallist($database, 'accounts', 'name, id', 'id = "'.$id.'"', 1);
+              $ownerid = $users->GetEntry(0);
+            }
+            else
+              $ownerid = null;
+            
+            $id = (isset($row['attack'])) ? $row['attack'] : 0;
+            if($id != 0)
+            {
+              $attacks = new Generallist($database, 'attacks', 'name, id', 'id = "'.$id.'"', 1);
+              $attack = $attacks->GetEntry(0);
+            }
+            else
+              $attack = null;
+            
+            $id = (isset($row['statsid'])) ? $row['statsid'] : 0;
+            if($id != 0)
+            {
+              $items = new Generallist($database, 'items', 'name, id', 'id = "'.$id.'"', 1);
+              $item = $items->GetEntry(0);
+            }
+            else
+              $item = null;
+            
+            if(!isset($row['used']))
+            {
+            }
+            else
+            {
+            if($row['used'] == 0)
+            {
+              $genutzt = "Benutzt: Nein";
+            }
+            else
+            {
+              $genutzt = "Benutzt: Ja";
+            }
+            }
             if(isset($row['name'])) echo $row['name'];
             else if(isset($row['title'])) echo $row['title'];
+            else if(isset($row['stars'])) echo 'Stars: '.$row['stars'];
             else if(isset($row['titel'])) echo $row['titel'];
-            else if(isset($row['Betreff'])) echo $row['Betreff'];
             else if(isset($row['topic'])) echo $row['topic'];
-			else if(isset($row['betakey'])) echo "Betakey: ".$row['betakey']." | ".$genutzt;
-            else if(isset($row['seller'])) echo $row['seller'];
-            else if(isset($row['spielerid'])) echo $row['spielerid'].' '.$spielerid_name['name'];
-            else if(isset($row['userid'])) echo $row['userid'].' '.$userid_name['name'];
+            else if(isset($row['seller'])) echo $item['name'].' x'.$row['amount'].' | '.$row['seller'].' ('.$row['sellerid'].')';
+            else if(isset($row['Betreff'])) echo $row['Betreff'];
+            else if(isset($row['spielerid'])) echo $row['spielerid'].' '.$spielerid['name'];
+            else if(isset($row['userid'])) echo $row['userid'].' '.$userid['name'];
+            else if(isset($row['attack'])) echo $row['attack'].' '.$attack['name'];
+            else if(isset($row['ownerid'])) echo $item['name'].' x'.$row['amount'].' | '.$ownerid['name'].' ('.$ownerid['id'].')';
+            if(isset($row['col'])) echo ' | Col: '.$row['col'];
+            if(isset($row['row'])) echo ' | Row: '.$row['row'];
+            if(isset($row['race'])) echo ' | Race: '.$row['race'];
+            if(isset($row['planet'])) echo ' | Planet: '.$row['planet'];
+            if(isset($row['player'])) echo ' | Player: '.$row['player'];
+            if(isset($row['price'])) echo ' | Preis: '.$row['price'];
+            echo ' | ['.$pid.']';
             ?>
             </option>
             <?php
@@ -1449,11 +1533,19 @@ if($player->GetArank() >= 2) {
       }
       ?>
       </select>
+      <br/><br/>
+      <input type="checkbox" name="sure"> Sicher?
+      <br/>
       <br/>
       <input type="submit" value="Löschen">
   </form>
-  <br/>
-  <br/>
+<br/>
+      <hr>
+<h2>
+  Erstellen
+</h2>
+  Es wird nur ein neuer Eintrag erstellt, wenn das ID Feld leer ist.
+<br/>
   <br/>
     <form method="GET" action="?p=admin">
       <input type="hidden" name="p" value="admin">

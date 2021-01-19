@@ -15,6 +15,8 @@ if(isset($_GET['a']) && $_GET['a'] == 'revive' && $player->GetPlanet() == 'Jense
     $message = 'Du kannst dich noch nicht wiederbeleben.';
   else if($player->GetAction() != 0)
     $message = 'Du tust gerade etwas.';
+  else if($player->GetFight() != 0)
+    $message = 'Du kannst dich während eines Kampfes nicht wiederbeleben.';
   else
   {
     $player->Revive();

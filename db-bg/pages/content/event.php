@@ -48,15 +48,22 @@ while($entry != null)
           <hr><b>Dropchance: <?php echo $entry['dropchance']; ?>%</b>
           <hr><b>
           <?php 
-          if($entry['zeni'] != 0) echo $entry['zeni'].' Zeni<br/>'; 
-          if($entry['item'] != '')
+          if(!$entry['displayprice'])
           {
-				      $items = explode(';',$entry['item']);
-              foreach($items as $itemID)
-              {
-                $item = $itemManager->GetItem($itemID);
-                echo $item->GetRealName().'<br/>';
-              }
+            echo '???';
+          }
+          else
+          {
+            if($entry['zeni'] != 0) echo $entry['zeni'].' Zeni<br/>'; 
+            if($entry['item'] != '')
+            {
+                $items = explode(';',$entry['item']);
+                foreach($items as $itemID)
+                {
+                  $item = $itemManager->GetItem($itemID);
+                  echo $item->GetRealName().'<br/>';
+                }
+            }
           }
           ?>
           </b>

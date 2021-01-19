@@ -181,6 +181,16 @@ class TitelManager
     $playerTitelStr = implode(';',$playertitels);
     $set = 'titels = "'.$playerTitelStr.'"';
 		$result = $this->database->Update($set,'accounts','id = "'.$playerid.'"',1);
+    
+    $itemID = $titel->GetItem();
+    if($itemID != 0)
+    {
+      $addAmount = 1;
+      $statstype = 0;
+      $upgrade = 0;
+		  $result = $this->database->Insert('statsid, visualid, ownerid, amount, statstype, upgrade',
+                                        '"'.$itemID.'","'.$itemID.'","'.$playerid.'","'.$addAmount.'","'.$statstype.'","'.$upgrade.'"', 'inventory');
+    }
   }
   
   public function GetTitels()

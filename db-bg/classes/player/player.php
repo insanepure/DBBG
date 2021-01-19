@@ -1509,7 +1509,7 @@ class Player
 				//}
 				
 				$newAttack = $this->GetAttack() + $addValue;
-        $this->AddDebugLog(' - Attack from '.$this->GetAttack().' to: '.$addValue);
+        $this->AddDebugLog(' - Attack from '.$this->GetAttack().' to: '.$newAttack);
 				$update = $update.',attack="'.$newAttack.'"';
 				$this->SetAttack($newAttack);
 			}

@@ -456,6 +456,21 @@ if($p == 'items')
     $schuhe = 224;
     $handschuhe = 223;
     addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //Vegeta
+  
+    $value = 1600;
+    $level = 90;
+    $aura = 289;
+    $waffe = 307;
+    $hemd = 303;
+    $hose = 304;
+    $schuhe = 305;
+    $hand = 323;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //Freezer
+  
+    $value = 1600;
+    $level = 90;
+    $aura = 290;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //SS
     
     while($entry != null)
     {

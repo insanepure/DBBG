@@ -1,4 +1,19 @@
 <?php
+$zorders = array();
+$zorders['aura'] = 0;
+$zorders['weapon'] = 1;
+$zorders['saiyatail'] = 2;
+$zorders['holyshine'] = 3;
+$zorders['body'] = 4;
+$zorders['schuhe'] = 5;
+$zorders['hose'] = 6;
+$zorders['hand'] = 6;
+$zorders['brust'] = 7;
+$zorders['reise'] = 8;
+$zorders['accessoire'] = 8;
+$zorders['clan'] = 9;
+$zorders['tooltip'] = 10;
+
 $clan = null;
 if($player->GetClan() != 0)
 {
@@ -10,13 +25,13 @@ if($player->GetClan() != 0)
 <div class="spacer"></div>
 <div style="position:relative;">
 <div class="char">
-	<div class="char2" style="z-index:3; background-image: url('img/races/<?php echo $player->GetRaceImage(); ?>.png')">
+	<div class="char2" style="z-index:<?php echo $zorders['body']; ?>; background-image: url('img/races/<?php echo $player->GetRaceImage(); ?>.png')">
 	</div>
  <?php if($clan != null && $clan->GetBanner() != '')
 {
 ?>
- <div class="tooltip" style="z-index:7; position:absolute; left:119px; top:155px;"> 
-	 <img src="<?php echo $clan->GetBanner(); ?>" style="z-index:5; position:absolute; left:50px; top:50px;" width="30px" height="30px"></img>
+ <div class="tooltip" style="z-index:<?php echo $zorders['tooltip']; ?>; position:absolute; left:119px; top:155px;"> 
+	 <img src="<?php echo $clan->GetBanner(); ?>" style="z-index:<?php echo $zorders['clan']; ?>; position:absolute; left:50px; top:50px;" width="30px" height="30px"></img>
     <span class="tooltiptext"><?php echo $clan->GetName(); ?></span>
     </div> 
 <?php
@@ -28,20 +43,20 @@ if($player->GetClan() != 0)
   
   if($player->GetPlanet() == 'Jenseits')
   {
-    ?><div class="char2" style="z-index:1; background-image: url('img/ausruestung/heiligenschein.png'"></div><?php
+    ?><div class="char2" style="z-index:<?php echo $zorders['holyshine']; ?>; background-image: url('img/ausruestung/heiligenschein.png'"></div><?php
   }
   if($player->GetApeTail() == 3)
   {
-    ?><div class="char2" style="z-index:2; background-image: url('img/races/saiyajintail.png'"></div><?php
+    ?><div class="char2" style="z-index:<?php echo $zorders['saiyatail']; ?>; background-image: url('img/races/saiyajintail.png'"></div><?php
   }
-	ShowSlotEquippedImage(6, $inventory, 1);
-	ShowSlotEquippedImage(1, $inventory, 0); 
-	ShowSlotEquippedImage(5, $inventory, 6);
-	ShowSlotEquippedImage(8, $inventory, 5);
-	ShowSlotEquippedImage(2, $inventory, 6); 
-	ShowSlotEquippedImage(3, $inventory, 5); 
-	ShowSlotEquippedImage(7, $inventory, 4);
-	ShowSlotEquippedImage(4, $inventory, 5);
+	ShowSlotEquippedImage(6, $inventory, $zorders['weapon']); //Waffe
+	ShowSlotEquippedImage(1, $inventory, $zorders['aura']); //Aura 
+	ShowSlotEquippedImage(5, $inventory, $zorders['brust']); // Brust
+	ShowSlotEquippedImage(8, $inventory, $zorders['accessoire']); //Accessoire
+	ShowSlotEquippedImage(2, $inventory, $zorders['hand']); //Hände
+	ShowSlotEquippedImage(3, $inventory, $zorders['hose']); //Hose
+	ShowSlotEquippedImage(7, $inventory, $zorders['schuhe']); //Schuhe
+	ShowSlotEquippedImage(4, $inventory, $zorders['reise']); //Reise
   
 if($clan != null && $clan->GetBanner() != '')
 {
@@ -97,7 +112,7 @@ if($clan != null && $clan->GetBanner() != '')
 </div>
 
 <div class="panzr borderB borderR borderT borderL">
-<div class="SideMenuKat catGradient borderB"><div class="schatten">Panzer</div></div>	
+<div class="SideMenuKat catGradient borderB"><div class="schatten">Accessoire</div></div>	
 <?php ShowSlot(8, $inventory); ?>
 <div class="spacer"></div>
 </div>

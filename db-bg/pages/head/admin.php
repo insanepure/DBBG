@@ -37,7 +37,7 @@ $accs = $player->GetName().' ('.$player->GetID().')';
 $log = '';
 
 
-if(isset($_GET['a']) && $_GET['a'] == 'delete')
+if(isset($_GET['a']) && $_GET['a'] == 'delete' && isset($_POST['sure']))
 {
   $table = $_GET['table'];
   $id = $_POST['id'];

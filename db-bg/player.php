@@ -47,68 +47,68 @@ $head = GetSlotImage(1, $inventory);
 if($head != null)
 {
   $img = imagecreatefrompng($head);
-  imagecopyresized($dst, $img, 0, 0, 0, 0, $newWidth, $newHeight, $src_x, $src_y);
-  imagedestroy($img); 
-}
-
-$back = GetSlotImage(8, $inventory);
-if($back != null)
-{
-  $img = imagecreatefrompng($back);
-  imagecopyresized($dst, $img, 0, 0, 0, 0, $newWidth, $newHeight, $src_x, $src_y);
+  imagecopyresized($dst, $img, $dstX, $dstY, 0, 0, $newWidth, $newHeight, imagesx($img), imagesy($img));
   imagedestroy($img); 
 }
 $weapon = GetSlotImage(6, $inventory);
 if($weapon != null)
 {
   $img = imagecreatefrompng($weapon);
-  imagecopyresized($dst, $img, 0, 0, 0, 0, $newWidth, $newHeight, $src_x, $src_y);
+  imagecopyresized($dst, $img, $dstX, $dstY, 0, 0, $newWidth, $newHeight, imagesx($img), imagesy($img));
   imagedestroy($img); 
 }
-
 
 if($player->GetApeTail() == 3)
 {
   $tail = 'img/races/saiyajintail.png';
   $img = imagecreatefrompng($tail);
-  imagecopyresized($dst, $img, 0, 0, 0, 0, $newWidth, $newHeight, $src_x, $src_y);
+  imagecopyresized($dst, $img, $dstX, $dstY, 0, 0, $newWidth, $newHeight, imagesx($img), imagesy($img));
   imagedestroy($img); 
 }
-imagecopyresized($dst, $raceImg, 0, 0, 0, 0, $newWidth, $newHeight, $src_x, $src_y);
+
+imagecopyresized($dst, $raceImg, $dstX, $dstY, 0, 0, $newWidth, $newHeight, $src_x, $src_y);
 
 $shoes = GetSlotImage(7, $inventory);
 if($shoes != null)
 {
   $img = imagecreatefrompng($shoes);
-  imagecopyresized($dst, $img, 0, 0, 0, 0, $newWidth, $newHeight, $src_x, $src_y);
+  imagecopyresized($dst, $img, $dstX, $dstY, 0, 0, $newWidth, $newHeight, imagesx($img), imagesy($img));
   imagedestroy($img); 
 }
 $pants = GetSlotImage(3, $inventory);
 if($pants != null)
 {
   $img = imagecreatefrompng($pants);
-  imagecopyresized($dst, $img, 0, 0, 0, 0, $newWidth, $newHeight, $src_x, $src_y);
-  imagedestroy($img); 
-}
-$travel = GetSlotImage(4, $inventory);
-if($pants != null)
-{
-  $img = imagecreatefrompng($travel);
-  imagecopyresized($dst, $img, 0, 0, 0, 0, $newWidth, $newHeight, $src_x, $src_y);
-  imagedestroy($img); 
-}
-$body = GetSlotImage(5, $inventory);
-if($body != null)
-{
-  $img = imagecreatefrompng($body);
-  imagecopyresized($dst, $img, 0, 0, 0, 0, $newWidth, $newHeight, $src_x, $src_y);
+  imagecopyresized($dst, $img, $dstX, $dstY, 0, 0, $newWidth, $newHeight, imagesx($img), imagesy($img));
   imagedestroy($img); 
 }
 $hands = GetSlotImage(2, $inventory);
 if($hands != null)
 {
   $img = imagecreatefrompng($hands);
-  imagecopyresized($dst, $img, 0, 0, 0, 0, $newWidth, $newHeight, $src_x, $src_y);
+  imagecopyresized($dst, $img, $dstX, $dstY, 0, 0, $newWidth, $newHeight, imagesx($img), imagesy($img));
+  imagedestroy($img); 
+}
+$body = GetSlotImage(5, $inventory);
+if($body != null)
+{
+  $img = imagecreatefrompng($body);
+  imagecopyresized($dst, $img, $dstX, $dstY, 0, 0, $newWidth, $newHeight, imagesx($img), imagesy($img));
+  imagedestroy($img); 
+}
+
+$travel = GetSlotImage(4, $inventory);
+if($pants != null)
+{
+  $img = imagecreatefrompng($travel);
+  imagecopyresized($dst, $img, $dstX, $dstY, 0, 0, $newWidth, $newHeight, imagesx($img), imagesy($img));
+  imagedestroy($img); 
+}
+$accessoire = GetSlotImage(8, $inventory);
+if($accessoire != null)
+{
+  $img = imagecreatefrompng($accessoire);
+  imagecopyresized($dst, $img, $dstX, $dstY, 0, 0, $newWidth, $newHeight, imagesx($img), imagesy($img));
   imagedestroy($img); 
 }
 

@@ -180,7 +180,14 @@ if($pages != 1)
   while($i != $pages)
   {
     ?>
-    <a href="?p=user&page=<?php echo $i+1; if(isset($_GET['race'])) echo '&race='.$_GET['race']; ?>">Seite <?php echo $i+1; ?></a> 
+    <a href="?p=user&page=
+    <?php echo $i+1; 
+    if(isset($_GET['race'])) echo '&race='.$_GET['race']; 
+    if(isset($_GET['username'])) echo '&username='.$_GET['username']; 
+    if(isset($_GET['place'])) echo '&place='.$_GET['place']; 
+    if(isset($_GET['status'])) echo '&status='.$_GET['status']; 
+             
+             ?> ">Seite <?php echo $i+1; ?></a> 
     <?php
     ++$i;
   }

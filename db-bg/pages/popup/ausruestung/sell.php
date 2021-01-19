@@ -20,6 +20,8 @@ echo $item->GetDescription();
 <div class="spacer"></div>
 <?php 
 echo 'Preis: <b>'.$item->GetPrice().' Zeni</b>'; 
+echo '<br/>';
+echo 'Verkaufspreis: <b>'.($item->GetPrice()/2).' Zeni</b>'; 
 ?>
 <hr>
 <div class="spacer"></div>

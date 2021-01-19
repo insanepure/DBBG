@@ -58,6 +58,11 @@ class Titel
     return $this->data['typeaction'];
   }
   
+  public function GetItem()
+  {
+    return $this->data['item'];
+  }
+  
   public function GetSort()
   {
     return $this->data['typesort'];

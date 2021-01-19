@@ -21,7 +21,6 @@ else
       <select class="select" name="wish">
     <?php
   
-  
     $playerWishes = explode(';',$player->GetWishes());
     foreach($wishes as &$wishID)
     {

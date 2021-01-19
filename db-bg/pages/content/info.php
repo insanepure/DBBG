@@ -65,7 +65,12 @@ else if(isset($_GET['info']) && $_GET['info'] == 'events')
   $entry = $events->GetEntry($id);
   while($entry != null)
   {
-    
+    if(!$entry['displayinfo'])
+    {
+      ++$id;
+      $entry = $events->GetEntry($id);
+      continue;
+    }
     $pandts = explode('@',$entry['placeandtime']);
 	  $pandt = explode(';',$pandts[0]);
     
@@ -82,15 +87,22 @@ else if(isset($_GET['info']) && $_GET['info'] == 'events')
           <b>Dropchance: <?php echo $entry['dropchance']; ?>%</b><br/>
           <b>Gewinn: 
           <?php 
-          if($entry['zeni'] != 0) echo $entry['zeni'].' Zeni<br/>'; 
-          if($entry['item'] != '')
+          if(!$entry['displayprice'])
           {
-				      $items = explode(';',$entry['item']);
-              foreach($items as $itemID)
-              {
-                $item = $itemManager->GetItem($itemID);
-                echo $item->GetRealName().'<br/>';
-              }
+            echo '???';
+          }
+          else
+          {
+            if($entry['zeni'] != 0) echo $entry['zeni'].' Zeni<br/>'; 
+            if($entry['item'] != '')
+            {
+                $items = explode(';',$entry['item']);
+                foreach($items as $itemID)
+                {
+                  $item = $itemManager->GetItem($itemID);
+                  echo $item->GetRealName().'<br/>';
+                }
+            }
           }
           ?>
           </b>
