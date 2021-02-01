@@ -255,7 +255,7 @@ class Fighters
 	
 	public function SetEnergy($value)
 	{
-		$this->data['energy'] = $value;
+		//$this->data['energy'] = $value;
 	}
 	
 	public function GetParalyzed()

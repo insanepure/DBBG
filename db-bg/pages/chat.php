@@ -21,7 +21,8 @@ else
     $titelColor = $titel->GetColor();
   }
   
-  $chat->AddUser($player->GetID(), $game, $player->GetName(), $player->GetArank(), $channel, session_id(), $titelText, $titelColor);
+  if(!$player->IsAdminLogged())
+    $chat->AddUser($player->GetID(), $player->GetUserID(), $game, $player->GetName(), $player->GetArank(), $channel, session_id(), $titelText, $titelColor);
   ?>
   <script type="text/javascript">
   function OnTextKeyDown()

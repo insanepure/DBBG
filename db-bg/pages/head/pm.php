@@ -64,7 +64,7 @@ else if(isset($_GET['a']) && $_GET['a'] == 'send')
     {
       $message = 'Der Text enthält ungültige Wörter.';
     }
-    if($tname == '')
+    else if($tname == '')
     {
       $message = 'Du hast keinen Namen angegeben.';
     }
@@ -81,6 +81,7 @@ else if(isset($_GET['a']) && $_GET['a'] == 'send')
       $id = $player->GetID();
       $image = $player->GetImage();
       $name = $player->GetName();
+      
       if($PMManager->SendPM($id, $image, $name, $title, $text, $tname))
       {
         $message = 'PM wurde erfolgreich gesendet.';

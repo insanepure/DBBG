@@ -13,6 +13,10 @@ if(isset($_GET['a']) && $_GET['a'] == 'start')
 		{
       $message = 'Das Event ist ein Bosskampf.';
 		}
+		else if($event->GetLevel() > $player->GetLevel())
+		{
+    $message = 'Dieses Event ist ungültig.';
+		}
     else if(!isset($_POST['players']) || !is_numeric($_POST['players']) || $_POST['players'] < $event->GetMinPlayers())
     {
       $message = 'Das Event benötigt mehr Spieler.';

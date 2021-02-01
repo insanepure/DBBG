@@ -6,6 +6,10 @@ if(!isset($_GET['p']))
 
 $p = $_GET['p'];
 $database->UpdateEnable(false);
+$showChangeOnly = isset($_GET['changeonly']);
+$updateEquippedPlayers = true;
+$slotOnly = $_GET['slot'];
+//$database->Debug();
 ?>
 <table>
 <?php
@@ -124,7 +128,7 @@ $database->UpdateEnable(false);
   
 if($p == 'items')
 {
-    $list = new Generallist($database, 'items', '*', $where, 'lv, type', 99999, 'ASC');
+    $list = new Generallist($database, 'items', '*', $where, 'lv, type, value', 99999, 'ASC');
     $id = 0;
     $entry = $list->GetEntry($id);
     //echo '<pre>';
@@ -147,7 +151,7 @@ if($p == 'items')
       return 0;
     }
   
-    function addSet(&$sets, $value, $level, $schuhe, $hose, $hemd, $hand, $waffe, $aura)
+    function addSet(&$sets, $value, $level, $schuhe, $hose, $hemd, $hand, $waffe, $aura, $accessoire)
     {
       $auraValue = getValue($sets, $aura);
       if($auraValue == 0 && $aura != 0)
@@ -157,40 +161,47 @@ if($p == 'items')
       
       $waffeValue = getValue($sets, $waffe);
       if($waffeValue == 0)
-        $waffeValue = round($value * 0.3);
+        $waffeValue = round($value * 0.19);
       
       $value = $value - $waffeValue;
       
       $hemdValue = getValue($sets, $hemd);
       if($hemdValue == 0)
-        $hemdValue = round($value * 0.35);
+        $hemdValue = round($value * 0.225);
       
       $value = $value - $hemdValue;
       
       $hoseValue = getValue($sets, $hose);
       if($hoseValue == 0)
-        $hoseValue = round($value * 0.4);
+        $hoseValue = round($value * 0.275);
       
       $value = $value - $hoseValue;
       
       $handValue = getValue($sets, $hand);
       if($handValue == 0)
-        $handValue = round($value * 0.6);
+        $handValue = round($value * 0.355);
       
       $value = $value - $handValue;
       
       $schuheValue = getValue($sets, $schuhe);
       if($schuheValue == 0)
-        $schuheValue = round($value * 1.0);
-        
+        $schuheValue = round($value * 0.525);
+      
       $value = $value - $schuheValue;
+      
+      $accessoireValue = getValue($sets, $accessoire);
+      if($accessoireValue == 0)
+        $accessoireValue = round($value * 1.0);
+        
+      $value = $value - $accessoireValue;
       
       $set = array(array($schuhe, $schuheValue)
                   ,array($hose, $hoseValue)
                   ,array($hemd, $hemdValue)
                   ,array($hand, $handValue)
                   ,array($waffe, $waffeValue)
-                  ,array($aura, $auraValue));
+                  ,array($aura, $auraValue)
+                  ,array($accessoire, $accessoireValue));
                   
       $sets[count($sets)] = $set;
     }
@@ -205,7 +216,8 @@ if($p == 'items')
     $handschuhe = 32;
     $waffe = 18;
     $aura = 0;
-    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //Lumpen
+    $accessoire = 0;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Lumpen
   
     $value = 50;
     $level = 1;
@@ -213,7 +225,8 @@ if($p == 'items')
     $hose = 15;
     $hemd = 16;
     $handschuhe = 17;
-    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //Tiger
+    $accessoire = 383;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Tiger
   
     $value = 40;
     $level = 4;
@@ -222,7 +235,7 @@ if($p == 'items')
     $hemd = 38;
     $handschuhe = 40;
     $waffe = 28;
-    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //Zerfetzer Stoff
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Zerfetzer Stoff
   
     $value = 60;
     $level = 4;
@@ -231,7 +244,7 @@ if($p == 'items')
     $hemd = 21;
     $handschuhe = 22;
     $waffe = 23;
-    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //Pterodactyl
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Pterodactyl
   
     $value = 50;
     $level = 5;
@@ -240,7 +253,7 @@ if($p == 'items')
     $hemd = 35;
     $handschuhe = 36;
     $waffe = 41;
-    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //Stoff
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Stoff
   
     $value = 70;
     $level = 5;
@@ -249,7 +262,7 @@ if($p == 'items')
     $hemd = 26;
     $handschuhe = 27;
     $waffe = 41;
-    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //Dieb
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Dieb
   
     $value = 90;
     $level = 7;
@@ -257,7 +270,8 @@ if($p == 'items')
     $hose = 43;
     $hemd = 44;
     $handschuhe = 45;
-    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //Oolong
+    $accessoire = 352;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Oolong
   
     $value = 120;
     $level = 9;
@@ -266,7 +280,7 @@ if($p == 'items')
     $hemd = 53;
     $handschuhe = 54;
     $waffe = 76;
-    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //Yamchu
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Yamchu
   
     $value = 140;
     $level = 12;
@@ -275,7 +289,7 @@ if($p == 'items')
     $hemd = 48;
     $handschuhe = 49;
     $waffe = 50;
-    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //Shu
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Shu
   
     $value = 200;
     $level = 13;
@@ -285,21 +299,21 @@ if($p == 'items')
     $handschuhe = 79;
     $waffe = 77;
     $aura = 190;
-    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //Schildkrötenschule
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Schildkrötenschule
   
     $value = 210;
     $level = 13;
     $schuhe = 85;
     $hose = 83;
     $hemd = 84;
-    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //MutenRoshi
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //MutenRoshi
   
     $value = 220;
     $level = 15;
     $schuhe = 87;
     $hose = 86;
     $handschuhe = 88;
-    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //Bakterian
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Bakterian
   
     $value = 240;
     $level = 18;
@@ -307,9 +321,9 @@ if($p == 'items')
     $hose = 90;
     $hemd = 89;
     $handschuhe = 92;
-    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //Mönch
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Mönch
   
-    $value = 320;
+    $value = 300;
     $level = 22;
     $schuhe = 110;
     $hose = 109;
@@ -317,90 +331,108 @@ if($p == 'items')
     $handschuhe = 111;
     $waffe = 112;
     $aura = 191;
-    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //Ninja
+    $accessoire = 292;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Ninja
   
-    $value = 330;
+    $value = 300;
+    $level = 22;
+    $accessoire = 345;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Ninja
+  
+    $value = 320;
     $level = 27;
     $schuhe = 118;
     $hose = 119;
     $hemd = 116;
     $handschuhe = 119;
-    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //Kappute Red Ribbon
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Kappute Red Ribbon
   
-    $value = 360;
+    $value = 370;
     $level = 27;
     $schuhe = 126;
     $hose = 125;
     $hemd = 128;
     $handschuhe = 127;
     $aura = 192;
-    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //Red Ribbon
+    $accessoire = 351;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Red Ribbon
   
-    $value = 380;
+    $value = 385;
     $level = 27;
     $schuhe = 130;
     $hose = 129;
     $hemd = 131;
     $waffe = 132;
-    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //Arale
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Arale
   
-    $value = 400;
+    $value = 410;
     $level = 30;
     $schuhe = 134;
     $hose = 133;
     $hemd = 135;
     $waffe = 136;
-    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //TaoBaiBai
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //TaoBaiBai
   
-    $value = 420;
+    $value = 410;
+    $level = 30;
+    $accessoire = 375;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Korin
+  
+    $value = 418;
     $level = 32;
     $schuhe = 148;
     $hose = 149;
     $hemd = 147;
-    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //Black
+    $accessoire = 349;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Black
   
-    $value = 450;
+    $value = 475;
     $level = 34;
     $schuhe = 156;
     $hose = 157;
     $hemd = 155;
     $handschuhe = 154;
     $waffe = 158;
-    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //Incognito
+    $aura = 384;
+    $accessoire = 385;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Incognito
   
-    $value = 520;
+    $value = 505;
     $level = 40;
     $schuhe = 153;
     $hose = 152;
     $hemd = 151;
     $aura = 193;
-    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //Kranich / Tenshinhan
+    $accessoire = 344;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Kranich / Tenshinhan
   
-    $value = 530;
+    $value = 520;
     $level = 44;
     $schuhe = 161;
     $hose = 160;
     $hemd = 159;
-    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //Oberteufel
+    $accessoire = 343;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Oberteufel
   
-    $value = 600;
+    $value = 545;
     $level = 45;
     $schuhe = 168;
     $hose = 167;
     $hemd = 166;
     $handschuhe = 169;
     $waffe = 170;
-    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //Königliche Wache
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Königliche Wache
   
-    $value = 640;
+    $value = 565;
     $level = 50;
     $schuhe = 188;
     $hose = 187;
     $hemd = 186;
     $handschuhe = 189;
-    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //Piccolo
+    $accessoire = 293;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Piccolo
   
-    $value = 720;
+    $value = 640;
     $level = 53;
     $schuhe = 201;
     $hose = 202;
@@ -408,76 +440,164 @@ if($p == 'items')
     $handschuhe = 200;
     $waffe = 203;
     $aura = 204;
-    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //Radditz
+    $accessoire = 376;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Radditz
   
-    $value = 840;
+    $value = 642;
+    $level = 56;
+    $accessoire = 377;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Kaio
+  
+    $value = 690;
     $level = 60;
     $schuhe = 209;
     $hose = 207;
     $hemd = 206;
     $handschuhe = 208;
     $aura = 210;
-    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //Vegeta
+    $accessoire = 294;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Vegeta
   
-    $value = 940;
+    $value = 710;
     $level = 74;
     $schuhe = 227;
     $hose = 226;
     $hemd = 225;
-    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //Nail
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Nail
   
-    $value = 1000;
+    $value = 810;
     $level = 82;
     $hose = 228;
     $hemd = 229;
     $aura = 253;
-    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //Burter
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Burter
   
-    $value = 1100;
+    $value = 830;
     $level = 82;
     $hose = 232;
     $hemd = 230;
     $schuhe = 233;
     $handschuhe = 231;
-    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //Recoome
+    $accessoire = 291;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Recoome
   
-    $value = 1200;
+    $value = 870;
     $level = 83;
     $hose = 235;
     $hemd = 234;
     $schuhe = 237;
     $handschuhe = 236;
-    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //Ginyu
+    $accessoire = 374;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Ginyu
   
-    $value = 1300;
+    $value = 890;
+    $level = 87;
+    $schuhe = 371;
+    $hemd = 370;
+    $hose = 369;
+    $handschuhe = 368;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Kapput Vegeta
+  
+    $value = 920;
     $level = 87;
     $hose = 222;
     $hemd = 221;
     $schuhe = 224;
     $handschuhe = 223;
-    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //Vegeta
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Vegeta
   
-    $value = 1600;
+    $value = 940;
+    $level = 90;
+    $hemd = 364;
+    $hose = 363;
+    $handschuhe = 365;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Kapputte GI - Freezer
+  
+    $value = 1040;
     $level = 90;
     $aura = 289;
     $waffe = 307;
     $hemd = 303;
     $hose = 304;
     $schuhe = 305;
-    $hand = 323;
-    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //Freezer
+    $handschuhe = 323;
+    $accessoire = 373;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Freezer
   
-    $value = 1600;
+    $value = 1040;
     $level = 90;
     $aura = 290;
-    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura); //SS
+    $accessoire = 302;
+    $hemd = 366;
+    $hose = 367;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //SS
+  
+    $value = 1060;
+    $level = 92;
+    $hemd = 309;
+    $hose = 308;
+    $schuhe = 310;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Kapput Krillin Anzug
+  
+    $value = 1080;
+    $level = 93;
+    $hemd = 314;
+    $hose = 316;
+    $schuhe = 317;
+    $handschuhe = 315;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Mustard
+  
+    $value = 1110;
+    $level = 97;
+    $hemd = 318;
+    $hose = 320;
+    $schuhe = 321;
+    $handschuhe = 319;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Vinegar
+  
+    $value = 1170;
+    $level = 100;
+    $hemd = 312;
+    $hose = 311;
+    $schuhe = 313;
+    $aura = 322;
+    $handschuhe = 386;
+    $accessoire = 387;
+    $waffe = 388;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Garlic
+  
+    $value = 1200;
+    $level = 102;
+    $hemd = 325;
+    $hose = 328;
+    $schuhe = 326;
+    $handschuhe = 324;
+    $aura = 327;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Mecha Freezer
     
+    ?>
+    <table>
+     <tr>
+      <td width="5%">ID</td> 
+      <td width="35%">Name</td> 
+      <td width="5%">Slot</td> 
+      <td width="5%">Level</td> 
+      <td width="5%">TypeValue</td> 
+      <td width="10%">NewValue</td> 
+      <td width="5%">PreValue</td> 
+      <td width="5%">PrePreis</td> 
+      <td width="5%">NewPreis</td> 
+      <td width="5%">PreArena</td> 
+      <td width="5%">NewArena</td> 
+     </tr>
+    <?php
+  
+    $previousSlotArray = array();
     while($entry != null)
     {
-      echo $entry['name'].' ('.$entry['id'].')';
-      echo ' - LVL: '.$entry['lv'].' ';
+      $type = $entry['type'];
       $preValue = $entry['value'];
-      if($entry['type'] == 1)
+      if($type == 1)
         $preValue = $entry['lp'] + $entry['kp'];
       $value = $preValue;
       
@@ -488,9 +608,9 @@ if($p == 'items')
       else if($entry['slot'] == 6)
         $value = round($value / 4);
       
-      if($entry['type'] == 3)
+      if($type == 3)
         $price = $value * 200;
-      else if($entry['type'] == 4)
+      else if($type == 4)
         $price = $value * 500;
       else
         $price = $value * 5;
@@ -501,19 +621,101 @@ if($p == 'items')
       if($entry['price'] == 0)
         $price = 0;
       
-      echo ' - Value: '.$value.' ('.$preValue.')';
-      echo ' - Price: '.$price.' ('.$entry['price'].')';
-      
       $arenaPoints = 100 + $value + ($entry['lv']*10);
-      if($entry['type'] != 3 || $row['race'] != '' || $value == 0 || $entry['arenapoints'] == 0)
+      if($type != 3 || $row['race'] != '' || $value == 0 || $entry['arenapoints'] == 0)
         $arenaPoints = 0;
       
-      echo ' - Arena: '.$arenaPoints.' ('.$entry['arenapoints'].')';
-      echo '<br/>';
+      $slot = $entry['slot'];
+      $previousSlotValue = 0;
+      if(isset($previousSlotArray[$slot]))
+        $previousSlotValue = $previousSlotArray[$slot];
+      
+      $previousSlotArray[$slot] = $value;
+      
+      if(isset($slotOnly) && $slotOnly != $slot || ($showChangeOnly && $value == $preValue && $price == $entry['price'] && $arenaPoints == $entry['arenapoints']))
+      {
+        ++$id;
+        $entry = $list->GetEntry($id);
+        continue;
+      }
+      echo '<tr>';
+      
+      echo '<td>';
+      echo $entry['id'];
+      echo '</td>';
+      
+      echo '<td>';
+      echo $entry['name'];
+      echo '</td>';
+      
+      echo '<td>';
+      echo $entry['slot'];
+      echo '</td>';
+      
+      echo '<td>';
+      echo $entry['lv'];
+      echo '</td>';
+      
+      echo '<td>';
+      echo $previousSlotValue;
+      echo '</td>';
+      
+      echo '<td>';
+      $diff = $value-$previousSlotValue;
+      echo $value;
+      if($diff >= 0)
+        echo ' (+'.$diff.')';
+      else
+        echo ' <font color="red">('.$diff.')</font>';
+      echo '</td>';
+      
+      echo '<td>';
+      echo $preValue;
+      echo '</td>';
+      
+      echo '<td>';
+      echo $price;
+      echo '</td>';
+      
+      echo '<td>';
+      echo $entry['price'];
+      echo '</td>';
+      
+      echo '<td>';
+      echo $arenaPoints;
+      echo '</td>';
+      
+      echo '<td>';
+      echo $entry['arenapoints'];
+      echo '</td>';
+      
+      echo '</tr>';
+      
+      
+      
       $result = $database->Update('value="'.$value.'",price="'.$price.'",arenapoints="'.$arenaPoints.'"','items','id = "'.$entry['id'].'"',1);
+      
+      if($updateEquippedPlayers)
+      {
+        $where2 = 'statsid="'.$entry['id'].'" AND equipped="1"';
+        $list2 = new Generallist($database, 'inventory', '*', $where2, 'id', 99999, 'ASC');
+        $id2 = 0;
+        $entry2 = $list2->GetEntry($id2);
+        while($entry2 != null)
+        {
+          echo '- Equipped by: '.$entry2['ownerid'].'<br/>';
+          $result = $database->Update('equipped="0"','inventory','ownerid = "'.$entry2['ownerid'].'"',9999999);
+          $result = $database->Update('equippedstats=""','accounts','id = "'.$entry2['ownerid'].'"',1);
+          ++$id2;
+          $entry2 = $list2->GetEntry($id2);
+        }
+      }
+      
+      
       ++$id;
       $entry = $list->GetEntry($id);
     }
+      ?></table><?php
 }
 else if($p == 'itemrework')
 {
@@ -658,7 +860,9 @@ else if($p == 'story')
       {
         $npc = new NPC($database, $npcid);
         $kis += $npc->GetKI();
-        $names = $names.' '.$npc->GetName();
+        if($names != '')
+          $names = $names.', ';
+        $names = $names.$npc->GetName().' ('.$npc->GetLevel().')';
       }
       
       $kis = $kis / count($npcs);
@@ -699,7 +903,7 @@ else if($p == 'story')
       if(!$npc->IsValid())
         continue;
       
-      echo $npc->GetName().' ('.$npc->GetKI().' & '.$npc->GetZeni().' & '.$npc->GetAttacks().') ';
+      echo $npc->GetName().' (LVL: '.$npc->GetLevel().' & KI: '.$npc->GetKI().' & $: '.$npc->GetZeni().' & ATK: '.$npc->GetAttacks().') ';
       if($npc->GetZeni() > $maxZeni)
         $maxZeni = $npc->GetZeni();
     }

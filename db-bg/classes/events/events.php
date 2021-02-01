@@ -146,6 +146,11 @@ class Event
     return $this->data['name'];
   }
   
+  public function GetLevel()
+  {
+    return $this->data['level'];
+  }
+  
   public function GetImage()
   {
     return $this->data['image'];

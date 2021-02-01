@@ -33,7 +33,7 @@ while($entry != null)
   $month = date('n');
   $year = date('Y');
   $isToday = Event::IsToday($player->GetPlanet(), $player->GetPlace(), $entry['placeandtime']);
-  if($isToday)
+  if($isToday && $player->GetLevel() >= $entry['level'])
   {
 	$group = $player->GetGroup();
   $amount = 1;

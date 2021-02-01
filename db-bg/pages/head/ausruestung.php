@@ -203,7 +203,7 @@ function ShowSlot($slot, $inventory)
   if($item != null)
   {
     ?>
-    <?php echo $item->GetName(); ?>
+    <font size="2"><?php echo $item->GetName(); ?></font>
     <div class="spacer"></div>
     <img class="boxSchatten borderT borderR borderL borderB" src="/img/items/<?php echo $item->GetImage(); ?>.png" style="width:50px;height:50px;"></img>
 				<form method="POST" action="?p=ausruestung&a=unequip">

@@ -230,8 +230,8 @@ class MarketItem
         break;
     }
     
-    $value = floor($value/$divider);
     $value = $value * $multiplier;
+    $value = floor($value/$divider);
     
     return $value;
   }

@@ -117,7 +117,7 @@ else if($_GET['a'] == 'messages')
           {
             $url = 'https://n-bg.de/user.php?id='.$message->GetAcc();
           }
-          ?><a target="_blank" href="<?php echo $url; ?>"><?php echo $titel.' '.$message->GetName(); ?></a></b>: <?php
+          ?><a target="_blank" href="<?php echo $url; ?>"><?php echo $titel.' '.$message->GetName().'#'.$message->GetMain(); ?></a></b>: <?php
         }
         else
         {

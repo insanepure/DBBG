@@ -23,7 +23,7 @@ $entry = $npcList->GetEntry($id);
 $npcs = $place->GetNPCs();
 while($entry != null)
 {
-  if(in_array($entry['id'], $npcs))
+  if(in_array($entry['id'], $npcs) && $player->GetLevel() >= $entry['level'])
   {
   ?>
   <tr>

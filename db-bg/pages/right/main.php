@@ -359,6 +359,9 @@ if($player->GetArank() >= 2)
 										<a id="no-link" href="?p=adminimages">
 											<div style="cursor:pointer;" class="SideMenuButton borderB">Bilder Verwaltung</div>
 										</a>
+										<a id="no-link" href="?p=adminmod">
+											<div style="cursor:pointer;" class="SideMenuButton borderB">Moderation</div>
+										</a>
 	<?php
 }
 if($player->GetArank() >= 3)

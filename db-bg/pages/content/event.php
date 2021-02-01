@@ -21,7 +21,7 @@ while($entry != null)
   $month = date('n');
   $year = date('Y');
   $isPlaceAndPlanet = Event::IsPlaceAndPlanet($player->GetPlanet(), $player->GetPlace(), $entry['placeandtime']);
-  if($isPlaceAndPlanet)
+  if($isPlaceAndPlanet && $player->GetLevel() >= $entry['level'])
   {
     $active = true;
     $isToday = Event::IsToday($player->GetPlanet(), $player->GetPlace(), $entry['placeandtime']);

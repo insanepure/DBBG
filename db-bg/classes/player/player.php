@@ -177,7 +177,7 @@ class Player
 		return $this->localplayer;
 	}
   
-  public function Login($stayLogged)
+  public function Login($stayLogged, $adminLogin=false)
   {
     if($stayLogged)
     {
@@ -189,14 +189,22 @@ class Player
       $date_of_expiry = time() - 10;
       setcookie( "charaid",  "", $date_of_expiry);
     }
-		$result = $this->database->Update('session="'.session_id().'"','accounts','id = "'.$this->data['id'].'"',1);
+    
+    $adminLogged = 0;
+    if($adminLogin)
+    {
+      $adminLogged = 1;
+      $this->data['adminlogged'] = true;
+    }
+    $update = 'session="'.session_id().'",adminlogged="'.$adminLogged.'"';
+		$result = $this->database->Update($update,'accounts','id = "'.$this->data['id'].'"',1);
   }
   
   public function Logout()
   {
     $date_of_expiry = time() - 10;
     setcookie( "charaid",  "", $date_of_expiry);
-		$result = $this->database->Update('session=""','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('session="",adminlogged="0"','accounts','id = "'.$this->data['id'].'"',1);
   }
 	
 	public function CheckMulti()
@@ -983,6 +991,11 @@ class Player
 		$seconds = time() - strtotime($this->GetChallengeTime());
 		return $seconds;
 	}
+  
+  public function IsAdminLogged()
+  {
+    return $this->data['adminlogged'];
+  }
 	
 	private function UpdateLastAction()
 	{
@@ -1007,7 +1020,8 @@ class Player
 			$update = $update.', captchatime="'.$time.'"';
 		}
 		
-		$result = $this->database->Update($update,'accounts','id = "'.$this->data['id'].'"',1);
+    if(!$this->IsAdminLogged())
+		  $result = $this->database->Update($update,'accounts','id = "'.$this->data['id'].'"',1);
 	}
 	
 	public function UpdateLastEventAction()

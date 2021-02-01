@@ -16,14 +16,17 @@ $zorders['tooltip'] = 10;
 
 
 $displayedPlayer = null;
+$displayedAccount = null;
 $isLocalPlayer = false;
 if(isset($_GET['id']) && is_numeric($_GET['id']) && $_GET['id'] != 0)
 {
   $displayedPlayer = new Player($database, $_GET['id']);
+  $displayedAccount = new Account($accountDB, $displayedPlayer->GetUserID());
 }
 if(!isset($displayedPlayer) || isset($displayedPlayer) && !$displayedPlayer->IsValid() || !isset($_GET['id']))
 {
   $displayedPlayer = $player;
+  $displayedAccount = $account;
   $isLocalPlayer = true;
 }
 $inventory = $displayedPlayer->GetInventory();
@@ -68,6 +71,12 @@ if($displayedPlayer->GetClan() != 0)
   }
   ?>
   <?php
+  if($displayedAccount->IsBanned())
+  {
+    ?><b><font color="red">Gebannt</font></b><?php
+  }
+  else
+  {
   if($displayedPlayer->IsOnline())
   {
 	  if($displayedPlayer->Getvisible() == 0)
@@ -117,6 +126,7 @@ if($displayedPlayer->GetClan() != 0)
     $timeDiffDays = floor($timeDiffDays);
     echo $timeDiffDays;
     if($timeDiffDays == 1) echo ' Tag'; else echo ' Tage';
+  }
   }
   ?>
 </div>
@@ -227,9 +237,11 @@ if($clan != null)
 </div>
 
 <?php
-if($isLocalPlayer || $player->GetArank() >= 3 || $player->GetTeamUser()  == 1)
+if($isLocalPlayer || $player->GetArank() >= 2 || $player->GetTeamUser()  == 1)
 {
   $equippedStats = explode(';',$displayedPlayer->GetEquippedStats());
+  if($isLocalPlayer || $player->GetArank() >= 3  || $player->GetTeamUser()  == 1)
+  {
 ?>
 <div class="profileBox boxSchatten"  style="position:absolute; right:10px; top:170px; width:240px; height:210px;"> 
 <table width="100%" cellspacing="0" border="0">
@@ -242,8 +254,6 @@ if($isLocalPlayer || $player->GetArank() >= 3 || $player->GetTeamUser()  == 1)
   </span>
   <span style="position:absolute; right:5px;">
     <?php 
-		if($isLocalPlayer || $player->GetArank() >= 3  || $player->GetTeamUser()  == 1)
-		{
 			$plp = $displayedPlayer->GetLP();
 			$pmlp = $displayedPlayer->GetMaxLP();
 			echo $plp; ?>/<?php echo $pmlp;
@@ -260,18 +270,6 @@ if($isLocalPlayer || $player->GetArank() >= 3 || $player->GetTeamUser()  == 1)
 			<font color="red">-<?php echo $equippedStats[$count]; ?></font>
 			<?php
 			}
-		}
-		else
-		{
-			if($displayedPlayer->GetRealFakeKI() == 0)
-			{
-				echo $displayedPlayer->GetMaxLP();
-			}
-			else
-			{
-				echo $displayedPlayer->GetFakeKI()*10;
-			}
-		}
     ?>
   </span>
   <br/>
@@ -280,42 +278,24 @@ if($isLocalPlayer || $player->GetArank() >= 3 || $player->GetTeamUser()  == 1)
   </span>
   <span style="position:absolute; right:5px;">
     <?php 
-		if($isLocalPlayer || $player->GetArank() >= 3  || $player->GetTeamUser()  == 1)
+		$pkp = $displayedPlayer->GetKP();
+		$pmkp = $displayedPlayer->GetMaxKP();
+		echo $pkp; ?>/<?php echo $pmkp;
+		$count = 1;
+		if($equippedStats[$count] > 0)
 		{
-			$pkp = $displayedPlayer->GetKP();
-			$pmkp = $displayedPlayer->GetMaxKP();
-			echo $pkp; ?>/<?php echo $pmkp;
-			$count = 1;
-			if($equippedStats[$count] > 0)
-			{
-			?>
-			<font color="#00bb00">+<?php echo $equippedStats[$count]; ?></font>
-			<?php
-			}
-			else if($equippedStats[$count] < 0)
+		?>
+		<font color="#00bb00">+<?php echo $equippedStats[$count]; ?></font>
+		<?php
+		}
+		else if($equippedStats[$count] < 0)
     {
     ?>
     <font color="red">-<?php echo $equippedStats[$count]; ?></font>
     <?php
     }
-		}
-		else
-		{
-			if($displayedPlayer->GetRealFakeKI() == 0)
-			{
-				echo $displayedPlayer->GetMaxKP();
-			}
-			else
-			{
-				echo $displayedPlayer->GetFakeKI()*10;
-			}
-		}
     ?>
   </span>
-	<?php 
-	if($isLocalPlayer || $player->GetArank() >= 3  || $player->GetTeamUser()  == 1)
-	{
-	?>
   <br/>
   <span style="position:absolute; left:5px;">
     <b>Angriff: </b>
@@ -385,12 +365,12 @@ if($isLocalPlayer || $player->GetArank() >= 3 || $player->GetTeamUser()  == 1)
   <span style="position:absolute; left:5px;"><b>Tägliche Kämpfe: </b></span><span style="position:absolute; right:5px;"><?php echo $displayedPlayer->GetDailyFights(); ?><?php echo $taley2 ?></span><br/>
   <span style="position:absolute; left:5px;"><b>Tägliche NPC Kämpfe: </b></span><span style="position:absolute; right:5px;"><?php echo $displayedPlayer->GetDailyNPCFights(); ?><?php echo $taley ?></span><br/>
   <span style="position:absolute; left:5px;"><b>Stats Kämpfe: </b></span><span style="position:absolute; right:5px;"><?php echo $displayedPlayer->GetTotalStatsFights(); ?></span><br/>
+
+</div>
 	<?php
 	}
 	?>
-</div>
-
-	<?php if($player->GetArank() >= 3) 
+	<?php if($player->GetArank() >= 2) 
 		{
 		?>	
 <div class="profileBox boxSchatten"  style="position:absolute; right:10px; top:370px; width:300px; height:150px;">  
@@ -398,9 +378,12 @@ if($isLocalPlayer || $player->GetArank() >= 3 || $player->GetTeamUser()  == 1)
   <tr>
     <td class="catGradient borderB borderT" colspan="2" align="center"><b>Player Option</b></td>
   </tr>
-  <tr>
-  <td>
   
+	<?php if($player->GetArank() >= 3) 
+		{
+		?>	
+  <tr>
+    <td>
 <form name="form1" action="?p=profil&id=<?php echo $displayedPlayer->GetID(); ?>&a=adminlogin" method="post" enctype="multipart/form-data">
 <center><input type="submit" value="Einloggen"></center>
 </form></td>
@@ -408,6 +391,20 @@ if($isLocalPlayer || $player->GetArank() >= 3 || $player->GetTeamUser()  == 1)
 	<center><a href="?p=admin&a=see&table=accounts&id=<?php echo $displayedPlayer->GetID(); ?>"><input type="submit" value="Editieren"></a></center>
 </form></td>
     </tr>
+  <?php
+    }
+    if($player->GetArank() >= 2) 
+    {
+      ?>
+    <tr>
+      <td colspan="2">
+<form name="form1" action="?p=adminmod&user=<?php echo $displayedPlayer->GetID(); ?>" method="post" enctype="multipart/form-data">
+<center><input type="submit" value="Moderieren"></center>
+</form></td>
+    </tr>
+      <?php
+    }
+    ?>
   <!--
   <tr>
     <td width="20%"><br>

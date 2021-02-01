@@ -2864,6 +2864,17 @@ class Fight
       }
 			return $attack->GetText();
     }
+    else if($attack->GetID() == 527) // Selbstzerstörung
+    {
+      $this->AddDebugLog(' - '.$target->GetName().' is using: '.$target->GetAction());
+      if($target->GetAction() != 2) //  Verteidigen
+      {
+        $target->SetLP(0);
+        $this->AddDebugLog(' - '.$target->GetName().' is dead.');
+      }
+      $player->SetLP(0);
+			return $attack->GetText();
+    }
     else if($attack->GetID() == 337) // Saibaman Explosion
     {
       for($i = 0; $i < count($this->teams); ++$i)

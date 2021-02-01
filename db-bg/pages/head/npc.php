@@ -50,7 +50,7 @@ if(isset($_GET['a']) && $_GET['a'] == 'fight')
       $npc = new NPC($database, $_GET['id'], $difficulty);
     
       $npcs = $place->GetNPCs();
-      if(!$npc->IsValid() || !in_array($npc->GetID(), $npcs))
+      if(!$npc->IsValid() || !in_array($npc->GetID(), $npcs) || $npc->GetLevel() > $player->GetLevel())
       {
         $message = 'Dieser NPC ist ungültig.';
       }

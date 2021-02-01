@@ -73,6 +73,11 @@ class NPC
     return $this->data['race'];
   }
   
+  public function GetLevel()
+  {
+    return $this->data['level'];
+  }
+  
   public function SetRace($value)
   {
     $this->data['race'] = $value;

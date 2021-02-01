@@ -39,7 +39,7 @@ if($player->GetARank() >= 3 && isset($_GET['a']) && $_GET['a'] == 'adminlogin')
 {
 	$otherPlayer = new Player($database, $_GET['id'], $actionManager);
   $player->Logout();
-  $otherPlayer->Login(false);
+  $otherPlayer->Login(false,true);
 }
 if(isset($_GET['a']) && $_GET['a'] == 'speedup')
 {

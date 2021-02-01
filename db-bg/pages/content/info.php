@@ -12,6 +12,7 @@ include_once 'classes/fight/attack.php';
 <a href="?p=info&info=dbs">Dragonballs</a><br> 
 <a href="?p=info&info=coop">Co-Op</a><br> 
 <a href="?p=info&info=events">Events</a><br> 
+<a href="?p=info&info=boss">Boss</a><br> 
 </td><td><img src="img/info.png" width="400" height="300"><br>
 <center>
 <a href="?p=info&info=faq">• Häufig gestellte Fragen</a><br>
@@ -53,14 +54,14 @@ if(isset($_GET['info']) && $_GET['info'] == 'skilltree')
   include_once 'skilltree.php';
 }
 
-else if(isset($_GET['info']) && $_GET['info'] == 'events')
+else if(isset($_GET['info']) && $_GET['info'] == 'boss')
 {
   ?>
 <table width="100%">
 <?php
   $itemManager = new ItemManager($database);
-  $where = 'isdungeon="0"';
-  $events = new Generallist($database, 'events', '*', $where, 'id', 99999999999, 'ASC');
+  $where = 'isdungeon="1"';
+  $events = new Generallist($database, 'events', '*', $where, 'level, id', 99999999999, 'ASC');
   $id = 0;
   $entry = $events->GetEntry($id);
   while($entry != null)
@@ -84,8 +85,13 @@ else if(isset($_GET['info']) && $_GET['info'] == 'events')
           <b><?php echo $entry['schedule']; ?></b><br/><br/>
           <b>Planet: <?php echo $pandt[0]; ?></b><br/>
           <b>Ort: <?php echo $pandt[1]; ?></b><br/>
+          <?php if($entry['level'] != 0)
+          {
+            ?><b>Level: <?php echo $entry['level']; ?></b><br/><?php
+          }
+          ?>
           <b>Dropchance: <?php echo $entry['dropchance']; ?>%</b><br/>
-          <b>Gewinn: 
+          <b>Gewinn:<br/>
           <?php 
           if(!$entry['displayprice'])
           {
@@ -100,7 +106,80 @@ else if(isset($_GET['info']) && $_GET['info'] == 'events')
                 foreach($items as $itemID)
                 {
                   $item = $itemManager->GetItem($itemID);
-                  echo $item->GetRealName().'<br/>';
+                  echo '<img width="30px" height="30px" src="img/items/'.$item->GetImage().'.png"></img> '.$item->GetRealName().'<br/>';
+                }
+            }
+          }
+          ?>
+          </b>
+        
+          </td>
+        </tr>
+        </table> 
+      </td></tr>
+    <?php
+    ++$id;
+    $entry = $events->GetEntry($id);
+  }
+
+?>
+</table><br><br>
+<?php
+}
+
+else if(isset($_GET['info']) && $_GET['info'] == 'events')
+{
+  ?>
+<table width="100%">
+<?php
+  $itemManager = new ItemManager($database);
+  $where = 'isdungeon="0"';
+  $events = new Generallist($database, 'events', '*', $where, 'level, id', 99999999999, 'ASC');
+  $id = 0;
+  $entry = $events->GetEntry($id);
+  while($entry != null)
+  {
+    if(!$entry['displayinfo'])
+    {
+      ++$id;
+      $entry = $events->GetEntry($id);
+      continue;
+    }
+    $pandts = explode('@',$entry['placeandtime']);
+	  $pandt = explode(';',$pandts[0]);
+    
+    
+    ?>
+      <tr><td><div class="catGradient borderT borderB"><center><b><?php echo $entry['name']; ?></b></center></div>
+      <table>
+        <tr>
+          <td><img src="img/events/<?php echo $entry['image']; ?>.png" style="width:200px;height:300px;"></img></td>
+          <td>
+          <b><?php echo $entry['schedule']; ?></b><br/><br/>
+          <b>Planet: <?php echo $pandt[0]; ?></b><br/>
+          <b>Ort: <?php echo $pandt[1]; ?></b><br/>
+          <?php if($entry['level'] != 0)
+          {
+            ?><b>Level: <?php echo $entry['level']; ?></b><br/><?php
+          }
+          ?>
+          <b>Dropchance: <?php echo $entry['dropchance']; ?>%</b><br/>
+          <b>Gewinn: <br/>
+          <?php 
+          if(!$entry['displayprice'])
+          {
+            echo '???';
+          }
+          else
+          {
+            if($entry['zeni'] != 0) echo $entry['zeni'].' Zeni<br/>'; 
+            if($entry['item'] != '')
+            {
+                $items = explode(';',$entry['item']);
+                foreach($items as $itemID)
+                {
+                  $item = $itemManager->GetItem($itemID);
+                  echo '<img width="30px" height="30px" src="img/items/'.$item->GetImage().'.png"></img> '.$item->GetRealName().'<br/>';
                 }
             }
           }
@@ -1058,7 +1137,7 @@ else if(isset($_GET['info']) && $_GET['info'] == 'regeln')
                 <tr>
                   <td>
                     <b><font color="0066FF">Nr2:</font></b></td>
-                  <td> Außerdem ist es nicht gestattet, sich als ein anderer User auszugeben.</td>
+                  <td> Außerdem ist es nicht gestattet, sich als ein anderer User oder einen anderen Clan auszugeben.</td>
                 </tr>
                 <tr>
                   <td>
@@ -1219,14 +1298,14 @@ else if(isset($_GET['info']) && $_GET['info'] == 'regeln')
       <td width="50%" style="vertical-align:top;">
  
           <details>
-            <summary><b><font color="0066FF">§9:</font> Pornografische Inhalte</b></summary>
+            <summary><b><font color="0066FF">§9:</font> Bilder und Texte</b></summary>
             <fieldset>
               <legend><b>Beschreibung:</b></legend>
               <table>
                 <tr>
                   <td>
                     <b><font color="0066FF">Nr1:</font></b></td>
-                  <td> Es ist nicht erlaubt pornografische / nicht jugendfreie Bilder im Profil darzustellen. </td>
+                  <td> Es ist nicht erlaubt pornografische / nicht jugendfreie Bilder im Profil oder in Texten darzustellen oder zu verlinken. </td>
                 </tr>
                 <tr>
                   <td>
@@ -1236,17 +1315,17 @@ else if(isset($_GET['info']) && $_GET['info'] == 'regeln')
                 <tr>
                   <td>
                     <b><font color="0066FF">Nr3:</font></b></td>
-                  <td> Bilder mit bestimmten politischen und religiösen Inhalten können verboten werden.</td>
+                  <td> Bilder und Texte mit politischen und religiösen Inhalten können verboten werden.</td>
                 </tr>
                 <tr>
                   <td>
                     <b><font color="0066FF">Nr4:</font></b></td>
-                  <td> Es ist außerdem nicht erlaubt, Bilder anderer User ohne ihre ausdrückliche Erlaubnis zu verwenden.</td>
+                  <td> Es ist außerdem nicht erlaubt, Bilder und Texte anderer User ohne ihre ausdrückliche Erlaubnis zu verwenden.</td>
                 </tr>
                 <tr>
                   <td>
                     <b><font color="0066FF">Nr5:</font></b></td>
-                  <td> Das gilt auch für von Ihnen verfasste Texte.</td>
+                  <td> Es dürfen keine Erwähnungen von realen Menschen oder Gewerben in Bildern oder Texten vorkommen.</td>
                 </tr>
                 <tr>
                   <td></td>

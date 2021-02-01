@@ -47,7 +47,7 @@ grecaptcha.ready(function() {
     while($eventEntry != null)
     {
       $isPlaceAndPlanet = Event::IsPlaceAndPlanet($entry['planet'], $entry['name'], $eventEntry['placeandtime']);
-      if($isPlaceAndPlanet)
+      if($isPlaceAndPlanet && $player->GetLevel() >= $eventEntry['level'])
       {
         $isToday = Event::IsToday($entry['planet'], $entry['name'], $eventEntry['placeandtime']);
         if($isToday)
