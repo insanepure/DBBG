@@ -8,16 +8,10 @@ class Fighters
 {
   
   private $data;
-	//private $inventory;
   
 	function __construct($data)
 	{
     $this->data = $data;
-		$this->inventory = null;
-		//if(isset($this->data['inventory']))
-		//{
-		//	$this->inventory = new Inventory($this->data['inventory']);
-		//}
   }
   
   public function GetPatternValue($name)
@@ -79,6 +73,26 @@ class Fighters
     $this->data['patternid'] = $value;
   }
   
+  public function GetPatternIDSuccess()
+  {
+    return $this->data['patternidsuccess'];
+  }
+  
+  public function SetPatternIDSuccess($value)
+  {
+    $this->data['patternidsuccess'] = $value;
+  }
+  
+  public function GetPatternIDFailed()
+  {
+    return $this->data['patternidfailed'];
+  }
+  
+  public function SetPatternIDFailed($value)
+  {
+    $this->data['patternidfailed'] = $value;
+  }
+  
   public function GetApeTail()
   {
     return $this->data['apetail'];
@@ -127,11 +141,6 @@ class Fighters
   public function SetReflect($value)
   {
     $this->data['reflect'] = $value;
-  }
-	
-  public function GetInventory()
-  {
-    return $this->inventory;
   }
 	
   public function SetName($value)
@@ -563,34 +572,6 @@ class Fighters
 		$this->SetAttacks(implode(';',$attacks));
 	}
 	
-	public function CalculateItemAttacks($itemManager)
-	{
-    /*
-		$itemAttacks = '';
-		$inventory = $this->GetInventory();
-		$i = 0;
-		$item = $inventory->GetItem($i);
-		$attacks = array();
-		
-		while(isset($item))
-		{
-			$itemData = $itemManager->GetItem($item->GetID());
-			if($itemData->GetFightAttack() != 0)
-			{
-				array_push($attacks, $itemData->GetFightAttack());
-			}
-			++$i;
-			$item = $inventory->GetItem($i);
-		}
-		
-		if(count($attacks) > 0)
-		{
-			$itemAttacks = implode(';',$attacks);
-			$this->SetAttacks(($this->GetAttacks().';'.$itemAttacks));
-		}
-    */
-	}
-	
 	public function Transform($transAttack, $revert)
 	{
 		$value = $transAttack->GetValue() / 100;
@@ -702,6 +683,11 @@ class Fighters
 	public function SetNPCControl($value)
 	{
 		$this->data['npccontrol'] = $value;
+	}
+	
+	public function IsStatsProcentual()
+	{
+		return $this->data['isstatsprocentual'] == 1;
 	}
 	
 }

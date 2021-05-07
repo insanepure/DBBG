@@ -1,12 +1,30 @@
 <?php
-exit();
-$players = 600;
-$width = 360 / 4;
-$height = 648 / 4;
+$start = 0;
+$end = 0;
 
-for($i = 1; $i <= $players; ++$i)
+if(isset($_GET['start']))
+  $start = $_GET['start'];
+if(isset($_GET['end']))
+  $end = $_GET['end'];
+
+
+if($start == 0 || $end == 0)
+  exit();
+
+if(isset($_GET['ava']))
 {
-?><img src="player.php?id=<?php echo $i; ?>" width="<?php echo $width; ?>" height="<?php echo $height; ?>"></img><?php
+  $width = 200;
+  $height = 200;
+}
+else
+{
+  $width = 360 / 4;
+  $height = 648 / 4;
+}
+
+for($i = $start; $i <= $end; ++$i)
+{
+?><img src="player.php?id=<?php echo $i; ?><?php if(isset($_GET['ava'])) { echo '&ava'; } ?>" width="<?php echo $width; ?>" height="<?php echo $height; ?>"></img><?php
 }
 
 ?>

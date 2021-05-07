@@ -43,6 +43,11 @@ class Attack
     return 'img/attacks/'.$this->data['image'].'.png';
   }
   
+	public static function GetTypeCount()
+	{
+    return 24;
+  }
+  
 	public static function GetTypeName($type)
 	{
 		switch($type)
@@ -113,6 +118,12 @@ class Attack
 		  case 22:
      	echo 'DOTS';
      	break;
+		  case 23:
+     	echo '% Schaden';
+     	break;
+		  case 24:
+     	echo '% Tech Schaden';
+     	break;
 		}
 	}
 	
@@ -139,6 +150,11 @@ class Attack
 	public function GetBlockedAttack()
 	{
 		return $this->data['blockedattack'];
+	}
+	
+	public function BlockTargetOnly()
+	{
+		return $this->data['blocktargetonly'] == 1;
 	}
 	
 	public function GetValue()

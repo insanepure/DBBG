@@ -3,8 +3,19 @@ include_once 'classes/bbcode/bbcode.php';
 include_once 'classes/news/newsmanager.php';
 $newsManager = new NewsManager($database, 5);
 
-
-if(isset($_GET['a']) && $_GET['a'] == 'post')
+if(isset($_GET['a']) && $_GET['a'] == 'like' && isset($_GET['id']) && is_numeric($_GET['id']))
+{
+  $newsManager->Like($account->Get('id'), $_GET['id']);
+}
+else if(isset($_GET['a']) && $_GET['a'] == 'dislike' && isset($_GET['id']) && is_numeric($_GET['id']))
+{
+  $newsManager->DisLike($account->Get('id'), $_GET['id']);
+}
+else if(isset($_GET['a']) && $_GET['a'] == 'removelikes' && isset($_GET['id']) && is_numeric($_GET['id']))
+{
+  $newsManager->RemoveLikes($account->Get('id'), $_GET['id']);
+}
+else if(isset($_GET['a']) && $_GET['a'] == 'post')
 {
   
   if(isset($_GET['id']) && is_numeric($_GET['id']) && isset($_POST['text']) && $_POST['text'] != '')

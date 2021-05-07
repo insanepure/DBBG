@@ -119,10 +119,9 @@ class MarketItem
   {
     $returnValue = $this->data['name'];
     $type = $this->GetType();
-    if($type == 1 || $type == 2 || $type == 4 || $type == 5 || $type == 6 && $this->GetStatsID() != 184 )
-      return $returnValue;
     
-    $returnValue = $returnValue.' '.$this->GetTypeName();
+    if($type == 3 && $this->data['value'] != 0 || $this->GetStatsID() == 184)
+      $returnValue = $returnValue.' '.$this->GetTypeName();
     
     if($this->GetUpgrade() != 0)
       $returnValue = $returnValue.' Level '.$this->GetCalculateUpgrade();
@@ -320,6 +319,22 @@ class MarketItem
         }
         break;
     }
+  }
+  
+  public function HasOverlay()
+  {
+    return $this->data['overlay'] != 0;
+  }
+  
+  public function GetOverlay()
+  {
+    switch($this->data['overlay'])
+    {
+      case 1:
+        return 'OverlayEvent';
+        break;
+    }
+    return '';
   }
   
 }

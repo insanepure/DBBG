@@ -8,13 +8,13 @@ else
 }
 if(isset($_GET['a']) && $_GET['a'] == 'delete')
 {
-	 $result = $database->Delete('meldungen','id = "'.$_GET['id'].'"',1);
+	 $result = $database->Delete('meldungen','id = '.$_GET['id'].'',1);
 	 $message= "Du hast Die Meldung Gelöscht!";
 }
 else if(isset($_GET['a']) && $_GET['a'] == 'edit')
 {
 	 $timestamp = date('Y-m-d H:i:s');
-	 $result = $database->Update('status="In Bearbeitung",bearbeiter="'.$player->GetName().'",datum2="'.$timestamp.'"','meldungen','id = "'.$_GET['id'].'"',1);
+	 $result = $database->Update('status="In Bearbeitung",bearbeiter="'.$player->GetName().'",datum2="'.$timestamp.'"','meldungen','id = '.$_GET['id'].'',1);
 	 $message= "Du Bearbeitest jetzt diese Meldung";
 }
 ?>

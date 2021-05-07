@@ -86,13 +86,13 @@ if(isset($_GET['a']) && $player->IsLogged())
     {
       $message = 'Du hast nicht genügend LP. Du benötigst mindestens 20% deiner maximalen LP.';
     }
-    else if(($newFight->GetType() == 3 || $newFight->GetType() == 4) && ($newFight->GetPlace() != $player->GetPlace() || $newFight->GetPlanet() != $player->GetPlanet()))
-    {
-      $message = 'Du befindest dich nicht am richtigen Ort.';
-    }
     else
     {
-      
+      $planet = new Planet($database, $player->GetPlanet());
+      if($newFight->GetType() != 0 && !$planet->IsSamePlanet($newFight->GetPlanet()))
+      {
+        $message = 'Du befindest dich nicht auf den richtigen Planeten.';
+      }
       if(isset($teams[$team]) && count($teams[$team]) == $mode[$team])
       {
         $message = 'Das Team ist schon voll!';
@@ -149,6 +149,9 @@ if(isset($_GET['a']) && $player->IsLogged())
                 break;
               case 8:
                 $fighttype = 'Arenakampf';
+                break;
+              case 9:
+                $fighttype = 'Turmkampf';
                 break;
             }
             LoginTracker::AddInteraction($accountDB, $charaids, $fighttype, 'dbbg');
@@ -244,8 +247,13 @@ if(isset($_GET['a']) && $player->IsLogged())
       {
         $message = 'Es gab Probleme bei der Erstellung des Kampfes.';
       }
-      $fight = $createdFight;
+      else
+      {
+        $createdFight->Join($player, 0, false);
+        $fight = $createdFight;
+      }
     }
   }
+  
 }
 ?>

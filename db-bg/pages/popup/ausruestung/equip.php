@@ -66,6 +66,7 @@ if($item->GetSlot() != $slotItem->GetSlot())
       <div class="spacer"></div>
       <img class="boxSchatten borderT borderR borderL borderB" src="img/items/<?php echo $slotItem->GetImage(); ?>.png" style="width:80px;height:80px;"></img>
       <?php echo $bbcode->parse($slotItem->GetDescription()); ?>
+      <?php echo $slotItem->DisplayEffect(); ?>
       
     </td>
     <td></td>
@@ -74,6 +75,7 @@ if($item->GetSlot() != $slotItem->GetSlot())
       <div class="spacer"></div>
       <img class="boxSchatten borderT borderR borderL borderB" src="img/items/<?php echo $item->GetImage(); ?>.png" style="width:80px;height:80px;"></img>
       <?php echo $bbcode->parse($item->GetDescription()); ?>
+      <?php echo $item->DisplayEffect(); ?>
     </td>
   <td></td>
   </tr>

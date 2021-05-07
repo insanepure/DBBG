@@ -2,7 +2,11 @@
 include_once '../classes/header.php';
 include_once '../classes/npc/npc.php';
 $npcs = null;
-if(isset($_GET['table']) && $_GET['table'] == 'playerinventory')
+if(isset($_GET['table']) && isset($_GET['delete']))
+{
+  ?><a onclick="RemoveTableRow(this)">X</a><?php
+}
+else if(isset($_GET['table']) && $_GET['table'] == 'playerinventory')
 {
   $row = $_GET['row'];
   if($_GET['cell'] == 0)
@@ -19,14 +23,13 @@ if(isset($_GET['table']) && $_GET['table'] == 'playerinventory')
 		while($entry != null)
 		{
 		?>
-			<option value="<?php echo $entry['id']; ?>">(<?php echo $entry['id']; ?>) <?php echo $entry['name']; ?></option>
+			<option value="<?php echo $entry['id']; ?>"><?php echo $entry['name'].'('.$entry['id'].')'; ?></option>
 			<?php
 			++$id;
 			$entry = $items->GetEntry($id);
 		}
 		?>
-		</select
-			><?php
+		</select><?php
 	}
   else if($_GET['cell'] == 1)
   {
@@ -54,14 +57,14 @@ if(isset($_GET['table']) && $_GET['table'] == 'playerinventory')
 <?php
   }
 }
-else if(isset($_GET['table']) && $_GET['table'] == 'needattacks')
+else if(isset($_GET['table']) && ($_GET['table'] == 'attacks' || $_GET['table'] == 'fightattacks' || $_GET['table'] == 'learnableattacks' || $_GET['table'] == 'needattacks' || $_GET['table'] == 'playerattack'))
 {
   $row = $_GET['row'];
   if($_GET['cell'] == 0)
   {
 		?>
-		<select class="select" name="needattacks[<?php echo $i; ?>]" style="width:400px;">
-			<option value="0">(0) Keine Attacke</option>
+		<select class="select" name="<?php echo $_GET['table']; ?>[<?php echo $row; ?>]" style="width:400px;" onchange="ChangeEdit('attackedit<?php echo $row; ?>', '?p=admin&a=see&table=attacks&id=', this)">
+			<option value="0">Keine Attacke(0)</option>
 		<?php
 
 		if($attacks == null)
@@ -73,13 +76,19 @@ else if(isset($_GET['table']) && $_GET['table'] == 'needattacks')
 		while($entry != null)
 		{
 		?>
-			<option value="<?php echo $entry['id']; ?>">(<?php echo $entry['id']; ?>) <?php echo $entry['name']; ?></option>
+			<option value="<?php echo $entry['id']; ?>"><?php echo $entry['name'].'('.$entry['id'].')'; ?></option>
 			<?php
 			++$id;
 			$entry = $attacks->GetEntry($id);
 		}
 		?>
 		</select>
+	<?php
+	}
+  else if($_GET['cell'] == 1)
+  {
+		?>
+    <a id="attackedit<?php echo $row; ?>" href="?p=admin&a=see&table=attacks" target="_blank">Bearbeiten</a>
 	<?php
 	}
 }
@@ -90,7 +99,7 @@ else if(isset($_GET['table']) && $_GET['table'] == 'eventitems')
   {
 		?>
 		<select class="select" name="event_items[<?php echo $i; ?>]" style="width:400px;">
-			<option value="0">(0) Kein Item</option>
+			<option value="0">Kein Item(0)</option>
 		<?php
 
 		if($items == null)
@@ -102,7 +111,7 @@ else if(isset($_GET['table']) && $_GET['table'] == 'eventitems')
 		while($entry != null)
 		{
 		?>
-			<option value="<?php echo $entry['id']; ?>">(<?php echo $entry['id']; ?>) <?php echo $entry['name']; ?></option>
+			<option value="<?php echo $entry['id']; ?>"><?php echo $entry['name'].'('.$entry['id'].')'; ?></option>
 			<?php
 			++$id;
 			$entry = $items->GetEntry($id);
@@ -115,6 +124,33 @@ else if(isset($_GET['table']) && $_GET['table'] == 'eventitems')
   {
 		?><input type="text" name="npcandstoryitems_itemchance[<?php echo $row; ?>]" value="0" style="width:70px"><?php
   }
+}
+else if(isset($_GET['table']) && $_GET['table'] == 'attackpassives')
+{
+  $row = $_GET['row'];
+  if($_GET['cell'] == 0)
+  {
+		?>
+		<select class="select" name="attack_passives[<?php echo $i; ?>]" style="width:300px;">
+		<?php
+		if($passiveList == null)
+		{
+			$passiveList = new Generallist($database, 'passives', '*', '', '', 99999999999, 'ASC');
+		}
+		$id = 0;
+		$entry = $passiveList->GetEntry($id);
+		while($entry != null)
+		{
+		?>
+			<option value="<?php echo $entry['id']; ?>"> <?php echo $entry['name'].'('.$entry['id'].')'; ?></option>
+			<?php
+			++$id;
+			$entry = $passiveList->GetEntry($id);
+		}
+		?>
+		</select>
+		<?php
+	}
 }
 else if(isset($_GET['table']) && $_GET['table'] == 'fighterpatterns')
 {
@@ -133,7 +169,7 @@ else if(isset($_GET['table']) && $_GET['table'] == 'fighterpatterns')
 		while($entry != null)
 		{
 		?>
-			<option value="<?php echo $entry['id']; ?>"> <?php echo '('.$entry['id'].') '.$entry['name']; ?></option>
+			<option value="<?php echo $entry['id']; ?>"> <?php echo $entry['name'].'('.$entry['id'].')'; ?></option>
 			<?php
 			++$id;
 			$entry = $patternList->GetEntry($id);
@@ -141,6 +177,12 @@ else if(isset($_GET['table']) && $_GET['table'] == 'fighterpatterns')
 		?>
 		</select>
 		<?php
+	}
+  else if($_GET['cell'] == 1)
+  {
+		?>
+   <a id="patternEdit<?php echo $row; ?>" href="?p=admin&a=see&table=patterns" target="_blank">Bearbeiten</a>
+	<?php
 	}
 }
 else if(isset($_GET['table']) && $_GET['table'] == 'playertitels')
@@ -160,7 +202,7 @@ else if(isset($_GET['table']) && $_GET['table'] == 'playertitels')
 		while($entry != null)
 		{
 		?>
-			<option value="<?php echo $entry['id']; ?>"> <?php echo '('.$entry['id'].') '.$entry['name']; ?></option>
+			<option value="<?php echo $entry['id']; ?>"> <?php echo $entry['name'].'('.$entry['id'].')'; ?></option>
 			<?php
 			++$id;
 			$entry = $titelList->GetEntry($id);
@@ -218,7 +260,7 @@ else if(isset($_GET['table']) && $_GET['table'] == 'npcandstoryitems')
 		while($entry != null)
 		{
 		?>
-			<option value="<?php echo $entry['id']; ?>">(<?php echo $entry['id']; ?>) <?php echo $entry['name']; ?></option>
+			<option value="<?php echo $entry['id']; ?>"><?php echo $entry['name'].'('.$entry['id'].')'; ?></option>
 			<?php
 			++$id;
 			$entry = $items->GetEntry($id);
@@ -249,7 +291,7 @@ else if(isset($_GET['table']) && $_GET['table'] == 'amountitems')
 		while($entry != null)
 		{
 		?>
-			<option value="<?php echo $entry['id']; ?>">(<?php echo $entry['id']; ?>) <?php echo $entry['name']; ?></option>
+			<option value="<?php echo $entry['id']; ?>"><?php echo $entry['name'].'('.$entry['id'].')'; ?></option>
 			<?php
 			++$id;
 			$entry = $items->GetEntry($id);
@@ -261,6 +303,109 @@ else if(isset($_GET['table']) && $_GET['table'] == 'amountitems')
   else if($_GET['cell'] == 1)
   {
 		?><input type="text" name="amountitems_amount[<?php echo $row; ?>]" value="0" style="width:70px"><?php
+  }
+}
+else if(isset($_GET['table']) && ($_GET['table'] == 'supportnpcs' || $_GET['table'] == 'npcs' || $_GET['table'] == 'trainers' ))
+{
+  $row = $_GET['row'];
+  if($_GET['cell'] == 0)
+  {
+    ?>
+    <select class="select" name="<?php echo $_GET['table'] ?>[]" style="width:400px;">
+    <?php 
+    if($npcs == null)
+    {
+      $npcs = new Generallist($database, 'npcs', '*', '', '', 99999999999, 'ASC');
+    }
+    $id = 0;
+    $entry = $npcs->GetEntry($id);
+    while($entry != null)
+    {
+      ?>
+      <option value="<?php echo $entry['id']; ?>"><?php echo $entry['name'].'('.$entry['id'].')'; ?></option>
+      <?php
+      ++$id;
+      $entry = $npcs->GetEntry($id);
+    }
+    ?>
+    </select>
+    <?php
+  }
+}
+else if(isset($_GET['table']) && substr($_GET['table'], 0, 9) == 'eventnpcs')
+{
+  $roundRow = substr($_GET['table'], 10, -1);
+  $row = $_GET['row'];
+  if($_GET['cell'] == 0)
+  {
+    ?>
+    <select class="select" name="event_npcs[<?php echo $roundRow; ?>][]" style="width:400px;">
+    <?php 
+    if($npcs == null)
+    {
+      $npcs = new Generallist($database, 'npcs', '*', '', '', 99999999999, 'ASC');
+    }
+    $id = 0;
+    $entry = $npcs->GetEntry($id);
+    while($entry != null)
+    {
+      ?>
+      <option value="<?php echo $entry['id']; ?>"><?php echo $entry['name'].'('.$entry['id'].')'; ?></option>
+      <?php
+      ++$id;
+      $entry = $npcs->GetEntry($id);
+    }
+    ?>
+    </select>
+    <?php
+  }
+}
+else if(isset($_GET['table']) && $_GET['table'] == 'eventrounds')
+{
+  $row = $_GET['row']+1;
+  if($_GET['cell'] == 0)
+  {
+    ?>
+    <td width="15%">Runde <?php echo $row+1; ?></td>
+    <?php
+  }
+  else if($_GET['cell'] == 1)
+  {
+    ?>
+      <table width="100%" cellspacing="0" id="eventnpcs[<?php echo $row; ?>]">
+        <tr><td width="80%">
+          <select class="select" name="event_npcs[<?php echo $row; ?>][0]" style="width:400px;">
+          <?php 
+          if($npcs == null)
+          {
+            $npcs = new Generallist($database, 'npcs', '*', '', '', 99999999999, 'ASC');
+          }
+          $id = 0;
+          $entry = $npcs->GetEntry($id);
+          while($entry != null)
+          {
+            ?>
+          <option value="<?php echo $entry['id']; ?>"><?php echo $entry['name'].'('.$entry['id'].')'; ?></option>
+            <?php
+          ++$id;
+          $entry = $npcs->GetEntry($id);
+          }
+          ?>
+          </select>
+        </td>
+        <td><a onclick="RemoveTableRow(this)">X</a></td>
+        </tr>
+      </table>
+      <br/>
+      <a onclick="AddTableRow('eventnpcs[<?php echo $row; ?>]', 1)">NPC hinzufügen</a><br/><br/>
+      <input type="checkbox" name="event_fhealing[<?php echo $row; ?>]" checked> Healing</br> 
+      <input type="number" name="event_survivalteam[<?php echo $row; ?>]" value="0" style="width:50px"> SurvivalTeam</br> 
+      <input type="number" name="event_survivalrounds[<?php echo $row; ?>]" value="0" style="width:50px"> SurvivalRounds</br> 
+      <input type="number" name="event_survivalwinner[<?php echo $row; ?>]" value="0" style="width:50px"> SurvivalWinner</br> 
+      <input type="number" name="event_healthratio[<?php echo $row; ?>]" value="0" style="width:50px"> HealthRatio</br> 
+      <input type="number" name="event_healthratioteam[<?php echo $row; ?>]" value="0" style="width:50px"> HealthRatioTeam</br> 
+      <input type="number" name="event_healthratiowinner[<?php echo $row; ?>]" value="0" style="width:50px"> HealthRatioWinner</br> 
+    <?php
   }
 }
 else if(isset($_GET['table']) && $_GET['table'] == 'eventfights')

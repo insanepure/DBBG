@@ -29,11 +29,7 @@ else if(isset($_GET['a']) && $_GET['a'] == 'continue' && $story->GetType() == 1)
 else if(isset($_GET['a']) && $_GET['a'] == 'train' && $story->GetType() == 3)
 {
   $itemManager = new ItemManager($database);
-  if($player->HasDBs())
-  {
-    $message = 'Du musst dir zuerst etwas wünschen.';
-  }
-  else if($player->GetPlanet() != $story->Getplanet())
+  if($player->GetPlanet() != $story->Getplanet())
   {
     $message = 'Du befindest dich auf den falschen Planeten.';
   }
@@ -52,6 +48,14 @@ else if(isset($_GET['a']) && $_GET['a'] == 'train' && $story->GetType() == 3)
     {
       $message = 'Du hast das benötigte Item nicht.';
     }
+    else if($player->HasDBs() && ($action->GetType() == 4 || $action->GetType() == 1 && $action->GetPlanet() != ''))
+    {
+      $message = 'Du kannst während du die Dragonballs hast dies nicht tun.';
+    }
+    else if($player->HasAllDBs() && ($action->GetType() == 4 || $action->GetType() == 1 && $action->GetPlanet() != ''))
+    {
+      $message = 'Du musst dir zuerst etwas wünschen.';
+    }
     else if($action->GetLevel() > $player->GetLevel())
     {
       $message = 'Dein Level ist zu niedrig.';
@@ -60,7 +64,7 @@ else if(isset($_GET['a']) && $_GET['a'] == 'train' && $story->GetType() == 3)
     {
       $message = 'Du hast nicht genug Zeni.';
     }
-    else if($player->GetAction() != 0)
+    else if($minutes != 0 && $player->GetAction() != 0)
     {
       $message = 'Du tust bereits etwas.';
     }
@@ -88,7 +92,7 @@ else if(isset($_GET['a']) && $_GET['a'] == 'train' && $story->GetType() == 3)
 }
 else if(isset($_GET['a']) && $_GET['a'] == 'fight' && $story->GetType() == 2)
 {
-  if($player->GetPlanet() != $story->Getplanet())
+  if($player->GetPlanet() != $story->GetPlanet())
   {
     $message = 'Du befindest dich auf den falschen Planeten.';
   }
@@ -115,10 +119,11 @@ else if(isset($_GET['a']) && $_GET['a'] == 'fight' && $story->GetType() == 2)
     $group = $player->GetGroup();
     if($group != null)
     {
+      $planet = new Planet($database, $player->GetPlanet());
       foreach($group as &$gID)
       {
         $gPlayer = new Player($database, $gID, $actionManager);
-        if($gPlayer->GetPlace() == $player->GetPlace() && $gPlayer->GetPlanet() == $player->GetPlanet() 
+        if($planet->IsSamePlanet($gPlayer->GetPlanet())
            && $gPlayer->GetLP() > ($gPlayer->GetMaxLP() * 0.2)
            && $gPlayer->GetFight() == 0
            && $gPlayer->GetTournament() == 0
@@ -174,9 +179,6 @@ else if(isset($_GET['a']) && $_GET['a'] == 'fight' && $story->GetType() == 2)
       $nLP = floor($nLP);
       $npc->SetLP($nLP);
       array_push($npcsArray, $npc);
-      
-    if($npc->GetPlayerAttack() != 0)
-      $player->AddFightAttack($npc->GetPlayerAttack());
     }
     
     $createdFight = Fight::CreateFight($player, $database, $type, $name, $mode, $story->GetLevelup(), $actionManager, $story->GetZeni(), $story->GetItems(), 
@@ -187,6 +189,7 @@ else if(isset($_GET['a']) && $_GET['a'] == 'fight' && $story->GetType() == 2)
     {
       $createdFight->Join($npc, $team, true);
     }
+    $createdFight->Join($player, 0, false);
     
     if(count($supportNPCs) != 0)
     {

@@ -26,8 +26,17 @@
   <tr height="75px">
     <td class="borderT" style="position:absolute;"><center>
       <div style="position:relative; width:60px; height:60px">
-      <img class="boxSchatten borderT borderR borderL borderB" src="img/items/<?php echo $item->GetImage(); ?>.png" style="position:absolute; left:0px; top:0px; width:60px; height:60px;">
-      <span style="position:absolute; right:2px; bottom:-4px; font-size:24px; color:#000;
+      <div style="width:60px; height:60px; position:relative; top:10px; left:-25px;">
+        <?php if($item->HasOverlay())
+        {
+          ?>
+        <img class="boxSchatten borderT borderR borderL borderB" src="img/items/<?php echo $item->GetOverlay(); ?>.png" style="width:60px;height:60px; position:absolute; z-index:1;"> 
+          <?php
+        }
+        ?>
+        <img class="boxSchatten borderT borderR borderL borderB" src="img/items/<?php echo $item->GetImage(); ?>.png" style="width:60px;height:60px; position:absolute; z-index:0;"> 
+      </div>
+      <span style="position:absolute; right:0px; bottom:-10px; font-size:24px; color:#000;
       text-shadow:
         -1px -1px 0 #fff,
         1px -1px 0 #fff,

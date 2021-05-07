@@ -46,7 +46,8 @@ class PMManager
 			$result->close();
 		}
   }
-    private function LoadSystemPMs()
+  
+  private function LoadSystemPMs()
   {
     //SELECT COUNT(id) as total FROM `pms` WHERE `receiverid` = 1 AND `read` = 0
     $result = $this->database->Select('COUNT(id) as total','pms','`receiverid` = '.$this->playerID.' AND `read` = 0 AND `senderid` = 0');
@@ -57,6 +58,20 @@ class PMManager
 
 			$result->close();
 		}
+  }
+	
+	public function DeleteAll($systemPMs, $pid)
+  {
+    if(!$systemPMs)
+    {
+		  $result = $this->database->Delete('pms','`senderid` != 0 AND `receiverid`='.$pid.'',999999999);
+	    $this->unreadPMs = 0;
+    }
+    else
+    {
+		  $result = $this->database->Delete('pms','`senderid` = 0 AND `receiverid`='.$pid.'',999999999);
+	    $this->unreadPMs2 = 0;
+    }
   }
 	
 	public function Delete($ids, $pid)
@@ -85,7 +100,7 @@ class PMManager
 				  $this->unreadPMs2 = $this->unreadPMs2-1;
 			}
 			
-			$whereText = '`id`="'.$id.'"';
+			$whereText = '`id`='.$id.'';
 			if($where == '')
 			{
 				$where = $whereText;
@@ -103,7 +118,7 @@ class PMManager
 			return;
 		}
 		
-		$result = $this->database->Delete('pms','('.$where.') AND `receiverid`="'.$pid.'"',1);
+		$result = $this->database->Delete('pms','('.$where.') AND `receiverid`='.$pid.'',1);
 	}
 	
 	public function ReadAllOnly($ids, $pid)
@@ -136,7 +151,7 @@ class PMManager
         else
 				  $this->unreadPMs2 = $this->unreadPMs2-1;
 			
-			$whereText = '`id`="'.$id.'"';
+			$whereText = '`id`='.$id.'';
 			if($where == '')
 			{
 				$where = $whereText;
@@ -155,7 +170,7 @@ class PMManager
 			return;
 		}
 		
-		$result = $this->database->Update('`read`= !`read`','pms','('.$where.') AND `receiverid`="'.$pid.'"',$count);
+		$result = $this->database->Update('`read`= !`read`','pms','('.$where.') AND `receiverid`='.$pid.'',$count);
 	}
 	
 	public function ReadAll($ids, $pid)
@@ -192,7 +207,7 @@ class PMManager
 				  $this->unreadPMs2 = $this->unreadPMs2+1;
       }
 			
-			$whereText = '`id`="'.$id.'"';
+			$whereText = '`id`='.$id.'';
 			if($where == '')
 			{
 				$where = $whereText;
@@ -211,7 +226,7 @@ class PMManager
 			return;
 		}
 		
-		$result = $this->database->Update('`read`= !`read`','pms','('.$where.') AND `receiverid`="'.$pid.'"',$count);
+		$result = $this->database->Update('`read`= !`read`','pms','('.$where.') AND `receiverid`='.$pid.'',$count);
 	}
 	
 	public function Read($id, $pid)
@@ -225,7 +240,7 @@ class PMManager
 		  $this->unreadPMs = $this->unreadPMs-1;
     else
 		  $this->unreadPMs2 = $this->unreadPMs2-1;
-		$result = $this->database->Update('`read`=1','pms','`id`="'.$id.'" AND `receiverid`="'.$pid.'"',1);
+		$result = $this->database->Update('`read`=1','pms','`id`='.$id.' AND `receiverid`='.$pid.'',1);
 	}
 	
 	public function SendPMToAll($id, $image, $name, $title, $text, $isHTML=0)
@@ -303,7 +318,7 @@ class PMManager
   public function LoadPM($id)
   {
     $pm = null;
-		$result = $this->database->Select('*','pms','`id` = "'.$id.'" AND (`receiverid` = "'.$this->playerID.'" OR `senderid` = "'.$this->playerID.'")',1);
+		$result = $this->database->Select('*','pms','`id` = '.$id.' AND (`receiverid` = '.$this->playerID.' OR `senderid` = '.$this->playerID.')',1);
 		if ($result) 
 		{
 			if ($result->num_rows > 0)
@@ -330,19 +345,19 @@ class PMManager
     $where = '';
     if($inbox)
     {
-      $where = 'receiverid="'.$this->playerID.'"';
+      $where = 'receiverid='.$this->playerID.'';
       if($system)
       {
-        $where = $where.' AND senderid="0"';
+        $where = $where.' AND senderid=0';
       }
       else
       {
-        $where = $where.' AND senderid != "0"';
+        $where = $where.' AND senderid != 0';
       }
     }
     else
     {
-      $where = 'senderid="'.$this->playerID.'"';
+      $where = 'senderid='.$this->playerID.'';
     }
 		$result = $this->database->Select('*','pms',$where,$start.','.$limit,'time','DESC');
 		if ($result) 
@@ -365,19 +380,19 @@ class PMManager
     $where = '';
     if($inbox)
     {
-      $where = 'receiverid="'.$this->playerID.'"';
+      $where = 'receiverid='.$this->playerID.'';
       if($system)
       {
-        $where = $where.' AND senderid="0"';
+        $where = $where.' AND senderid=0';
       }
       else
       {
-        $where = $where.' AND senderid != "0"';
+        $where = $where.' AND senderid != 0';
       }
     }
     else
     {
-      $where = 'senderid="'.$this->playerID.'"';
+      $where = 'senderid='.$this->playerID.'';
     }
     $total = 0;
     //SELECT COUNT(id) as total FROM `pms` WHERE `receiverid` = 1 AND `read` = 0

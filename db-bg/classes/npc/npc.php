@@ -125,7 +125,15 @@ class NPC
   
   public function GetPlayerAttack()
   {
-    return $this->data['playerattack'];
+    if($this->data['playerattack'] == '')
+      return array();
+    
+    return explode(';',$this->data['playerattack']);
+  }
+  
+  public function GetOverrideAttacks()
+  {
+    return $this->data['overrideattacks'];
   }
   
   public function GetImage()
@@ -145,7 +153,10 @@ class NPC
   
   public function AddFightAttack($technique)
   {
-		$attacks = explode(';',$this->GetAttacks());
+    $attacks = array();
+    if($this->GetAttacks() != '')
+		  $attacks = explode(';',$this->GetAttacks());
+    
 		if(in_array($technique, $attacks))
 		{
 			return;
@@ -260,10 +271,15 @@ class NPC
 	{
 		$this->data['reflex'] = $value;
 	}
+	
+	public function IsStatsProcentual()
+	{
+		return $this->data['isstatsprocentual'] == 1;
+	}
   
   private function LoadData($id)
   {
-    $result = $this->database->Select('*', 'npcs', 'id="'.$id.'"', 1);
+    $result = $this->database->Select('*', 'npcs', 'id='.$id.'', 1);
 		if ($result) 
 		{
 			if ($result->num_rows > 0)

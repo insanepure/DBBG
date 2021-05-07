@@ -15,6 +15,9 @@ $charaCreationActive = $isReleaseNow;
 include_once 'serverurl.php';
 include_once $_SERVER['DOCUMENT_ROOT'].'../../main/www/classes/header.php';
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
 $db = 'DB';
 $user = 'droot';
 $pw = '';
@@ -29,6 +32,8 @@ include_once 'pms/pmmanager.php';
 include_once 'planet/planet.php';
 include_once 'places/place.php';
 include_once 'player/player.php';
+include_once 'clan/clan.php';
+include_once 'eventitems/eventitems.php';
 
 if(!$userLoginActive && $account->IsLogged())
 {
@@ -40,13 +45,10 @@ $database->Debug();
 }*/
 
 include_once 'events/events.php';
+include_once 'tower/tower.php';
 include_once 'npc/npc.php';
 include_once 'fight/fight.php';
 include_once 'gamedata.php';
-
-//Import the PHPMailer class into the global namespace
-use PHPMailer\PHPMailer\PHPMailer;
-
 //$database->Debug();
 function SendMail($email, $topic, $message)
 {
@@ -86,8 +88,67 @@ return $mail->send();
   
 }
 
+$eventItems = null;
+
 if($player->IsLogged())
 {
+  $eventItems = new EventItems($database);
+  
+  $eventItemURL = parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY);
+  $eventItemPickURL = '&a=eventitem';
+  $eventItemURL = str_replace($eventItemPickURL, '', $eventItemURL);
+  
+  $eventItem = $eventItems->LoadItem($eventItemURL);
+  
+  if($eventItem != null)
+  {
+    if($eventItems->HasItem($player->GetID(), $eventItem->GetID()))
+    {
+      $eventItem = null;
+    }
+    else if(isset($_GET['a']) && $_GET['a'] == 'eventitem')
+    {
+      $eventItems->AddItem($player->GetID(), $eventItem->GetID());
+      
+      $itemID = $eventItem->GetItem();
+      $itemAmount = $eventItem->GetItemAmount();
+      $zeni = $eventItem->GetZeni();
+      
+      $message = 'Du erhältst';
+      $itemMessage = '';
+      $zeniMessage = '';
+      if($itemID != 0)
+      {
+        $itemManager = new ItemManager($database);
+        $item = $itemManager->GetItem($itemID);
+        $player->AddItems($item, $item, $itemAmount);
+        
+        $itemMessage = $itemAmount.'x '.$item->GetName();
+      }
+      if($zeni != 0)
+      {
+        $player->AddZeni($zeni);
+        
+        $zeniMessage = $zeni.' Zeni';
+      }
+      
+      if($itemMessage != '')
+        $message = $message.' '.$itemMessage;
+      if($itemMessage != '' && $zeniMessage != '')
+        $message = $message.' und';      
+      if($zeniMessage != '')
+        $message = $message.' '.$zeniMessage;
+      
+        $message = $message.'.';
+      $eventItem = null;
+    }
+  }
+  
+  $clan = null;
+  if($player->GetClan() != 0)
+  {
+    $clan = new Clan($database, $player->GetClan());
+  }
   $PMManager = new PMManager($database, $player->GetID());
   $tournamentManager = null;
   if($player->GetTournament() != 0)

@@ -2,6 +2,7 @@
 include_once 'classes/items/itemmanager.php';
 include_once 'classes/bbcode/bbcode.php';
 
+$titelManager = new titelManager($database);
 $itemManager = new ItemManager($database);
 include_once 'classes/npc/npc.php';
 include_once 'classes/places/place.php';
@@ -50,12 +51,37 @@ if(isset($_GET['a']) && $_GET['a'] == 'fight')
       $npc = new NPC($database, $_GET['id'], $difficulty);
     
       $npcs = $place->GetNPCs();
-      if(!$npc->IsValid() || !in_array($npc->GetID(), $npcs) || $npc->GetLevel() > $player->GetLevel())
+      if(!$npc->IsValid() || !in_array($npc->GetID(), $npcs) || $player->GetARank() < 2 && $npc->GetLevel() > $player->GetLevel())
       {
         $message = 'Dieser NPC ist ungültig.';
       }
       else
       {
+        
+        
+        $gPlayers = array();
+        $group = $player->GetGroup();
+        if($group != null)
+        {
+          $planet = new Planet($database, $player->GetPlanet());
+          foreach($group as &$gID)
+          {
+            $gPlayer = new Player($database, $gID, $actionManager);
+            if($planet->IsSamePlanet($gPlayer->GetPlanet())
+               && $gPlayer->GetLP() > ($gPlayer->GetMaxLP() * 0.2)
+               && $gPlayer->GetFight() == 0
+               && $gPlayer->GetTournament() == 0
+               && $gPlayer->GetID() != $player->GetID()
+              )
+            {
+              array_push($gPlayers, $gPlayer);
+              if((count($gPlayers)+1) == $difficulty)
+                break;
+            }
+          }
+        }
+        array_push($gPlayers, $player);
+        
         $type = $_POST['type']; //NPCFight
         $mode = $difficulty.'vs1';
         if($type == 3)
@@ -78,6 +104,18 @@ if(isset($_GET['a']) && $_GET['a'] == 'fight')
         $createdFight = Fight::CreateFight($player, $database, $type, $name, $mode, 0, $actionManager, $zeni, $items,0,0,$survivalteam,$survivalrounds,
                                            $survivalwinner,0,0,0,0,0,$_GET['id'],$difficulty, $healthRatio, $healthRatioTeam, $healthRatioWinner);
         $createdFight->Join($npc, $team, true);
+        $createdFight->Join($player, 0, false);
+        
+        foreach($gPlayers as &$gPlayer)
+        {
+          array_push($charaids, $gPlayer->GetID());
+          
+          if($gPlayer->GetID() == $player->GetID())
+            continue;
+          
+          $createdFight->Join($gPlayer, 0, false);
+        }
+        
 				if($createdFight->IsStarted())
         {
 				  header('Location: ?p=infight');

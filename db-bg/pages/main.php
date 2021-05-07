@@ -9,6 +9,7 @@ if (!$account->IsLogged() && isset($_GET['p'])
 		&& $_GET['p'] != 'online'
 		&& $_GET['p'] != 'register'
 		&& $_GET['p'] != 'partner'
+		&& $_GET['p'] != 'changelog'
 	 )
 {
 	header('Location: ?p=login');
@@ -25,6 +26,7 @@ else if ($account->IsLogged() && !$player->IsLogged() && isset($_GET['p'])
 		&& $_GET['p'] != 'characreate'
 		&& $_GET['p'] != 'charalogin'
 		&& $_GET['p'] != 'partner'
+		&& $_GET['p'] != 'changelog'
 	 )
 {
 	header('Location: ?p=login');

@@ -2,7 +2,6 @@
 include_once 'classes/items/itemmanager.php';
 include_once 'classes/bbcode/bbcode.php';
 include_once 'classes/fight/attackmanager.php';
-include_once 'classes/clan/clan.php';
 $itemManager = new ItemManager($database);
 $attackManager = new AttackManager($database);
 $titelManager = new titelManager($database);
@@ -24,13 +23,17 @@ function generateRandomString($length = 10) {
     }
     return $randomString;
 }
-function ShowSlotEquippedImage($slot, $inventory, $zindex)
+function ShowSlotEquippedImage($slot, $inventory, $zorders, $zordersOnTop)
 {
   $item = $inventory->GetItemAtSlot($slot);
   if($item != null)
   {
+   if($item->IsOnTop())
+     $zindex = $zordersOnTop[$slot];
+    else
+      $zindex = $zorders[$slot];
 		?> 
-		<div class="profilecharacter" style="top:20px; left:185px; z-index:<?php echo $zindex; ?>; background-image:url('img/ausruestung/<?php echo $item->GetEquippedImage(); ?>.png')"></div>
+		<div class="profilecharacter" style="top:20px; left:185px; z-index:<?php echo $zindex; ?>; background-image:url('img/ausruestung/<?php echo $item->GetEquippedImage(); ?>')"></div>
 		<?php
   }
 }
@@ -221,7 +224,11 @@ else if(isset($_GET['a']) && $_GET['a'] == 'pwchange' && isset($_POST['realcheck
 }
 else if(isset($_GET['a']) && $_GET['a'] == 'delete')
 {
-	if($player->GetFight() != 0)
+	if(!isset($_GET['code']) && !isset($_POST['realcheck']))
+	{
+		$message = 'Du musst die Checkbox ankreuzen.';
+	}
+	else if($player->GetFight() != 0)
 	{
 		$message = 'Du kannst dich während eines Kampfes nicht löschen.';
 	}
@@ -237,9 +244,9 @@ else if(isset($_GET['a']) && $_GET['a'] == 'delete')
 	{
 		$message = 'Du musst zuerst deine Aktion beenden.';
 	}
-	else if(!isset($_GET['code']) && !isset($_POST['realcheck']))
+	else if($player->GetClan() != 0)
 	{
-		$message = 'Du musst die Checkbox ankreuzen.';
+		$message = 'Du musst zuerst deinen Clan verlassen.';
 	}
 	else
 	{
@@ -308,6 +315,49 @@ else if(isset($_GET['a']) && $_GET['a'] == 'powerup')
     }
 	}
 }
+else if(isset($_GET['a']) && $_GET['a'] == 'fightattack')
+{
+	if(!isset($_GET['aid']) || !is_numeric($_GET['aid']))
+	{
+		$message = 'Du hast keine Technik ausgewählt.';
+	}
+  else
+  {
+    $aid = $_GET['aid'];
+    $attacks = explode(';',$player->GetAttacks());
+    $fightAttacks = explode(';',$player->GetFightAttacks());
+    if(!in_array($aid, $attacks))
+    {
+      $message = 'Du besitzt diese Technik nicht.';
+    }
+    else
+    {
+      $equipped = in_array($aid, $fightAttacks);
+      if($equipped && ($aid == 1 && !in_array(2, $fightAttacks)))
+      {
+        $message = 'Du kannst Schlag nicht entfernen, wenn du Verteidigung nicht ausgewählt hast.';
+      }
+      else if($equipped && ($aid == 2 && !in_array(1, $fightAttacks)))
+      {
+        $message = 'Du kannst Verteidigung nicht entfernen, wenn du Schlag nicht ausgewählt hast.';
+      }
+      else if($equipped)
+      {
+        //unequip
+        $idx = array_search($aid, $fightAttacks);
+        array_splice($fightAttacks, $idx, 1);
+        
+		    $player->UpdateFightAttacks($fightAttacks);
+      }
+      else
+      {
+        //equip
+        array_push($fightAttacks, $aid);
+		    $player->UpdateFightAttacks($fightAttacks);
+      }
+    }
+  }
+}
 else if(isset($_GET['a']) && $_GET['a'] == 'attacks')
 {
 	if(!isset($_POST['attacks']))
@@ -328,82 +378,15 @@ else if(isset($_GET['a']) && $_GET['a'] == 'attacks')
 		$message = 'Du hast deine Techniken für den Kampf ausgewählt.';
 	}
 }
-else if(isset($_GET['a']) && $_GET['a'] == 'fakeki' && isset($_POST['fakeki']) && $player->CanFakeKI())
+else if(isset($_GET['a']) && $_GET['a'] == 'fakeki' && isset($_POST['fakeki']) && $player->CanFakeKI() && is_numeric($_POST['fakeki']))
 {
-	$fakeki = $_POST['fakeki'];
+	$fakeki = intval($_POST['fakeki']);
 	if($fakeki > $player->GetKI() || $fakeki < 0)
 	{
 		$fakeki = 0;
 	}
 	$player->ChangeFakeKI($fakeki);
 }
-/*
-else if(isset($_GET['a']) && $_GET['a'] == 'chatban')
-{
-$servername = "localhost";
-$username = "root";
-$password = "YZl3XUowy0";
-$dbname = "dbbg";
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error){
-die("Connection failed: " . $conn->connect_error);
-}
-$sql = 'UPDATE accounts SET chatban="1" WHERE id="'.$_POST['playeridtoban'].'"';
-if ($conn->query($sql) === TRUE) {
-} else {echo "Error updating record: " . $conn->error;}
-
-$conn->close();
-$datumunban = date('Y-m-d H:i:s', time()+60*60*24*30);
-$PMManager->SendPM(0, 'img/chatimage.png', 'Chat', 'Chat Ausschluss', 'Du Wurdest durch ein Regelbruch aus dem Chat ausgeschlossen!'.chr(10).chr(10).'§6: Chat.'.chr(10).chr(10).'Nr1: 	Das Provozieren anderer User im DBBG Chat ist strengstens untersagt'.chr(10).chr(10).'Nr2: 	Dazu gehören gezielte Provokationen die zu Konflikte führen.'.chr(10).chr(10).'Nr3: 	Moderatoren/Supporter sind berechtigt, bestimmte Diskussionen und Gesprächsthemen zu beenden oder zu verbieten, wenn diese sich negativ auf die Chat auswirken (In Form von verärgerte User, ungeeigneter Gesprächsstoff, anstößige Inhalte, Inhalte die nicht gern gesehen bzw. unpassend sind)'.chr(10).chr(10).'Bitte Lese dir die Regeln noch einmal durch um für die zukung weiter Strafen zu umgehen.'.chr(10).chr(10).'Hinweiß:'.chr(10).chr(10).'Diese Nachricht ist von System Erstellt worden wen du weitere fragen zur aufhebung oder fragen zu deinem Chat Ausschluss hast stell deine Fragen bitte über das Support Ticket System.', $_POST['playernametoban']);
-$message2 = '```=============================================='.chr(10).'Der User '.$_POST['playernametoban'].' hat von '.$player->GetName().chr(10).'Am: '.$timestamp = date('Y-m-d H:i:s').' einen Chat Ausschluss bekommen.'.chr(10).'Hinweiß: Es wurde eine PM an den User Gesendet'.chr(10).'Entbannung: '.$datumunban.chr(10).'Info: Bitte Manuel in 30Tagen wieder freischalten.'.chr(10).'==============================================```';
-//postToDiscord($message2);
-$message = 'Du hast den User: '.$_POST['playernametoban'].' aus dem Chat entfernt und ein Chat Ausschluss eingetragen.';
-
-}
-
-else if(isset($_GET['a']) && $_GET['a'] == 'warn')
-{
-$servername = "localhost";
-$username = "root";
-$password = "YZl3XUowy0";
-$dbname = "dbbg";
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error){
-die("Connection failed: " . $conn->connect_error);
-}
-$sql = 'UPDATE accounts SET warnung=warnung+"1" WHERE id="'.$_POST['playeridtoban'].'"';
-if ($conn->query($sql) === TRUE) {
-} else {echo "Error updating record: " . $conn->error;}
-
-$conn->close();
-$datumunban = date('Y-m-d H:i:s', time()+60*60*24*30);
-$PMManager->SendPM(0, 'img/chatimage.png', 'SYSTEM', 'Verwarnung', 'Du hast durch ein Regelbruch eine Verwarnung bekommen!', $_POST['playernametoban']);
-$message2 = '```=============================================='.chr(10).'Der User '.$_POST['playernametoban'].' hat von '.$player->GetName().chr(10).'Am: '.$timestamp = date('Y-m-d H:i:s').' eine Verwarnung bekommen.'.chr(10).'==============================================```';
-//postToDiscord($message2);
-$message = 'Du hast den User: '.$_POST['playernametoban'].' Eine Verwarnung eingetragen';
-
-}
-
-else if(isset($_GET['a']) && $_GET['a'] == 'chatunban')
-{
-$servername = "localhost";
-$username = "root";
-$password = "YZl3XUowy0";
-$dbname = "dbbg";
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error){
-die("Connection failed: " . $conn->connect_error);
-}
-$sql = 'UPDATE accounts SET chatban="0" WHERE id="'.$_POST['playeridtoban'].'"';
-if ($conn->query($sql) === TRUE) {
-} else {echo "Error updating record: " . $conn->error;}
-
-$conn->close();
-$PMManager->SendPM(0, 'img/chatimage.png', 'Chat', 'Chat Freischaltung', 'Du Wurdest durch ein Supporter/Moderator wieder zum Chat zugelassen!'.chr(10).chr(10).'Bitte Beachte die Regeln:'.chr(10).chr(10).'§6: Chat.'.chr(10).chr(10).'Nr1: 	Das Provozieren anderer User im DBBG Chat ist strengstens untersagt'.chr(10).chr(10).'Nr2: 	Dazu gehören gezielte Provokationen die zu Konflikte führen.'.chr(10).chr(10).'Nr3: 	Moderatoren/Supporter sind berechtigt, bestimmte Diskussionen und Gesprächsthemen zu beenden oder zu verbieten, wenn diese sich negativ auf die Chat auswirken (In Form von verärgerte User, ungeeigneter Gesprächsstoff, anstößige Inhalte, Inhalte die nicht gern gesehen bzw. unpassend sind)'.chr(10).chr(10).'Bitte Lese dir die Regeln noch einmal durch um für die zukung weiter Strafen zu umgehen.'.chr(10).chr(10).'Hinweiß:'.chr(10).chr(10).'Diese Nachricht ist von System Erstellt worden wen du weitere fragen zur aufhebung oder fragen zu deinem Chat Ausschluss hast stell deine Fragen bitte über das Support Ticket System.', $_POST['playernametoban']);
-$message2 = '```=============================================='.chr(10).'Der User '.$_POST['playernametoban'].' wurde von '.$player->GetName().' Am: '.$timestamp = date('Y-m-d H:i:s').' zum Chat wieder zugelassen.'.chr(10).'==============================================```';
-//postToDiscord($message2);
-}
-*/
 else if(isset($_GET['a']) && $_GET['a'] == 'style' && isset($_POST['design']))
 {
 	$design = $_POST['design'];
@@ -796,6 +779,7 @@ else if(isset($_GET['a']) && $_GET['a'] == 'challenge')
 				$name = $player->GetName().' vs '.$target->GetName();
 				$team = 1;
 				$createdFight = Fight::CreateFight($player, $database, $type, $name, $mode, 0, $actionManager, 0, '', 0, $target->GetID());
+        $createdFight->Join($player, 0, false);
 				$target->Challenge($createdFight->GetID());
         if($createdFight->IsStarted())
         {

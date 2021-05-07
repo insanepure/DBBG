@@ -60,7 +60,7 @@ if(isset($_GET['a']) && $_GET['a'] == 'train' && isset($_GET['id']) && isset($_G
           $learnID = 23;
           $action = $actionManager->GetAction($learnID);
           $minutes = $action->GetMinutes();
-          if($player->GetAction() != 0)
+          if($minutes != 0 && $player->GetAction() != 0)
           {
             $message = 'Du tust bereits etwas.';
           }

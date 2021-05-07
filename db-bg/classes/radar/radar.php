@@ -80,7 +80,7 @@ class Radar
 			array_splice($places, $placeID, 1);
 			$db->SetPlace($place);
 			$db->SetPlayer(0);
-			$result = $this->database->Update('wishleft="'.$wishNum.'",place="'.$place.'", player="0", activetime="'.$timestamp.'"','dragonballs','id="'.$db->GetID().'"',1);
+			$result = $this->database->Update('wishleft="'.$wishNum.'",place="'.$place.'", player="0", activetime="'.$timestamp.'"','dragonballs','id='.$db->GetID().'',1);
 		}
 	  $result = $this->database->Update('wishcounter=wishcounter-1','accounts','wishcounter != 0',9999999);
 	}
@@ -102,7 +102,7 @@ class Radar
 		$db->SetY($y);
 		$db->SetPlace($place);
 		$db->SetRadarPlayer(null);
-		$result = $this->database->Update('player="0",place="'.$place.'"','dragonballs','id="'.$db->GetID().'"',1);
+		$result = $this->database->Update('player="0",place="'.$place.'"','dragonballs','id='.$db->GetID().'',1);
 	}
 	
 	public function Pickup($player, $db)
@@ -134,7 +134,7 @@ class Radar
 		$db->SetY($y);
 		$db->SetPlace($place);
 		$db->SetRadarPlayer($radarPlayer);
-		$result = $this->database->Update('player="'.$player->GetID().'",place="'.$place.'"','dragonballs','id="'.$db->GetID().'"',1);
+		$result = $this->database->Update('player="'.$player->GetID().'",place="'.$place.'"','dragonballs','id='.$db->GetID().'',1);
 	}
   
   public function GetPlayerPosition($player)
@@ -262,11 +262,11 @@ class Radar
 		{
 			if($where == '')
 			{
-				$where = 'id="'.$players[$i].'"';
+				$where = 'id='.$players[$i].'';
 			}
 			else
 			{
-				$where = $where.' OR id="'.$players[$i].'"';
+				$where = $where.' OR id='.$players[$i].'';
 			}
 		}
 		

@@ -11,7 +11,7 @@ if(isset($_GET['user']) && is_numeric($_GET['user']))
 {
     $userid = 0;
     $username = '';
-		$result = $database->Select('id, name, userid','accounts', 'id = "'.$_GET['user'].'"',1);
+		$result = $database->Select('id, name, userid','accounts', 'id = '.$_GET['user'].'',1);
 		if ($result) 
 		{
 		  if ($result->num_rows > 0)
@@ -25,7 +25,7 @@ if(isset($_GET['user']) && is_numeric($_GET['user']))
   
     $banned = false;
     $banreason = '';
-		$result = $accountDB->Select('id, banned, banreason','users', 'id = "'.$userid.'"',1);
+		$result = $accountDB->Select('id, banned, banreason','users', 'id = '.$userid.'',1);
 		if ($result) 
 		{
 		  if ($result->num_rows > 0)

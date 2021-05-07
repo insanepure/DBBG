@@ -24,7 +24,12 @@ grecaptcha.ready(function() {
   }
   ?>
 </div>
-<?php
+  
+<?php 
+if(!$isInactive && $dbNums != null && count($dbNums) == 0 && $player->CanWish() && count($drops) != 7)
+{
+  ?><br/>Es sind keine Dragonballs in der Nähe, du solltest woanders hinreisen.<br/><?php
+}
   if(!$player->CanWish())
   {
     $wishCounter = $player->GetWishCounter();

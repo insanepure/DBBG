@@ -4,7 +4,7 @@ if($database == NULL)
 	print 'This File ('.__FILE__.') should be after Datatabase!';
 }
 
-include 'eventfight.php';
+include_once 'eventfight.php';
 
 class Event
 {
@@ -274,7 +274,7 @@ class Event
 			++$i;
 		}
 		$this->data['finishedplayers'] = $string;
-		$result = $this->database->Update('`finishedplayers`="'.$string.'"','events','id="'.$this->GetID().'"',1);
+		$result = $this->database->Update('`finishedplayers`="'.$string.'"','events','id='.$this->GetID().'',1);
   }
   
   public function RemoveFinishedPlayers($id)
@@ -313,7 +313,7 @@ class Event
 			++$i;
 		}
 		$this->data['finishedplayers'] = $string;
-		$result = $this->database->Update('`finishedplayers`="'.$string.'"','events','id="'.$this->GetID().'"',1);
+		$result = $this->database->Update('`finishedplayers`="'.$string.'"','events','id='.$this->GetID().'',1);
   }
   
   public function GetFight($id)
@@ -325,20 +325,20 @@ class Event
 		return $this->fights[$id];
   }
 	
-	public function Invite($fightID, $group, $player)
+	public function Invite($fightID, $group, $player, $planet)
 	{
-		$where = '`group` = "'.implode(';',$group).'" AND fight=0 AND place="'.$player->GetPlace().'" AND planet="'.$player->GetPlanet().'"';
+		$where = '`group` = "'.implode(';',$group).'" AND fight=0 AND (planet="'.$planet->GetName().'" OR planet="'.$planet->GetLinkedPlanet().'")';
 		$limit = count($group);
 		$result = $this->database->Update('`eventinvite`="'.$fightID.'"','accounts',$where,$limit);
 	}
 	
-	public function GetValidPlayers($player, $group)
+	public function GetValidPlayers($player, $group, $planet)
 	{
 		$where = '';
 		
 		if($group == null)
 		{
-			$where = 'id = "'.$player->GetID().'"';
+			$where = 'id = '.$player->GetID().'';
 		}
 		else
 			{
@@ -347,18 +347,18 @@ class Event
 			{
 				if($where == '')
 				{
-					$where = '(id = "'.$group[$i].'"';
+					$where = '(id = '.$group[$i].'';
 				}
 				else
 				{
-					$where = $where.' OR id = "'.$group[$i].'"';
+					$where = $where.' OR id = '.$group[$i].'';
 				}
 				++$i;
 			}
 			$where = $where.')';
 		}
 		
-    $where = $where.' AND lp > mlp*0.2 AND fight = 0 AND tournament = 0 AND place="'.$player->GetPlace().'" AND planet="'.$player->GetPlanet().'"';
+    $where = $where.' AND lp > mlp*0.2 AND fight = 0 AND tournament = 0 AND (planet="'.$planet->GetName().'" OR planet="'.$planet->GetLinkedPlanet().'")';
 		$validPlayers = 0;
     $result = $this->database->Select('COUNT(id) as total','accounts',$where);
     if ($result) 
@@ -373,7 +373,7 @@ class Event
   
   private function LoadData($id)
   {
-    $result = $this->database->Select('*', 'events', 'id="'.$id.'"', 1);
+    $result = $this->database->Select('*', 'events', 'id='.$id.'', 1);
 		if ($result) 
 		{
 			if ($result->num_rows > 0)

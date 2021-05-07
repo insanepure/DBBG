@@ -66,7 +66,7 @@ class Fight
    if($debuglog == $this->startLog)
      return;
    
-	 $result = $this->database->Update('debuglog="'.$debuglog.'"','fights', 'id = "'.$this->GetID().'"',1);
+	 $result = $this->database->Update('debuglog="'.$debuglog.'"','fights', 'id = '.$this->GetID().'',1);
  }
   
   public function GetPatternValue($name)
@@ -103,17 +103,17 @@ class Fight
 		else if($this->GetType() == 6 || $this->GetType() == 8) // Tournament || Arena
 		{		
 		  $target->SetLP(0);
-		  $result = $this->database->Update('lp="0"','fighters','id = "'.$target->GetID().'"',1);
+		  $result = $this->database->Update('lp="0"','fighters','id = '.$target->GetID().'',1);
 		}
     else
     {				
 		  $target->SetNPCControl(true);
-      $result = $this->database->Update('npccontrol="1"','fighters','id = "'.$target->GetID().'"',1);
+      $result = $this->database->Update('npccontrol="1"','fighters','id = '.$target->GetID().'',1);
     }
     
     if($this->GetType() == 8)
     {
-		  $result = $this->database->Delete('arenafighter','fighter = "'.$target->GetAcc().'"',1);
+		  $result = $this->database->Delete('arenafighter','fighter = '.$target->GetAcc().'',1);
     }
     
 		if($actionsLeft == 1)
@@ -121,6 +121,43 @@ class Fight
 			$this->CalculateRound();
 		}
 	}
+  
+  static function GetTypeName($type)
+  {
+    switch($type)
+    {
+      case 0:
+        return 'Spaß';
+        break;
+      case 1:
+        return 'Wertung';
+        break;
+      case 2:
+        return 'Tod';
+        break;
+      case 3:
+        return 'NPC';
+        break;
+      case 4:
+        return 'Story';
+        break;
+      case 5:
+        return 'Event';
+        break;
+      case 6:
+        return 'Turnier';
+        break;
+      case 7:
+        return 'Dragonball';
+        break;
+      case 8:
+        return 'Arena';
+        break;
+      case 9:
+        return 'Turm';
+        break;
+    }
+  }
   
   private function getTitelManager()
   {
@@ -132,7 +169,7 @@ class Fight
   
   private function getTitelsFromPlayer($player)
   {
-		$result = $this->database->Select('id, titels','accounts','id = "'.$player->GetAcc().'"',1);
+		$result = $this->database->Select('id, titels','accounts','id = '.$player->GetAcc().'',1);
 		if ($result) 
 		{
 			if ($result->num_rows > 0)
@@ -297,7 +334,7 @@ class Fight
 			$attack = $this->GetAttack($aid);
       if($attack == null)
       {;
-        $this->AddDebugLog(' - - Attack with ID '.$aid.' not found');
+        $this->AddDebugLog(' - - ERROR: Attack with ID '.$aid.' not found');
         $this->DebugSend(true);
 				++$i;
 				continue;
@@ -427,6 +464,14 @@ class Fight
 			{
 				$this->addInAttackArray($offensives, $attack);
 			}
+			else if($attack->GetType() == 23) // % Damage
+			{
+				$this->addInAttackArray($offensives, $attack);
+			}
+			else if($attack->GetType() == 24) // % Tech Damage
+			{
+				$this->addInAttackArray($offensives, $attack);
+			}
 			++$i;
 		}
 		
@@ -479,8 +524,8 @@ class Fight
       if(count($endAttacks) == 0)
       {
         $failSafe = 1;
-        $this->AddDebugLog(' - - no Attack for '.$fighter->GetName());
-        $this->AddDebugLog(' - - Fallback to ID '.$failSafe);
+        $this->AddDebugLog(' - - ERROR: no Attack for '.$fighter->GetName());
+        $this->AddDebugLog(' - - ERROR: Fallback to ID '.$failSafe);
         $this->DebugSend(true);
         $attack = $this->GetAttack($failSafe);
       }
@@ -518,6 +563,8 @@ class Fight
     }
     
     $patternid = 0;
+    $patternidSuccess = 0;
+    $patternidFailed = 0;
     
     //0 = self
     //1 = Random Enemy
@@ -530,6 +577,10 @@ class Fight
       $attack = $this->GetAttack($pattern->GetAttack());
       $targetType = $pattern->GetPatternTarget();
       $patternid = $pattern->GetPatternSet();
+      $patternidSuccess = $pattern->GetPatternSetSuccess();
+      $patternidFailed = $pattern->GetPatternSetFailed();
+      $this->AddDebugLog(' - - Pattern Success: '.$patternidSuccess);
+      $this->AddDebugLog(' - - Pattern Failed: '.$patternidFailed);
     }
     else
     {
@@ -549,6 +600,7 @@ class Fight
     if($target == null)
     {
       $target = $fighter;
+      $this->AddDebugLog(' - - ERROR: No target for '.$fighter->GetName());
       $this->DebugSend(true);
     }
 		
@@ -558,15 +610,18 @@ class Fight
 		$fighter->SetTarget($tID);
 		$fighter->SetPreviousTarget($tID);
     $fighter->SetPatternID($patternid);
+    $fighter->SetPatternIDSuccess($patternidSuccess);
+    $fighter->SetPatternIDFailed($patternidFailed);
     $timestamp = date('Y-m-d H:i:s');
-		$result = $this->database->Update('action="'.$aid.'", target="'.$tID.'", previoustarget="'.$tID.'", lastaction="'.$timestamp.'", patternid="'.$patternid.'"','fighters','id = "'.$fighter->GetID().'"',1);
+		$result = $this->database->Update('action='.$aid.', target='.$tID.', previoustarget='.$tID.', lastaction="'.$timestamp.'"
+    ,patternid='.$patternid.',patternidsuccess='.$patternidSuccess.',patternidfailed='.$patternidFailed.'','fighters','id = '.$fighter->GetID().'',1);
 		
 	}
   
   public function UpdateAttackCode($fighter)
   {
     $attackcode = md5($fighter->GetID()+time()+hexdec($fighter->GetAttackCode()));
-		$result = $this->database->Update('attackcode="'.$attackcode.'"','fighters','id = "'.$fighter->GetID().'"',1);
+		$result = $this->database->Update('attackcode="'.$attackcode.'"','fighters','id = '.$fighter->GetID().'',1);
     $fighter->SetAttackCode($attackcode);
   }
   
@@ -655,7 +710,7 @@ class Fight
 		}
 		else
 		{
-		$result = $this->database->Update('lp="0"','fighters','id = "'.$fighter->GetID().'"',1);
+		$result = $this->database->Update('lp="0"','fighters','id = '.$fighter->GetID().'',1);
 		}
 	}
 	
@@ -739,7 +794,7 @@ class Fight
     {
       $kickTimer = $fighter->GetKickTimer() + $timeDiff;
       $fighter->SetKickTimer($kickTimer);
-    	$result = $this->database->Update('kicktimer="'.$kickTimer.'"','fighters','id = "'.$fighter->GetID().'"',1);
+    	$result = $this->database->Update('kicktimer="'.$kickTimer.'"','fighters','id = '.$fighter->GetID().'',1);
 		}
 		
 		if($actionsLeft == 0)
@@ -749,7 +804,7 @@ class Fight
 		else
 		{
 			$timestamp = date('Y-m-d H:i:s');
-			$result = $this->database->Update('action="'.$aid.'", target="'.$tid.'", previoustarget="'.$tid.'", lastaction="'.$timestamp.'", loadrounds="'.$loadRounds.'"','fighters','id = "'.$fighter->GetID().'"',1);
+			$result = $this->database->Update('action="'.$aid.'", target="'.$tid.'", previoustarget="'.$tid.'", lastaction="'.$timestamp.'", loadrounds="'.$loadRounds.'"','fighters','id = '.$fighter->GetID().'',1);
 		}
 	}
 	
@@ -959,7 +1014,7 @@ class Fight
 	private function RemoveNPCSpawn($fighter)
 	{
 		$this->RemoveFighter($fighter->GetID(), true);
-		$result = $this->database->Delete('fighters','id="'.$fighter->GetID().'"',1);
+		$result = $this->database->Delete('fighters','id='.$fighter->GetID().'',1);
 	}
 	
 	private function ResetActions()
@@ -1073,13 +1128,13 @@ class Fight
 					$text = $text.'</table>';
 					
 					$player->UpdateFight(0);
-					$update = 'fight = "0"';
+					$update = 'fight = 0';
 					$inGainAccs = $this->IsInGainAccs($player->GetID());
 					
 					if($this->GetType() == 6 && $wonTeam != $i)
 					{
             $this->AddDebugLog(' - - set Tournament to 0');
-						$update = $update.', tournament="0"';
+						$update = $update.', tournament=0';
 						$player->SetTournament(0);
 					}
 					else if($this->GetType() == 8)
@@ -1100,7 +1155,7 @@ class Fight
 					if($this->GetType() == 1 && $dailyFights <= 5)
 					{
             $this->AddDebugLog(' - - add dailyfights to: '.$dailyFights);
-						$update = $update.', dailyfights="'.$dailyFights.'"';
+						$update = $update.', dailyfights='.$dailyFights.'';
 					}
           
 					if($wonTeam == -2)
@@ -1167,13 +1222,13 @@ class Fight
 						$story = $player->GetStory() + 1;
 						$player->SetStory($story);
             $this->AddDebugLog(' - - add story to: '.$story);
-						$update = $update.', story="'.$story.'"';
+						$update = $update.', story='.$story.'';
 						if($this->GetLevelup())
 						{
 							$level = $player->GetLevel() + 1;
 							$player->SetLevel($level);
               $this->AddDebugLog(' - - add level to: '.$level);
-							$update = $update.', level="'.$level.'"';
+							$update = $update.', level='.$level.'';
 							$stats = $stats+10;
 						}
            $this->getTitelManager()->AddTitelStory($player, $story);
@@ -1213,8 +1268,8 @@ class Fight
 						if($randomChance <= $chance)
 						{
 							$item = $itemManager->GetItem($itemID);
-							$kampfWinPM = '<img src="img/items/'.$item->GetImage().'.png" width="80px" height="80px"></img>
-							Du hast 1x '.$item->GetName().' gewonnen.';
+							$kampfWinPM = "<img src='img/items/".$item->GetImage().".png' width='80px' height='80px'></img>
+							Du hast 1x ".$item->GetName()." gewonnen.";
               $gotSomething = true;
 
 							$itemID = $item->GetID();
@@ -1302,23 +1357,17 @@ class Fight
 					
 					if($kampfWinPM != '')
 					{
-						$kampfWinPM = '<center>'.$kampfWinPM.' bekommen.</center>';
+						$kampfWinPM = '<center>'.$kampfWinPM.'</center>';
 						$text = $kampfWinPM.'<br/>'.$text;
 					}
 					$PMManager->SendPM(0, 'img/battel2.png', 'SYSTEM', 'Kampf: '.$this->GetName(), $text, $player->GetName(), 1);
-		      if($this->GetType() == 7) //Dragonball
-          {
-            $this->DebugSend(false);
-          }
-					
-					
 					if($zeni != 0)
 					{
               $this->AddDebugLog(' - - add Zeni: '.$zeni);
 							$zeni = $player->GetZeni() + $zeni;
               $this->AddDebugLog(' - - - Zeni now: '.$zeni);
 							$player->SetZeni($zeni);
-							$update = $update.', zeni="'.$zeni.'"';
+							$update = $update.', zeni='.$zeni.'';
 					}
 					
           $fightsTillStats = 10;
@@ -1332,7 +1381,7 @@ class Fight
               $this->AddDebugLog(' - - Previous Statsfight: '.$player->GetTotalStatsFights());
               $this->AddDebugLog(' - - Set Statsfight: '.$totalStatsFights);
 							$player->SetTotalStatsFights($totalStatsFights);
-							$update = $update.', totalstatsfights="'.$totalStatsFights.'"';
+							$update = $update.', totalstatsfights='.$totalStatsFights.'';
 
 							if($totalStatsFights % $fightsTillStats == 0)
 							{
@@ -1343,13 +1392,13 @@ class Fight
 					
 					if($stats != 0)
 					{
-							$update = $update.', statspopup="1"';
+							$update = $update.', statspopup=1';
 							$player->SetStatsPopup(true);
               $this->AddDebugLog(' - - Add Stats: '.$stats);
 							$stats = $stats + $player->GetStats();
               $this->AddDebugLog(' - - Stats now: '.$stats);
 							$player->SetStats($stats);
-							$update = $update.', stats="'.$stats.'"';
+							$update = $update.', stats='.$stats.'';
 					}
           
           if($this->GetType() != 0) // NO Spaß
@@ -1374,7 +1423,7 @@ class Fight
           }
           $this->getTitelManager()->AddTitelFight($player, 1, $this->GetType(), $titleSort);
           
-					$result = $this->database->Update($update,'accounts','id = "'.$player->GetID().'"',1);
+					$result = $this->database->Update($update,'accounts','id = '.$player->GetID().'',1);
 					
 					++$j;
 				}
@@ -1382,7 +1431,7 @@ class Fight
 			}
     
       $debuglog = $this->GetDebugLog();
-	    $result = $this->database->Update('debuglog="'.$debuglog.'"','fights', 'id = "'.$this->GetID().'"',1);
+	    $result = $this->database->Update('debuglog="'.$debuglog.'"','fights', 'id = '.$this->GetID().'',1);
 	}
 	
 	private function UpdatePlayersData($wonTeam)
@@ -1391,8 +1440,18 @@ class Fight
 		$addzeni = false;
 		$addstats = false;
 		$addstory = false;
-		$eventFight = null;
 		$npcDifficulty = 0;
+    $nextFight = false;
+    $survivalRounds = 0;
+    $survivalWinner = 0;
+    $eventID = 0;
+    $isHealing = 0;
+    $nextFightID = 0;
+    $healthRatio =  100;
+    $healthRatioTeam =  0;
+    $healthRatioWinner =  0;
+    $survivalTeam = 0;
+    $npcs = array();
     
 		if($this->GetType() == 0) //Spaß
 		{
@@ -1423,6 +1482,20 @@ class Fight
 			$heal = $this->IsHealing();
 			$lpkp = !$heal;
       $npcDifficulty = $event->GetDifficulty()/100;
+      if($eventFight != null)
+      {
+        $nextFight = true;
+        $survivalRounds = $eventFight->GetSurvivalRounds();
+        $survivalWinner = $eventFight->GetSurvivalWinner();
+        $eventID = $event->GetID();
+        $isHealing = $eventFight->IsHealing();
+        $nextFightID = $this->GetEventFight()+1;
+        $healthRatio =  $eventFight->GetHealthRatio();
+        $healthRatioTeam =  $eventFight->GetHealthRatioTeam();
+        $healthRatioWinner =  $eventFight->GetHealthRatioWinner();
+        $survivalTeam = $eventFight->GetSurvivalTeam();
+        $npcs = $eventFight->GetNPCs();
+      }
 			//End
 			if($eventFight == null && $wonTeam == 0)
 			{
@@ -1506,8 +1579,8 @@ class Fight
       if($wonPlayer != null)
 			  $wonID = $wonPlayer->GetAcc();
       
-      $whereDragonball = 'player="'.$wonID.'"';
-      $whereWish = 'id="'.$wonID.'"';
+      $whereDragonball = 'player='.$wonID.'';
+      $whereWish = 'id='.$wonID.'';
       
 			for($i = 0; $i < count($this->teams); ++$i)
 			{
@@ -1524,10 +1597,10 @@ class Fight
           {
             $this->AddDebugLog('Dragonball '.$dragonballs[$playerID].' is in fight and will be added to '.$wonID.'.');
             
-            $whereDBString = 'player="'.$playerID.'"';
+            $whereDBString = 'player='.$playerID.'';
             $whereDragonball = $whereDragonball.' OR '.$whereDBString;
             
-            $whereWishString = 'id="'.$playerID.'"';
+            $whereWishString = 'id='.$playerID.'';
             $whereWish = $whereWish.' OR '.$whereWishString;
           }
 				}
@@ -1552,7 +1625,7 @@ class Fight
 				for($j = 0; $j < count($team); ++$j)
 				{
 					$teamPlayer = $team[$j];
-					$whereString = 'fighter="'.$teamPlayer->GetAcc().'"';
+					$whereString = 'fighter='.$teamPlayer->GetAcc().'';
 					if($where == '')
 					{
 						$where = '('.$whereString;
@@ -1567,22 +1640,47 @@ class Fight
 			$where = $where.')';
 			$result = $this->database->Update('infight=0','arenafighter',$where,2);
     }
+		else if($this->GetType() == 9) //Tower
+		{
+      $tower = new Tower($this->database);
+      $nextFightID = $this->GetEventFight()+1;
+      $nextFloor = $tower->GetFloor($nextFightID);
+			$heal = $this->IsHealing();
+			$lpkp = !$heal;
+      if($nextFloor != null)
+      {
+        $nextFight = true;
+        $survivalRounds = 0;
+        $survivalWinner = 0;
+        $eventID = 0;
+        $isHealing = 0;
+        $healthRatio =  100;
+        $healthRatioTeam =  0;
+        $healthRatioWinner =  0;
+        $survivalTeam = 0;
+        $npcs = $nextFloor->GetNPCs();
+      }
+		}
 		
 		$this->UpdateAllPlayers($wonTeam, $lpkp, $addzeni, $addstats, $addstory);
-		if($eventFight != null && $wonTeam == 0)
+    
+    
+    
+    
+		if($nextFight && $wonTeam == 0)
 		{
-      $npcs = $eventFight->GetNPCs();
       $players = count($this->teams[0]);
-			$type = 5;
+			$type = $this->GetType();
 			$mode = $players.'vs'.count($npcs);
 			$name = $this->GetName();
       $tournament=0;
       $dragonball=0;
       $npcid=0;
       $difficulty=0;
-			$createdFight = Fight::CreateFight($this->playerAccount, $this->database, $type, $name, $mode, 0, $this->actionManager, 0, '', 0, 0, $eventFight->GetSurvivalTeam()
-                                         ,$eventFight->GetSurvivalRounds(),$eventFight->GetSurvivalWinner(), $event->GetID(), $eventFight->IsHealing(), $this->GetEventFight()+1
-                                         , $tournament, $dragonball, $npcid, $difficulty, $eventFight->GetHealthRatio(), $eventFight->GetHealthRatioTeam(), $eventFight->GetHealthRatioWinner());
+			$createdFight = Fight::CreateFight($this->playerAccount, $this->database, $type, $name, $mode, 0, $this->actionManager, 0, '', 0, 0, $survivalTeam
+                                         ,$survivalRounds, $survivalWinner,$eventID, $isHealing, $nextFightID
+                                         , $tournament, $dragonball, $npcid, $difficulty,$healthRatio, $healthRatioTeam, $healthRatioWinner);
+      
       $createdFight->UpdateGainAcc($this->GetGainAccs());
       $i = 0;
 			$team = 1;
@@ -1593,6 +1691,8 @@ class Fight
         $createdFight->Join($npc, $team, true);
         ++$i;
       }
+      
+      $createdFight->Join($this->playerAccount, 0, false);
 			
 			$i = 0;
 			$groupString = $this->playerAccount->GetGroup();
@@ -1607,7 +1707,7 @@ class Fight
 				++$i;
 			}
 			
-			//header('Location: ?p=fight');
+			header('Location: ?p=infight');
 		}
 	}
 	
@@ -1830,6 +1930,14 @@ class Fight
 					array_push($this->preAttacks, $attackEntry);
 				}
 				else if($attack->GetType() == 22) // Dots
+				{
+					array_push($this->attacks, $attackEntry);
+				}
+				else if($attack->GetType() == 23) // % Damage
+				{
+					array_push($this->attacks, $attackEntry);
+				}
+				else if($attack->GetType() == 24) // % Tech Damage
 				{
 					array_push($this->attacks, $attackEntry);
 				}
@@ -2092,7 +2200,7 @@ class Fight
 		else
 		{
     	$timestamp = date('Y-m-d H:i:s');
-			$result = $this->database->Update('action="0", target="0", lastaction="'.$timestamp.'"','fighters','fight = "'.$this->GetID().'" AND paralyzed=0 AND loadrounds="0"',999);
+			$result = $this->database->Update('action=0, target=0, lastaction="'.$timestamp.'"','fighters','fight = '.$this->GetID().' AND paralyzed=0 AND loadrounds="0"',999);
 			$this->ResetActions();
 			$this->SetRound($this->GetRound()+1);
 		}
@@ -2101,7 +2209,7 @@ class Fight
     $this->AddDebugLog('----------------------------');
     $this->AddDebugLog(' ');
     
-		$result = $this->database->Update('text="'.$newText.'",round="'.$this->GetRound().'",state="'.$this->GetState().'"','fights','id = "'.$this->GetID().'"',1);
+		$result = $this->database->Update('text="'.$newText.'",round='.$this->GetRound().',state='.$this->GetState().'','fights','id = '.$this->GetID().'',1);
 	}
 	
 	private function RemoveFusions($force = false)
@@ -2146,7 +2254,7 @@ class Fight
           {
             $fuseTimer = $fuseTimer-1;
             $player->SetFuseTimer($fuseTimer);
-		        $result = $this->database->Update('fusetimer="'.$fuseTimer.'"','fighters','id="'.$player->GetID().'"',1);
+		        $result = $this->database->Update('fusetimer="'.$fuseTimer.'"','fighters','id='.$player->GetID().'',1);
           }
           
 					$searchID = array_search($player->GetAcc(), $inactivesID);
@@ -2183,7 +2291,7 @@ class Fight
 		for($i = 0; $i < count($deletes); ++$i)
 		{
       $deleteID = $deletes[$i]->GetID();
-			$deleteStr = 'id="'.$deleteID.'"';
+			$deleteStr = 'id='.$deleteID.'';
 			if($deleteWhere == '')
 			{
 				$deleteWhere = $deleteStr;
@@ -2207,7 +2315,7 @@ class Fight
       $kp = $inactives[$i]->GetMaxKP() * $kpPercentage;
 			$inactives[$i]->SetLP($lp);
 			$inactives[$i]->SetKP($kp);
-		  $result = $this->database->Update('inactive="0",lp="'.$lp.'",kp="'.$kp.'"','fighters','id="'.$inactives[$i]->GetID().'"', 1000);
+		  $result = $this->database->Update('inactive=0,lp='.$lp.',kp='.$kp.'','fighters','id='.$inactives[$i]->GetID().'', 1000);
 		}
 		
 		$result = $this->database->Delete('fighters',$deleteWhere,count($deletes));
@@ -2294,7 +2402,7 @@ class Fight
 			$fighter->SetLP($newLP);
 			$fighter->SetKP($newKP);
 			$fighter->SetEnergy($newEP);
-			$result = $this->database->Update('lp="'.$newLP.'",kp="'.$newKP.'",energy="'.$newEP.'"','fighters','id = "'.$fighter->GetID().'"',1);
+			$result = $this->database->Update('lp='.$newLP.',kp='.$newKP.',energy='.$newEP.'','fighters','id = '.$fighter->GetID().'',1);
       
       $type = '';
 			$attackImage = $dotAtk->GetImage();
@@ -2333,7 +2441,7 @@ class Fight
 				$kp = 0;
 			}
 			$dotCaster->SetKP($kp);
-			$result = $this->database->Update('kp="'.$kp.'"','fighters','id = "'.$dotCaster->GetID().'"',1);
+			$result = $this->database->Update('kp='.$kp.'','fighters','id = '.$dotCaster->GetID().'',1);
 			
 			if($kp == 0 || $dotRound == 0)
 			{
@@ -2356,7 +2464,7 @@ class Fight
       $fighter->SetDots(implode(';', $newDots));
     }
     
-		$result = $this->database->Update('dots="'.$fighter->GetDots().'"','fighters','id = "'.$fighter->GetID().'"',1);
+		$result = $this->database->Update('dots="'.$fighter->GetDots().'"','fighters','id = '.$fighter->GetID().'',1);
 	}
 
 	private function DoBuffCost(&$fighter)
@@ -2389,7 +2497,7 @@ class Fight
 				$kp = 0;
 			}
 			$buffCaster->SetKP($kp);
-			$result = $this->database->Update('kp="'.$kp.'"','fighters','id = "'.$buffCaster->GetID().'"',1);
+			$result = $this->database->Update('kp='.$kp.'','fighters','id = '.$buffCaster->GetID().'',1);
 			
 			if($kp == 0 || $buffRound == 0)
 			{
@@ -2418,7 +2526,7 @@ class Fight
     }
     
     $this->AddDebugLog(' - - Update Buffs to: '.$fighter->GetBuffs());
-		$result = $this->database->Update('buffs="'.$fighter->GetBuffs().'"','fighters','id = "'.$fighter->GetID().'"',1);
+		$result = $this->database->Update('buffs="'.$fighter->GetBuffs().'"','fighters','id = '.$fighter->GetID().'',1);
 	}
 	
 	private function CalculateAttack($player, $target, $attack)
@@ -2433,7 +2541,7 @@ class Fight
 		$kpminus = 0;
 		$removeLoadAttack = false;
       
-      $this->AddDebugLog('Calculate Attack '.$attack->GetName().' of '.$player->GetName().' on '.$target->GetName());
+    $this->AddDebugLog('Calculate Attack '.$attack->GetName().' of '.$player->GetName().' on '.$target->GetName());
 		
 		
 		if($player->GetLoadAttack() != 0)
@@ -2450,7 +2558,7 @@ class Fight
 					{
 						$teamMember = $teamMembers[$j];
 						$teamMember->RemoveAttack($loadAttack->GetLoadAttack());
-						$result = $this->database->Update('attacks="'.$teamMember->GetAttacks().'"','fighters','id = "'.$teamMember->GetID().'"',1);
+						$result = $this->database->Update('attacks="'.$teamMember->GetAttacks().'"','fighters','id = '.$teamMember->GetID().'',1);
 						++$j;
 					}
 					$removeLoadAttack = true;
@@ -2461,26 +2569,57 @@ class Fight
 		if($loadRounds != 0)
 		{
 			$loadRounds = $loadRounds-1;
-			$result = $this->database->Update('loadrounds="'.$loadRounds.'"','fighters','id = "'.$player->GetID().'"',1);
+			$result = $this->database->Update('loadrounds='.$loadRounds.'','fighters','id = '.$player->GetID().'',1);
 			$player->SetLoadRounds($loadRounds);
 		}
+    
+    $blocked = false;
+    if(!$attack->BlockTargetOnly() && ($attack->GetBlockAttack() != 0 || $attack->GetBlockedAttack() != 0))
+    {
+      $this->AddDebugLog(' - Check if Attack is blocked by anyone');
+      for($i = 0; $i < count($this->teams); ++$i)
+      {
+        $team = $this->teams[$i];
+        for($j = 0; $j < count($team); ++$j)
+        {
+          $fighter = $team[$j];
+          if($fighter->GetTarget() == $player->GetID())
+          {
+             $this->AddDebugLog(' - Check '.$fighter->GetName().' with Attack '.$fighter->GetAction());
+            if($attack->GetBlockAttack() != 0 && $attack->GetBlockAttack() == $fighter->GetAction() || 
+              $attack->GetBlockedAttack() != 0 && $attack->GetBlockedAttack() != $fighter->GetAction())
+            {
+              $this->AddDebugLog(' - ATTACK BLOCKED');
+              $blocked = true;
+              break;
+            }
+          }
+        }
+        if($blocked)
+          break;
+      }
+    }
 		
-		if($loadRounds != 0)
+    if($blocked)
+    {
+			$text = false;
+    }
+		else if($loadRounds != 0)
 		{
 			$text = $attack->GetLoadText();
 		}
-		else if($attack->GetBlockAttack() != 0 && $attack->GetBlockAttack() == $target->GetAction())
+		else if($attack->BlockTargetOnly() && $attack->GetBlockAttack() != 0 && $attack->GetBlockAttack() == $target->GetAction())
 		{
-			$text = $attack->GetMissText();
+			$text = false;
 		}
-		else if($attack->GetBlockedAttack() != 0 && $attack->GetBlockedAttack() != $target->GetAction())
+		else if($attack->BlockTargetOnly() && $attack->GetBlockedAttack() != 0 && $attack->GetBlockedAttack() != $target->GetAction())
 		{
-			$text = $attack->GetMissText();
+			$text = false;
 		}
 		else if($attack->GetType() == 1)
 		{
 			$alive = $target->GetLP() != 0;
-			$text = $this->DealDamage($player, $target, $attack, $damage, $type, true);
+			$text = $this->DealDamage($player, $target, $attack, $damage, $type, true, false, false);
 			if($alive && $target->GetLP() == 0 && $this->GetType() == 2)
 			{
 				$died = true;
@@ -2547,7 +2686,7 @@ class Fight
 		else if($attack->GetType() == 12)
 		{
 			$alive = $target->GetLP() != 0;
-			$text = $this->DealDamage($player, $target, $attack, $damage, $type, false);
+			$text = $this->DealDamage($player, $target, $attack, $damage, $type, false, false, false);
 			if($alive && $target->GetLP() == 0 && $this->GetType() == 2)
 			{
 				$died = true;
@@ -2595,6 +2734,46 @@ class Fight
 		{
 			$text = $this->Dots($player, $target, $attack);
 		}
+		else if($attack->GetType() == 23)
+		{
+			$alive = $target->GetLP() != 0;
+			$text = $this->DealDamage($player, $target, $attack, $damage, $type, true, true, false);
+			if($alive && $target->GetLP() == 0 && $this->GetType() == 2)
+			{
+				$died = true;
+			}
+		}
+		else if($attack->GetType() == 24)
+		{
+			$alive = $target->GetLP() != 0;
+			$text = $this->DealDamage($player, $target, $attack, $damage, $type, true, false, true);
+			if($alive && $target->GetLP() == 0 && $this->GetType() == 2)
+			{
+				$died = true;
+			}
+		}
+    
+    $hasMissed = $text == false;
+    if($hasMissed)
+      $text = $attack->GetMissText();
+    
+    if($player->GetPatternIDFailed() != 0 || $player->GetPatternIDSuccess() != 0)
+    {
+      $this->AddDebugLog(' - PatternIDFailed ('.$player->GetPatternIDFailed().') or Success ('.$player->GetPatternIDSuccess().') is defined');
+      
+      $newPatternID = 0;
+      if($hasMissed)
+      {
+        $newPatternID = $player->GetPatternIDFailed();
+      }
+      else
+      {
+        $newPatternID = $player->GetPatternIDSuccess();
+      }
+      $this->AddDebugLog(' - $newPatternID ('.$newPatternID.')');
+      $player->SetPatternID($newPatternID);
+			$result = $this->database->Update('patternid='.$newPatternID,'fighters','id = '.$player->GetID().'',1);
+    }
     
 		if($attack->GetType() != 4 && $attack->GetType() != 21 && $attack->GetType() != 22)
     {
@@ -2616,14 +2795,14 @@ class Fight
 			{
 				$player->RemoveAttack($attack->GetID());
 			}
-			$result = $this->database->Update('inventory="'.$inventory->Encode().'"','fighters','id = "'.$player->GetID().'"',1);
+			$result = $this->database->Update('inventory="'.$inventory->Encode().'"','fighters','id = '.$player->GetID().'',1);
 		}
     */
 		
 		if($removeLoadAttack)
 		{
 			$player->SetLoadAttack(0);
-			$result = $this->database->Update('loadattack="0"','fighters','id = "'.$player->GetID().'"',1);
+			$result = $this->database->Update('loadattack=0','fighters','id = '.$player->GetID().'',1);
 		}
 		
 		$trans = array_filter(explode(';',$player->GetTransformations()));
@@ -2673,7 +2852,7 @@ class Fight
           $pLP = round($teamMember->GetLP()+$lpIncrease);
           if($pLP > $teamMember->GetMaxLP()) $pLP = $teamMember->GetMaxLP();
           $teamMember->SetLP($pLP);
-				  $result = $this->database->Update('lp="'.$pLP.'"','fighters','id = "'.$teamMember->GetID().'"',1);
+				  $result = $this->database->Update('lp="'.$pLP.'"','fighters','id = '.$teamMember->GetID().'',1);
         }
         ++$j;
       }
@@ -2722,7 +2901,7 @@ class Fight
       $update = '';
 			if($kpminus != 0)
 			{
-        $updateVal = 'kp="'.$player->GetKP().'"';
+        $updateVal = 'kp='.$player->GetKP().'';
         if($update != '')
         {
           $update = $update.', '.$updateVal;
@@ -2734,7 +2913,7 @@ class Fight
 			}
 			if($lpminus != 0)
 			{
-        $updateVal = 'lp="'.$player->GetLP().'"';
+        $updateVal = 'lp='.$player->GetLP().'';
         if($update != '')
         {
           $update = $update.', '.$updateVal;
@@ -2745,7 +2924,7 @@ class Fight
         }
 			}
       
-      $updateVal = 'energy="'.$player->GetEnergy().'"';
+      $updateVal = 'energy='.$player->GetEnergy().'';
       if($update != '')
       {
         $update = $update.', '.$updateVal;
@@ -2757,7 +2936,7 @@ class Fight
       
       if($update != '')
       {
-				$result = $this->database->Update($update,'fighters','id = "'.$player->GetID().'"',1);
+				$result = $this->database->Update($update,'fighters','id = '.$player->GetID().'',1);
       }
 		}
 		
@@ -2784,13 +2963,13 @@ class Fight
       {
         if($this->GetType() != 7)
         {
-			    $result = $this->database->Update('player="0", place="'.$deadPlayer->GetPlace().'"','dragonballs','player="'.$deadPlayer->GetID().'"',999);
+			    $result = $this->database->Update('player=0, place="'.$deadPlayer->GetPlace().'"','dragonballs','player='.$deadPlayer->GetID().'',999);
         }
         
         $deadPlayer->SetPlanet($planet);
         $deadPlayer->SetPlace($place);
         $timestamp = date('Y-m-d H:i:s');
-        $result = $this->database->Update('deathplace=place, deathplanet=planet, deathtime= "'.$timestamp.'", place="'.$place.'", planet="'.$planet.'"','accounts','id = "'.$target->GetAcc().'"',1);
+        $result = $this->database->Update('deathplace=place, deathplanet=planet, deathtime= "'.$timestamp.'", place="'.$place.'", planet="'.$planet.'"','accounts','id = '.$target->GetAcc().'',1);
       }
 		}
 		
@@ -2826,21 +3005,21 @@ class Fight
 		
 		if($hit < $miss)
 		{
-			return $attack->GetMissText();
+			return false;
 		}
     
 		$this->SetWeather($attack->GetValue());
-		$result = $this->database->Update('weather="'.$attack->GetValue().'"','fights','id = "'.$this->GetID().'"',1);
+		$result = $this->database->Update('weather="'.$attack->GetValue().'"','fights','id = '.$this->GetID().'',1);
     $this->addAttackTitel($player, $attack);
 		return $attack->GetText();
 	}
   
-  private function DoGiveUP($player, $action)
+  private function DoGiveUP($player, $attack)
 	{
     $this->addAttackTitel($player, $attack);
     $player->SetLP(0);
-		$result = $this->database->Update('lp="0"','fighters','id = "'.$player->GetID().'"',1);
-		return $action->GetText();
+		$result = $this->database->Update('lp=0','fighters','id = '.$player->GetID().'',1);
+		return $attack->GetText();
 	}
   
 	private function DoMiscAttacks($player, $target, $attack)
@@ -2862,6 +3041,7 @@ class Fight
           
         }
       }
+		  $result = $this->database->Update('lp=0','fighters','fight='.$this->GetID().' AND id != '.$player->GetID().'',100);
 			return $attack->GetText();
     }
     else if($attack->GetID() == 527) // Selbstzerstörung
@@ -2870,9 +3050,12 @@ class Fight
       if($target->GetAction() != 2) //  Verteidigen
       {
         $target->SetLP(0);
+		    $result = $this->database->Update('lp=0','fighters','id = '.$target->GetID().'',1);
         $this->AddDebugLog(' - '.$target->GetName().' is dead.');
       }
       $player->SetLP(0);
+		  $result = $this->database->Update('lp=0','fighters','id = '.$player->GetID().'',1);
+      $this->AddDebugLog(' - Fighter-LP '.$player->GetLP());
 			return $attack->GetText();
     }
     else if($attack->GetID() == 337) // Saibaman Explosion
@@ -2895,16 +3078,19 @@ class Fight
         }
       }
       $player->SetLP(0);
+		  $result = $this->database->Update('lp=0','fighters','fight='.$this->GetID().' AND action != 2',999);
+      $this->AddDebugLog(' - Fighter-LP '.$player->GetLP());
 			return $attack->GetText();
     }
     else if($attack->GetID() == 338) // Banana Hit
     {
       if($target->GetLPPercentage() > $attack->GetValue())
-			  return $attack->GetMissText();
+			  return false;
       else
       {
           $this->AddDebugLog(' - '.$target->GetName().' wurde gefangen.');
         $target->SetLP(0);
+		    $result = $this->database->Update('lp=0','fighters','id = '.$target->GetID().'',1);
 			  return $attack->GetText();
       }
     }
@@ -2916,11 +3102,11 @@ class Fight
       
       if($target->GetLP() > 0 && $target->GetParalyzed() == 0 && $hit < $miss)
       {
-        return $attack->GetMissText();
+        return false;
       }
       
       $target->SetApeTail(1);
-			$result = $this->database->Update('apetail="1"','fighters','id = "'.$target->GetID().'"',1);
+			$result = $this->database->Update('apetail=1','fighters','id = '.$target->GetID().'',1);
       $this->addAttackTitel($player, $attack);
 			return $attack->GetText();
 		}
@@ -2932,23 +3118,23 @@ class Fight
 	{
 		if($target->GetTarget() != $player->GetID() || $target->GetAction() != $action->GetID())
 		{
-			return $action->GetMissText();
+			return false;
 		}
 		if($target->GetID() == $player->GetID())
 		{
-			return $action->GetMissText();
+			return false;
 		}
 		else if($target->GetTeam() != $player->GetTeam())
 		{
-			return $action->GetMissText();
+			return false;
 		}
 		else if($player->GetFusedAcc() != 0 || $target->GetFusedAcc() != 0)
 		{
-			return $action->GetMissText();
+			return false;
 		}
 		else if($target->GetLP() == 0)
 		{
-			return $action->GetMissText();
+			return false;
 		}
 		else if($target->IsInactive())
 		{
@@ -3008,7 +3194,7 @@ class Fight
     
 		$fusedPlayer->SetName($name);
 		$this->CreateFighter($fusedPlayer, $player->GetTeam(), false, 0, $target->GetAcc(), $action->GetRounds());
-		$result = $this->database->Update('inactive="1"','fighters','id = "'.$player->GetID().'" OR id="'.$target->GetID().'"',2);
+		$result = $this->database->Update('inactive=1','fighters','id = '.$player->GetID().' OR id='.$target->GetID().'',2);
 		$target->SetInactive(true);
 		$player->SetInactive(true);
 		
@@ -3032,13 +3218,13 @@ class Fight
 		
 		if($hit < $miss || $target->GetParalyzed() != 0)
 		{
-			return $attack->GetMissText();
+			return false;
 		}
 		$returnText = $attack->GetText();
 		$target->SetAction($attack->GetLoadAttack());
 		$target->SetParalyzed($attack->GetValue());
      $this->AddDebugLog(' - Paralyze: '.$attack->GetValue());
-		$result = $this->database->Update('action="'.$attack->GetLoadAttack().'",paralyzed="'.$attack->GetValue().'"','fighters','id = "'.$target->GetID().'"',1);
+		$result = $this->database->Update('action='.$attack->GetLoadAttack().',paralyzed='.$attack->GetValue().'','fighters','id = '.$target->GetID().'',1);
     $this->addAttackTitel($player, $attack);
 		return $returnText;
 	}
@@ -3052,11 +3238,11 @@ class Fight
 		$returnText = $attack->GetText();
 		if($paralyzed == 0)
 		{
-			$returnText = $attack->GetMissText();
+			$returnText = false;
 		}
 		$player->SetParalyzed($paralyzed);
      $this->AddDebugLog(' - DeParalyze: '.$paralyzed);
-		$result = $this->database->Update('paralyzed="'.$paralyzed.'"','fighters','id = "'.$player->GetID().'"',1);
+		$result = $this->database->Update('paralyzed='.$paralyzed.'','fighters','id = '.$player->GetID().'',1);
     $this->addAttackTitel($player, $attack);
 		return $returnText;
 	}
@@ -3087,9 +3273,9 @@ class Fight
       if($lp < 0)
         $lp = 0;
       $target->SetLP($lp);
-		  $result = $this->database->Update('lp="'.$lp.'"','fighters','id = "'.$target->GetID().'"',1);
+		  $result = $this->database->Update('lp='.$lp.'','fighters','id = '.$target->GetID().'',1);
       
-      return $attack->GetMissText();
+      return false;
     }	
     
 		$returnText = $attack->GetText();
@@ -3097,7 +3283,7 @@ class Fight
 		$returnText = $returnText.'<br/>!target sackt zu Boden.';
 		
 		$target->SetLP($lp);
-		$result = $this->database->Update('lp="'.$lp.'"','fighters','id = "'.$target->GetID().'"',1);
+		$result = $this->database->Update('lp='.$lp.'','fighters','id = '.$target->GetID().'',1);
     $this->addAttackTitel($player, $attack);
 		$killed = true;
     
@@ -3114,7 +3300,7 @@ class Fight
 			$teamMember = $teamMembers[$j];
 			if($teamMember->GetOwner() == $player->GetID())
 			{
-				return $attack->GetMissText();
+				return false;
 			}
 			++$j;
 		}
@@ -3148,7 +3334,7 @@ class Fight
 		$mode[$team] = $mode[$team]+1;
 		$mode = implode('vs',$mode);
 		$this->SetMode($mode);
-		$result = $this->database->Update('mode="'.$mode.'"','fights','id = "'.$this->GetID().'"',1);
+		$result = $this->database->Update('mode='.$mode.'','fights','id = '.$this->GetID().'',1);
 	}
 	
 	public function DecMode($team)
@@ -3158,14 +3344,14 @@ class Fight
 		$mode[$team] = $mode[$team]-1;
 		$mode = implode('vs',$mode);
 		$this->SetMode($mode);
-		$result = $this->database->Update('mode="'.$mode.'"','fights','id = "'.$this->GetID().'"',1);
+		$result = $this->database->Update('mode='.$mode.'','fights','id = '.$this->GetID().'',1);
 	}
 	
 	private function LoadAttack($player, $target, $attack)
 	{
 		if($target->GetLoadAttack() != $attack->GetLoadAttack())
 		{
-			return $attack->GetMissText();
+			return false;
 		}
 		
 		if($attack->IsProcentual())
@@ -3177,7 +3363,7 @@ class Fight
 		
 		$newLoadValue = $target->GetLoadValue() + $damage;
 		$target->SetLoadValue($newLoadValue);
-		$result = $this->database->Update('loadvalue="'.$newLoadValue.'"','fighters','id = "'.$target->GetID().'"',1);
+		$result = $this->database->Update('loadvalue='.$newLoadValue.'','fighters','id = '.$target->GetID().'',1);
     $this->addAttackTitel($player, $attack);
 		return $attack->GetText();
 	}
@@ -3187,7 +3373,7 @@ class Fight
 		$loadAttack = $attack->GetID();
 		$player->SetLoadAttack($loadAttack);
 		$player->SetLoadValue(1);
-		$result = $this->database->Update('loadvalue="0",loadattack="'.$loadAttack.'"','fighters','id = "'.$player->GetID().'"',1);
+		$result = $this->database->Update('loadvalue=0,loadattack='.$loadAttack.'','fighters','id = '.$player->GetID().'',1);
 		
 		$team = $player->GetTeam();
 		$j = 0;
@@ -3196,7 +3382,7 @@ class Fight
 		{
 			$teamMember = $teamMembers[$j];
 			$teamMember->AddAttack($attack->GetLoadAttack());
-			$result = $this->database->Update('attacks="'.$teamMember->GetAttacks().'"','fighters','id = "'.$teamMember->GetID().'"',1);
+			$result = $this->database->Update('attacks="'.$teamMember->GetAttacks().'"','fighters','id = '.$teamMember->GetID().'',1);
 			++$j;
 		}
     
@@ -3217,7 +3403,7 @@ class Fight
 		
 		if($target->GetParalyzed() == 0 && $hit < $miss)
 		{
-			return $attack->GetMissText();
+			return false;
 		}
 		
 		$returnText = $attack->GetText();
@@ -3254,8 +3440,8 @@ class Fight
 		$target->SetLP($lp);
 		$player->SetLoadValue(0);
 		$player->SetLoadAttack(0);
-		$result = $this->database->Update('lp="'.$lp.'"','fighters','id = "'.$target->GetID().'"',1);
-		$result = $this->database->Update('loadvalue="0", loadattack="0"','fighters','id = "'.$player->GetID().'"',1);
+		$result = $this->database->Update('lp='.$lp.'','fighters','id = '.$target->GetID().'',1);
+		$result = $this->database->Update('loadvalue=0, loadattack=0','fighters','id = '.$player->GetID().'',1);
 		
     $this->addAttackTitel($player, $attack);
 		return $returnText;
@@ -3271,7 +3457,7 @@ class Fight
 		return $this->FireLoadDamage($player, $target, $attack, $damage, $type);
 	}
 	
-	private function DealDamage($player, $target, $attack, &$damage, &$type, $useAtkVal)
+	private function DealDamage($player, $target, $attack, &$damage, &$type, $useAtkVal, $damageProcentual, $techProcentual)
 	{
 		if($target->GetLP() == 0)
 		{
@@ -3291,7 +3477,7 @@ class Fight
 		if($target->GetParalyzed() == 0 && $hit < $miss)
 		{
       $this->AddDebugLog(' - '.$player->GetName().' missed '.$target->GetName());
-			return $attack->GetMissText();
+			return false;
 		}
 		
 		$returnText = $attack->GetText();
@@ -3300,12 +3486,57 @@ class Fight
 		
 		$atkVal = $player->GetAttack() / $target->GetDefense();
     if(!$useAtkVal)
-		$atkVal = 1;
+		  $atkVal = 1;
     $this->AddDebugLog(' - AtkVal is: <b>'.$atkVal.'</b>');
     $this->AddDebugLog(' - Attack Value is: <b>'.$attack->GetValue().'</b>');
     
-		
-		if($attack->IsProcentual())
+    if($techProcentual)
+    {
+      $this->AddDebugLog(' - Damage is tech procentual');
+      
+      $highestTechVal = 0;
+      $i = 0;
+      while(isset($this->teams[$i]))
+      {
+        $players = $this->teams[$i];
+        $j = 0;
+        while(isset($players[$j]))
+        {
+          $teamPlayer = $players[$j];
+          $attacks = explode(';', $teamPlayer->GetAttacks());
+          foreach($attacks as &$attackID)
+          {
+            $attack = $this->attackManager->GetAttack($attackID);
+            if($attack->GetType() == 1 && $attack->GetValue() > $highestTechVal)
+              $highestTechVal = $attack->GetValue();
+          }
+          $j++;
+        }
+        ++$i;
+      }
+      
+      
+      $this->AddDebugLog(' - Player '.$player->GetName().' has KI: <b>'.$player->GetKI().'</b>');
+			$playerValue = $player->GetKI() * ($attack->GetValue() / 100) * ($highestTechVal/100);
+      $this->AddDebugLog(' - Playervalue is: <b>'.$playerValue.'</b>');
+      $this->AddDebugLog(' - Attackminvalue is: <b>'.$attack->GetMinValue().'</b>');
+      $this->AddDebugLog(' - $highestTechVal is: <b>'.$highestTechVal.'</b>');
+      
+			if($playerValue < $attack->GetMinValue())
+			{
+				$playerValue = $attack->GetMinValue();
+			}
+			$atkVal = $playerValue * $atkVal;
+    }
+		else if($damageProcentual)
+    {
+      $targetLP = $target->GetIncreasedLP();
+			$atkVal = $targetLP * ($attack->GetValue() / 100);
+      $this->AddDebugLog(' - Damage is procentual');
+      $this->AddDebugLog(' - Target '.$target->GetName().' has LP: <b>'.$targetLP.'</b>');
+      $this->AddDebugLog(' - Attackminvalue is: <b>'.$attack->GetMinValue().'</b>');
+    }
+		else if($attack->IsProcentual())
 		{
       $this->AddDebugLog(' - Attack is procentual');
       $this->AddDebugLog(' - Player '.$player->GetName().' has KI: <b>'.$player->GetKI().'</b>');
@@ -3317,7 +3548,6 @@ class Fight
 			{
 				$playerValue = $attack->GetMinValue();
 			}
-      $atkVal2 = $playerValue * $atkVal;
 			$atkVal = $playerValue * $atkVal;
 		}
 		else
@@ -3329,10 +3559,13 @@ class Fight
 		
     $crit = rand(0,100);
     $critChance = 10;
+    
+    if($damageProcentual)
+      $critChance = 0;
 		//if($player->GetRace() == 'Mensch')
     //  $critChance = 30;
       
-		if($crit <= $critChance)
+		if($crit < $critChance)
 		{
 		 // if($player->GetRace() == 'Mensch')
 			//  $atkVal = $atkVal * 1.8;
@@ -3353,12 +3586,14 @@ class Fight
     $damage = 0;
     
 		$lp = $target->GetLP();
+    $this->AddDebugLog(' - LP was: <b>'.$lp.'</b>');
     $this->AddDebugLog(' - Attack LP Value is: <b>'.$attack->GetLPValue().'</b>');
     $lpDamage = round($atkVal * ($attack->GetLPValue()/100));
     $damage += $lpDamage;
 		$lp = $lp - $lpDamage;
     
-    $this->AddDebugLog(' - '.$player->GetName().' dealt <b>'.$damage.'</b> DMG to '.$target->GetName());
+    $this->AddDebugLog(' - '.$player->GetName().' dealt <b>'.$lpDamage.'</b> LP-DMG to '.$target->GetName());
+    $this->AddDebugLog(' - LP is: <b>'.$lp.'</b>');
     
     
     $update = '';
@@ -3400,6 +3635,8 @@ class Fight
 		}
     
 		$kp = $target->GetKP();
+    $this->AddDebugLog(' - KP was: <b>'.$kp.'</b>');
+    $this->AddDebugLog(' - Attack KP Value is: <b>'.$attack->GetKPValue().'</b>');
     $kpDamage = round($atkVal * ($attack->GetKPValue()/100));
     $damage += $kpDamage;
 		$kp = $kp - $kpDamage;
@@ -3407,8 +3644,12 @@ class Fight
 		{
 			$kp = 0;
 		}
+    $this->AddDebugLog(' - '.$player->GetName().' dealt <b>'.$kpDamage.'</b> KP-DMG to '.$target->GetName());
+    $this->AddDebugLog(' - KP is: <b>'.$kp.'</b>');
     
 		$ep = $target->GetEnergy();
+    $this->AddDebugLog(' - EP was: <b>'.$ep.'</b>');
+    $this->AddDebugLog(' - Attack EP Value is: <b>'.$attack->GetEPValue().'</b>');
     $epDamage = round($atkVal * ($attack->GetEPValue()/100));
     $damage += $epDamage;
 		$ep = $ep + $epDamage;
@@ -3417,7 +3658,10 @@ class Fight
 		else if($ep >= $target->GetMaxEnergy()) 
       $ep = $target->GetMaxEnergy();
     
+    $this->AddDebugLog(' - '.$player->GetName().' dealt <b>'.$epDamage.'</b> EP-DMG to '.$target->GetName());
+    $this->AddDebugLog(' - EP is: <b>'.$ep.'</b>');
     
+    $this->AddDebugLog(' - '.$player->GetName().' dealt <b>'.$damage.'</b> Total-DMG to '.$target->GetName());
     
     if($target->GetReflect() != 0)
     {
@@ -3458,7 +3702,7 @@ class Fight
         else if($newEP >= $player->GetMaxEnergy()) 
           $newEP = $player->GetMaxEnergy();
         $player->SetEnergy($newEP);
-		    $result = $this->database->Update('lp="'.$newLP.'",kp="'.$newKP.'",energy="'.$newEP.'"','fighters','id = "'.$player->GetID().'"',1);
+		    $result = $this->database->Update('lp='.$newLP.',kp='.$newKP.',energy='.$newEP.'','fighters','id = '.$player->GetID().'',1);
       }
     }
 		
@@ -3468,8 +3712,8 @@ class Fight
     
     if($update != '')
       $update = $update.',';
-    $update = $update.'lp="'.$lp.'"';
-		$result = $this->database->Update($update,'fighters','id = "'.$target->GetID().'"',1);
+    $update = $update.'lp='.$lp.',kp='.$kp.',energy='.$ep;
+		$result = $this->database->Update($update,'fighters','id = '.$target->GetID().'',1);
     
     $this->addAttackTitel($player, $attack);
 		return $returnText;
@@ -3499,7 +3743,7 @@ class Fight
 																			,reflect="'.$player->GetReflect().'"
 																			,transformations="'.$player->GetTransformations().'"
 																			,buffs="'.$player->GetBuffs().'"';
-		$result = $this->database->Update($sql,'fighters','id = "'.$player->GetID().'"',1);
+		$result = $this->database->Update($sql,'fighters','id = '.$player->GetID().'',1);
 	}
 	
 	private function Revert($player, $update=true)
@@ -3578,7 +3822,7 @@ class Fight
 				$player->Transform($attack, true);
 				$this->UpdateTransform($player);
 				//Revert
-				return $attack->GetMissText();
+				return false;
 			}
 			$transAttack = $this->GetAttack($trans[$i]);
 
@@ -3649,7 +3893,7 @@ class Fight
     
     $this->addAttackTitel($player, $attack);
     
-		$result = $this->database->Update('lp="'.$lp.'",kp="'.$kp.'",energy="'.$ep.'"','fighters','id = "'.$player->GetID().'"',1);
+		$result = $this->database->Update('lp='.$lp.',kp='.$kp.',energy='.$ep.'','fighters','id = '.$player->GetID().'',1);
 	}
 	
 	private function Heal($player, $target, $attack, &$damage, &$type)
@@ -3691,6 +3935,7 @@ class Fight
     
     if($enemyKI == 0)
     {
+      $this->AddDebugLog(' - - ERROR: EnemyKI is 0');
       $this->DebugSend(true);
       $enemyKI = $target->GetKI();
     }
@@ -3701,7 +3946,7 @@ class Fight
 		
 		if($target->GetParalyzed() == 0 && $hit < $miss)
 		{
-			return $attack->GetMissText();
+			return false;
 		}
 		
 		$returnText = $attack->GetText();
@@ -3794,7 +4039,7 @@ class Fight
     $damage = round($damage/$count);
     
     
-		$result = $this->database->Update('lp="'.$lp.'",kp="'.$kp.'",energy="'.$ep.'"','fighters','id = "'.$target->GetID().'"',1);
+		$result = $this->database->Update('lp='.$lp.',kp='.$kp.',energy='.$ep.'','fighters','id = '.$target->GetID().'',1);
     
     $this->addAttackTitel($player, $attack);
 		
@@ -3813,7 +4058,7 @@ class Fight
 		
 		if($player->GetParalyzed() == 0 && $hit < $miss)
 		{
-			return $attack->GetMissText();
+			return false;
 		}
 		
 		$returnText = $attack->GetText();
@@ -3885,7 +4130,7 @@ class Fight
     if($count != 0)
     {
       $damage = round($damage/$count);
-		  $result = $this->database->Update('lp="'.$lp.'",kp="'.$kp.'",energy="'.$ep.'"','fighters','id = "'.$player->GetID().'"',1);
+		  $result = $this->database->Update('lp='.$lp.',kp='.$kp.',energy='.$ep.'','fighters','id = '.$player->GetID().'',1);
     }
     
     $this->addAttackTitel($player, $attack);
@@ -3895,9 +4140,15 @@ class Fight
   
 private function Revive($player, $target, $attack, &$damage)
 {
+    $this->AddDebugLog(' - Revive: '.$player->GetName().' on '.$target->GetName());
     if($target->GetLP() != 0)
     {
       return $attack->GetDeadText();
+    }
+  
+    if($player->GetLP() == 0 || $player->GetID() == $target->GetID())
+    {
+			return false;
     }
   
 		$miss = rand(0,100);
@@ -3905,7 +4156,7 @@ private function Revive($player, $target, $attack, &$damage)
 		
 		if($target->GetParalyzed() == 0 && $hit < $miss)
 		{
-			return $attack->GetMissText();
+			return false;
 		}
 		
 		$returnText = $attack->GetText();
@@ -3915,11 +4166,13 @@ private function Revive($player, $target, $attack, &$damage)
 		{
 			$atkVal = $player->GetKI() * ($attack->GetValue() / 100);
 		}
+    $this->AddDebugLog(' - $atkVal: '.$atkVal);
     
     $damage = 0;
 		
 		$lp = $target->GetLP();
     $lpDamage = round($atkVal * ($attack->GetLPValue()/100));
+    $this->AddDebugLog(' - $lpDamage: '.$lpDamage);
     $damage += $lpDamage;
 		$lp = $lp + $lpDamage;
 		if($lp >= $target->GetIncreasedLP()) $lp = $target->GetIncreasedLP();
@@ -3927,6 +4180,7 @@ private function Revive($player, $target, $attack, &$damage)
     
 		$kp = $target->GetKP();
     $kpDamage = round($atkVal * ($attack->GetKPValue()/100));
+    $this->AddDebugLog(' - $kpDamage: '.$kpDamage);
     $damage += $kpDamage;
 		$kp = $kp + $kpDamage;
 		if($kp >= $target->GetIncreasedKP()) $kp = $target->GetIncreasedKP();
@@ -3934,13 +4188,14 @@ private function Revive($player, $target, $attack, &$damage)
     
 		$ep = $target->GetEnergy();
     $epDamage = round($atkVal * ($attack->GetEPValue()/100));
+    $this->AddDebugLog(' - $epDamage: '.$epDamage);
     $damage += $epDamage;
 		$ep = $ep + $epDamage;
 		if($ep >= $target->GetMaxEnergy()) $ep = $target->GetMaxEnergy();
 		$target->SetEnergy($ep);
     
     
-		$result = $this->database->Update('lp="'.$lp.'",kp="'.$kp.'",energy="'.$ep.'"','fighters','id = "'.$target->GetID().'"',1);
+		$result = $this->database->Update('lp='.$lp.',kp='.$kp.',energy='.$ep.'','fighters','id = '.$target->GetID().'',1);
   
     $this->addAttackTitel($player, $attack);
   
@@ -3982,7 +4237,7 @@ private function Revive($player, $target, $attack, &$damage)
 		if($target->GetParalyzed() == 0 && $hit < $miss)
     {
         $this->AddDebugLog(' - - Missed');
-      return $attack->GetMissText();
+      return false;
     }
 		
     $buffKI = min($target->GetKI(), $player->GetKI());
@@ -4075,6 +4330,7 @@ private function Revive($player, $target, $attack, &$damage)
     $this->AddDebugLog(' -- - Set Taunt of '.$target->GetName().' to '.$itaunt);
     if($itaunt < 0)
     {
+      $this->AddDebugLog(' - - ERROR: taunt is less than 0');
       $this->DebugSend(true);
       $itaunt = 0;
     }
@@ -4156,7 +4412,7 @@ private function Revive($player, $target, $attack, &$damage)
 		
 		if($target->GetParalyzed() == 0 && $hit < $miss)
 		{
-			return $attack->GetMissText();
+			return false;
 		}
     
 		$paralyzed = $target->GetParalyzed() - $attack->GetValue();
@@ -4166,7 +4422,7 @@ private function Revive($player, $target, $attack, &$damage)
 		$returnText = $attack->GetText();
 		$target->SetParalyzed($paralyzed);
      $this->AddDebugLog(' - UnParalyze: '.$paralyzed);
-		$result = $this->database->Update('paralyzed="'.$paralyzed.'"','fighters','id = "'.$target->GetID().'"',1);
+		$result = $this->database->Update('paralyzed='.$paralyzed.'','fighters','id = '.$target->GetID().'',1);
     
     $this->addAttackTitel($player, $attack);
 		return $returnText;
@@ -4201,7 +4457,7 @@ private function Revive($player, $target, $attack, &$damage)
 
 		if($target->GetParalyzed() == 0 && $hit < $miss)
     {
-      return $attack->GetMissText();
+      return false;
     }
     
 		$returnText = $attack->GetText();
@@ -4213,7 +4469,7 @@ private function Revive($player, $target, $attack, &$damage)
 		
 		//Setzte die Werte
 		$target->SetDots(implode(';', $newDots));
-		$result = $this->database->Update('dots="'.$target->GetDots().'"','fighters','id = "'.$target->GetID().'"',1);
+		$result = $this->database->Update('dots="'.$target->GetDots().'"','fighters','id = '.$target->GetID().'',1);
     
     $this->addAttackTitel($fighter, $attack);
 		
@@ -4238,12 +4494,12 @@ private function Revive($player, $target, $attack, &$damage)
 			}
 		}
 		$target->SetDots(implode(';', $newDots));
-		$result = $this->database->Update('dots="'.$target->GetDots().'"','fighters','id = "'.$target->GetID().'"',1);
+		$result = $this->database->Update('dots="'.$target->GetDots().'"','fighters','id = '.$target->GetID().'',1);
 	}
 	
 	private function LoadFight($id)
 	{
-    $result = $this->database->Select('*', 'fights', 'id="'.$id.'"', 1);
+    $result = $this->database->Select('*', 'fights', 'id='.$id.'', 1);
 		if ($result) 
 		{
 			if ($result->num_rows > 0)
@@ -4258,7 +4514,7 @@ private function Revive($player, $target, $attack, &$damage)
 	
 	private function LoadFighters($player)
 	{
-		$result = $this->database->Select('*','fighters','fight="'.$this->GetID().'"',999, 'team');
+		$result = $this->database->Select('*','fighters','fight='.$this->GetID().'',999, 'team');
 		if ($result) 
 		{
 			if ($result->num_rows > 0)
@@ -4366,6 +4622,7 @@ private function Revive($player, $target, $attack, &$damage)
     {
       return false;
     }
+     $this->AddDebugLog('Join');
     
 		$this->CreateFighter($joiningPlayer, $team, $isNPC);
 
@@ -4387,8 +4644,10 @@ private function Revive($player, $target, $attack, &$damage)
 		
 		if($full)
 		{
+      $this->AddDebugLog('- Fight is full!');
 		  $imageLeft = true;
       $i = 0;
+      $highestKI = 0;
       while(isset($this->teams[$i]))
       {
         $players = $this->teams[$i];
@@ -4396,6 +4655,7 @@ private function Revive($player, $target, $attack, &$damage)
         while(isset($players[$j]))
         {
           $teamPlayer = $players[$j];
+          
           $trans = $teamPlayer->GetTransformations();
           $teamPlayer->SetTransformations('');
           $playerText = '';
@@ -4412,6 +4672,23 @@ private function Revive($player, $target, $attack, &$damage)
             $playerText = "!source macht sich zum Kampf bereit.";
             $attackImage = 'img/attacks/fightready.png';
           }
+          
+          $playerKI = $teamPlayer->GetMaxKI();
+          $attacks = explode(';', $teamPlayer->GetAttacks());
+          foreach($attacks as &$attackID)
+          {
+            $attack = $this->attackManager->GetAttack($attackID);
+            if($attack->GetType() == 4)
+            {
+              $vwKI = $teamPlayer->GetMaxKI() * (1 + ($attack->GetValue()/100));
+              if($vwKI > $playerKI)
+                $playerKI = $vwKI;
+            }
+          }
+          
+          if(!$teamPlayer->IsNPC() && $playerKI > $highestKI)
+            $highestKI = $playerKI;
+          
           $playerText = $this->ReplaceTextValues($playerText, $teamPlayer, $teamPlayer, 0, 4);
           $attackText = $this->DisplayAttackText($attackImage, $playerText, $imageLeft);
           $roundText = $roundText.$attackText;
@@ -4420,14 +4697,48 @@ private function Revive($player, $target, $attack, &$damage)
         }
         ++$i;
       }
+      $this->AddDebugLog('- Highest KI: '.$highestKI);
+      
+      $i = 0;
+      while(isset($this->teams[$i]))
+      {
+        $players = $this->teams[$i];
+        $j = 0;
+        while(isset($players[$j]))
+        {
+          $teamPlayer = $players[$j];
+          if($teamPlayer->IsNPC() && $teamPlayer->IsStatsProcentual())
+          {
+            $this->AddDebugLog('- NPC: '.$teamPlayer->GetName());
+            $lp = ($teamPlayer->GetMaxLP()/100) * $highestKI;
+            $lp = round($lp) * 10;
+            $this->AddDebugLog('- - New LP: '.$lp);
+            $kp = ($teamPlayer->GetMaxKP()/100) * $highestKI;
+            $kp = round($kp) * 10;
+            $this->AddDebugLog('- - New KP: '.$kp);
+            $atk = ($teamPlayer->GetMaxAttack()/100) * $highestKI;
+            $atk = round($atk);
+            $this->AddDebugLog('- - New Atk: '.$atk);
+            $def = ($teamPlayer->GetMaxDefense()/100) * $highestKI;
+            $def = round($def);
+            $this->AddDebugLog('- - New Def: '.$def);
+            $ki = round((($lp/10)+($kp/10)+$atk+$def)/4);
+            $this->AddDebugLog('- - New KI: '.$ki);
+			      $result = $this->database->Update('ki='.$ki.',mki='.$ki.',lp='.$lp.',mlp='.$lp.',ilp='.$lp.',kp='.$kp.',mkp='.$kp.',ikp='.$kp.',attack='.$atk.',mattack='.$atk.',defense='.$def.',mdefense='.$def,'fighters','id = '.$teamPlayer->GetID().'',1);
+          }
+          $j++;
+        }
+        ++$i;
+      }
     
       $newText = $this->database->EscapeString($roundText.$this->GetText());
       $this->SetText($newText);
       
+      $this->AddDebugLog('FIGHT START');
 			$this->SetState(1);
-			$result = $this->database->Update('state="'.$this->GetState().'",text="'.$newText.'"','fights','id = "'.$this->GetID().'"',1);		
+			$result = $this->database->Update('state='.$this->GetState().',text="'.$newText.'"','fights','id = '.$this->GetID().'',1);		
     	$timestamp = date('Y-m-d H:i:s');
-			$result = $this->database->Update('lastaction="'.$timestamp.'"','fighters','fight = "'.$this->GetID().'"',9999999);
+			$result = $this->database->Update('lastaction="'.$timestamp.'"','fighters','fight = '.$this->GetID().'',9999999);
 			$this->attackManager = new AttackManager($this->database);
 		}
 		
@@ -4437,9 +4748,9 @@ private function Revive($player, $target, $attack, &$damage)
 	
   public function DeleteFightAndFighters()
   {
-			$result = $this->database->Update('fight="0"','accounts','fight = "'.$this->GetID().'"',9999);		
-    	$this->database->Delete('fights','id="'.$this->GetID().'"');
-    	$this->database->Delete('fighter','fight="'.$this->GetID().'"');
+			$result = $this->database->Update('fight=0','accounts','fight = '.$this->GetID().'',9999);		
+    	$this->database->Delete('fights','id='.$this->GetID().'');
+    	$this->database->Delete('fighter','fight='.$this->GetID().'');
 	}
 	
   public function Leave($leavingPlayer)
@@ -4465,11 +4776,11 @@ private function Revive($player, $target, $attack, &$damage)
 		$leftTeams = count($this->GetTeams());
 		if($this->GetType() == 3 && $leftTeams == 1 || $this->GetType() != 3 && $leftTeams == 0)
 		{
-    	$this->database->Delete('fights','id="'.$this->GetID().'"');
+    	$this->database->Delete('fights','id='.$this->GetID().'');
 			
 			if($this->GetType() == 2)
 			{
-    	$this->database->Delete('fighter','fight="'.$this->GetID().'"');
+    	$this->database->Delete('fighter','fight='.$this->GetID().'');
 			}
 		}
 		
@@ -4493,7 +4804,7 @@ private function Revive($player, $target, $attack, &$damage)
 	public function UpdateGainAcc($gainAccs)
 	{
 		$this->SetGainAccs($gainAccs);
-		$result = $this->database->Update('gainaccs="'.$gainAccs.'"','fights','id = "'.$this->GetID().'"',1);		
+		$result = $this->database->Update('gainaccs="'.$gainAccs.'"','fights','id = '.$this->GetID().'',1);		
 	}
 	
 	public function AddGainAcc($id)
@@ -4511,7 +4822,7 @@ private function Revive($player, $target, $attack, &$damage)
 		}
 		
 		$this->SetGainAccs($gainAccs);
-		$result = $this->database->Update('gainaccs="'.$gainAccs.'"','fights','id = "'.$this->GetID().'"',1);		
+		$result = $this->database->Update('gainaccs="'.$gainAccs.'"','fights','id = '.$this->GetID().'',1);		
 	}
 	
 	public function RemoveGainAcc($id)
@@ -4533,7 +4844,7 @@ private function Revive($player, $target, $attack, &$damage)
 		}
 		
 		$this->SetGainAccs($gainAccs);
-		$result = $this->database->Update('gainaccs="'.$gainAccs.'"','fights','id = "'.$this->GetID().'"',1);		
+		$result = $this->database->Update('gainaccs="'.$gainAccs.'"','fights','id = '.$this->GetID().'',1);		
 	}
 	
 	public function GetFighter($id)
@@ -4559,7 +4870,7 @@ private function Revive($player, $target, $attack, &$damage)
   
   public function DeleteFight()
   {
-    $this->database->Delete('fights','id="'.$this->GetID().'"');
+    $this->database->Delete('fights','id='.$this->GetID().'');
   }
   
   public function GetID()
@@ -4862,38 +5173,84 @@ private function Revive($player, $target, $attack, &$damage)
 		return $this->player;
 	}
   
-  public function GetNPCInFight()
+  public function GetNPCAttacks(&$override)
   {
+    $this->AddDebugLog('GetNPCAttacks');
     $npc = null;
     $i = 0;
 		$npcFighter = null;
-		while(isset($this->teams[$i]))
+    $override = 0;
+    $attacks = array();
+		for($i = 0; $i < 10; ++$i)
 		{
+      $this->AddDebugLog(' - Team: '.$i);
+      if(!isset($this->teams[$i]))
+        continue;
+      
 			$j = 0;
 			$teamMembers = $this->teams[$i];
 			while(isset($teamMembers[$j]))
 			{
+        $this->AddDebugLog(' - Member: '.$j);
 				if($teamMembers[$j]->GetNPC() != 0)
 				{
+          $this->AddDebugLog(' - IS NPC, add Attacks');
           $npc = new NPC($this->database, $teamMembers[$j]->GetNPC(), 1);
-          return $npc;
+          if($npc->GetOverrideAttacks() != 0)
+          {
+            $override = $npc->GetOverrideAttacks();
+            $this->AddDebugLog(' - Override Attacks: '.$override);
+          }
+          
+          $playerAttacks = $npc->GetPlayerAttack();
+          $this->AddDebugLog(' - Attacks: '.implode(';', $playerAttacks));          
+          foreach($playerAttacks as &$playerAttack)
+          {
+            array_push($attacks, $playerAttack);
+          }
 				}
 				++$j;
 			}
-      ++$i;
     }
     
-    return $npc;
+   $this->AddDebugLog(' - NPC Attacks: '.count($attacks));
+    
+    return $attacks;
   }
 	
 	public function CreateFighter($player, $team, $isNPC, $owner=0, $fusion=0, $fusetimer=0)
 	{
-    
-    if($this->GetStory() != 0)
+    $this->AddDebugLog('CreateFighter');
+   $this->AddDebugLog(' - Name: '.$player->GetName());
+    if(!$isNPC)
     {
-      $npc = $this->GetNPCInFight();
-      if($npc != null && $npc->GetPlayerAttack() != 0)
-        $player->AddFightAttack($npc->GetPlayerAttack());
+      $override = 0;
+      $playerAttacks = $this->GetNPCAttacks($override);
+      if(count($playerAttacks) != 0)
+      {
+        if($override == 1)
+        {
+          $player->SetFightAttacks('');
+          $this->AddDebugLog(' - Override all Attacks');
+        }
+        else if($override == 2)
+        {
+          $this->AddDebugLog(' - Override without Powerup');
+          $previousAttacks = explode(';', $player->GetFightAttacks());
+          $player->SetFightAttacks('');
+          foreach($previousAttacks as &$previousAttackID)
+          {
+			      $previousAttack = $this->GetAttack($previousAttackID);
+            if($previousAttack->GetType() == 4)
+            {
+              array_push($playerAttacks, $previousAttackID);
+              $this->AddDebugLog(' - Add: '.$previousAttack->GetName());
+            }
+          }
+        }
+         $player->AddFightAttack($playerAttacks);
+         $this->AddDebugLog(' - FightAttacks: '.$playerAttacks);
+      }
     }
     
 		$mlp = $player->GetMaxLP();
@@ -4928,13 +5285,21 @@ private function Revive($player, $target, $attack, &$damage)
 			$def += $equippedStats[3];
 		}
     
-    $attacks = explode(';', $player->GetAttacks());
+    $attacks = array();
+    if(!$isNPC && $player->GetFightAttacks() != '')
+      $attacks = explode(';', $player->GetFightAttacks());
+    else if($isNPC && $player->GetAttacks() != '')
+      $attacks = explode(';', $player->GetAttacks());
+    
     $powerup = '';
-    if(!$isNPC)
+    if(!$isNPC && $player->GetKP() > 0)
       $powerup = $player->GetStartingPowerup();
     
     if(!in_array($powerup, $attacks))
       $powerup = '';
+    
+    $attacks = implode(';', $attacks);
+    $this->AddDebugLog(' - FinalAttacks: '.$attacks);
 		
     $timestamp = date('Y-m-d H:i:s');
 		$row['id'] = $player->GetID();
@@ -4945,13 +5310,14 @@ private function Revive($player, $target, $attack, &$damage)
 		$row['charimage'] = $player->GetImage();
 		//$row['inventory'] = $inventory;
     $ki = $player->GetKI();
+		$row['attacks'] = $attacks;
 		if($isNPC)
 		{
 		  $row['npc'] = $player->GetID();
       $row['apetail'] = 0;
       $row['apecontrol'] = 0;
-			$row['attacks'] = $player->GetAttacks();
 			$row['patterns'] = $player->GetPatterns();
+		  $row['isstatsprocentual'] = $player->IsStatsProcentual() ? 1 : 0;
 		}
 		else
 		{
@@ -4960,12 +5326,15 @@ private function Revive($player, $target, $attack, &$damage)
       $row['apetail'] = $player->GetApeTail();
       $row['apecontrol'] = $player->GetApeControl();
       $row['race'] = $player->GetRace();
-			$row['attacks'] = $player->GetFightAttacks();
+		  $row['isstatsprocentual'] = 0;
 		  $ki = ($ilp/10) + ($ikp/10) + $atk + $def;
 		  $ki = round($ki / 4);
 		}
+    
+    $mKI = $ki;
+    //$mKI = (($ilp/10) + ($ikp/10) + $player->GetAttack() + $player->GetDefense())/4;
     $row['ki'] = $ki;
-    $row['mki'] = $ki;
+    $row['mki'] = $mKI;
 		$row['lp'] = $lp;
 		$row['ilp'] = $ilp;
 		$row['mlp'] = $mlp;
@@ -5057,7 +5426,8 @@ private function Revive($player, $target, $attack, &$damage)
 		, apecontrol
 		, fusetimer
 		, patterns
-		, race'
+		, race
+		, isstatsprocentual'
 		,'"'.$row['acc'].'"
 		,"'.$row['npc'].'"
 		,"'.$row['fight'].'"
@@ -5094,9 +5464,10 @@ private function Revive($player, $target, $attack, &$damage)
 		,"'.$row['apecontrol'].'"
 		,"'.$row['fusetimer'].'"
 		,"'.$row['patterns'].'"
-		,"'.$row['race'].'"','fighters');
+		,"'.$row['race'].'"
+		,"'.$row['isstatsprocentual'].'"','fighters');
 		
-    $result = $this->database->Select('*', 'fighters', 'id="'.$this->database->GetLastID().'"', 1);
+    $result = $this->database->Select('*', 'fighters', 'id='.$this->database->GetLastID().'', 1);
 		if ($result) 
 		{
 			if ($result->num_rows > 0)
@@ -5118,7 +5489,11 @@ private function Revive($player, $target, $attack, &$damage)
       array_push($fighters, '['.$player->GetID().']');
       $fighters = implode(';', $fighters);
       $this->SetFighters($fighters);
-		  $result = $this->database->Update('fighters="'.$fighters.'"','fights','id = "'.$this->GetID().'"',1);
+      
+      
+      $test = ($player->GetARank() != 0) ? 1 : 0;
+      
+		  $result = $this->database->Update('fighters="'.$fighters.'",testfight='.$test,'fights','id = '.$this->GetID().'',1);
     }
 		
 		if(!$isNPC && $fusion == 0)
@@ -5173,11 +5548,11 @@ private function Revive($player, $target, $attack, &$damage)
       
       $newFighterArray = implode(';', $newFighterArray);
       $this->SetFighters($newFighterArray);
-      $result = $this->database->Update('fighters="'.$newFighterArray.'"','fights','id = "'.$this->GetID().'"',1);
+      $result = $this->database->Update('fighters="'.$newFighterArray.'"','fights','id = '.$this->GetID().'',1);
     }
     
     
-    $this->database->Delete('fighters','acc="'.$player->GetID().'"');
+    $this->database->Delete('fighters','acc='.$player->GetID().'');
 		$this->RemoveFighter($player->GetID());
     $player->UpdateFight(0);
 	}
@@ -5257,10 +5632,6 @@ private function Revive($player, $target, $attack, &$damage)
 		$fight->SetWeather($weather);
 		$fight->SetDebugLog('');
 		$fight->SetFighters('');
-		if($player != null)
-		{
-			$fight->CreateFighter($player, 0, false);
-		}
     return $fight;
   }
   

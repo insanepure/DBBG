@@ -62,6 +62,9 @@ if(isset($_GET['a']) && $_GET['a'] == 'learn' && isset($_GET['attack']) && is_nu
     }
     else
       $canLearn = true;
+    
+    
+    
     $learnID = 23;
     $action = $actionManager->GetAction($learnID);
     $minutes = $action->GetMinutes() * $attack->GetLearnTime();
@@ -70,12 +73,10 @@ if(isset($_GET['a']) && $_GET['a'] == 'learn' && isset($_GET['attack']) && is_nu
         $message = 'Du musst zuvor eine der vorherigen Techniken lernen.';
     else if(!$canLearn)
         $message = 'Du musst zuvor '.$attacksNeeded.' lernen.';
-    else if($player->GetAction() != 0)
-      $message = 'Du tust bereits etwas.';
     else
     {
-      $player->Learn($action, $minutes, $attack->GetID(), $skill->GetNeededPoints());
-      $message = 'Du lernst nun '.$attack->GetName();
+      $player->LearnSkill($attack->GetID(), $skill->GetNeededPoints());
+      $message = 'Du hast '.$attack->GetName().' gelernt.';
     }
   }
   

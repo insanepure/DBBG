@@ -6,11 +6,11 @@ if($player->GetArank() >= 2)
 <div  class="catGradient borderT borderB" style="width:90%;">
 <h2>Admin Log</h2>
 </div>
-<table width="90%" border="1">
+<table width="90%" border="1" style="table-layout:fixed">
   <tr>
-  <td>ID</td>
-  <td>Zeit</td>
-  <td>Accounts</td>
+  <td width="10%">ID</td>
+  <td width="10%">Zeit</td>
+  <td width="15%">Accounts</td>
   <td>Log</td>
   </tr>
 <?php
@@ -32,7 +32,7 @@ if ($result)
        <td><?php echo $row['id']; ?></td>
        <td><?php echo $row['time']; ?></td>
        <td><?php echo $row['accounts']; ?></td>
-       <td><?php echo $row['log']; ?></td>
+       <td style="word-wrap:break-word"><?php echo $row['log']; ?></td>
        </tr>
       <?php
      }

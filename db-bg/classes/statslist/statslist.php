@@ -29,21 +29,21 @@ class StatsList
   private static function UpdateWin($database, $entry)
   {
     $select = 'win=win+1, total=total+1, dailywin=dailywin+1, dailytotal=dailytotal+1';
-    $where = 'acc = "'.$entry['acc'].'" AND (type="'.$entry['type'].'" OR type="-1")';
+    $where = 'acc = '.$entry['acc'].' AND (type='.$entry['type'].' OR type=-1)';
 		$result = $database->Update($select,'statslist',$where,2);
   }
   
   private static function UpdateLoose($database, $entry)
   {
     $select = 'loose=loose+1, total=total+1, dailyloose=dailyloose+1, dailytotal=dailytotal+1';
-    $where = 'acc = "'.$entry['acc'].'" AND (type="'.$entry['type'].'" OR type="-1")';
+    $where = 'acc = '.$entry['acc'].' AND (type='.$entry['type'].' OR type=-1)';
 		$result = $database->Update($select,'statslist',$where,2);
   }
   
   private static function UpdateDraw($database, $entry)
   {
     $select = 'draw=draw+1, total=total+1, dailydraw=dailydraw+1, dailytotal=dailytotal+1';
-    $where = 'acc = "'.$entry['acc'].'" AND (type="'.$entry['type'].'" OR type="-1")';
+    $where = 'acc = '.$entry['acc'].' AND (type='.$entry['type'].' OR type=-1)';
 		$result = $database->Update($select,'statslist',$where,2);
   }
   
@@ -97,7 +97,7 @@ class StatsList
   
   private static function GetEntry($database, $id, $type)
   {
-		$result = $database->Select('*','statslist','acc = "'.$id.'" AND type="'.$type.'"',1);
+		$result = $database->Select('*','statslist','acc = '.$id.' AND type='.$type.'',1);
 		if ($result) 
 		{
 			if ($result->num_rows > 0)

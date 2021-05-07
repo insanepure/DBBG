@@ -215,6 +215,16 @@ if ($player->IsLogged())
 				<?php
 				}
         ?>
+        <?php
+        if($player->GetPlanet() != 'Jenseits' && $player->GetARank() >= 2)
+        {
+        ?>
+				<a href="?p=timetravel" id="no-link">
+					<div style="cursor:pointer;" class="SideMenuButton borderB">Zeitreise</div>
+				</a>
+				<?php
+				}
+        ?>
 				<?php 
 				if($player->HasRadar())
 				{
@@ -226,7 +236,7 @@ if ($player->IsLogged())
 				}
         ?>
 				<?php 
-				if($player->HasDBs())
+				if($player->HasAllDBs())
 				{
 				?>
 				<a href="?p=wish" id="no-link">
@@ -257,9 +267,17 @@ if ($player->IsLogged())
 	?>
 				<a href="?p=clan&id=<?php echo $player->GetClan(); ?>" id="no-link">
 					<div style="cursor:pointer;" class="SideMenuButton borderB">Clan Profil</div>
-				</a>
+				</a><?php 
+        $hasApplicants= false;
+        if($clan->GetLeader() == $player->GetID() || $clan->GetCoLeader() == $player->GetID())
+        { 
+          $hasApplicants = $clan->HasApplicants();
+        }
+        ?>
+        
+        
 				<a href="?p=clanmanage" id="no-link">
-					<div style="cursor:pointer;" class="SideMenuButton borderB">Clan Verwaltung</div>
+					<div style="cursor:pointer;" class="SideMenuButton borderB"><?php if($hasApplicants) { ?> <font color="red"> <?php } ?>Clan Verwaltung<?php if($hasApplicants) { ?> </font><?php } ?></div>
 				</a>
 	<?php
  }
@@ -337,18 +355,26 @@ else
 					<div class="SideMenuInfo borderB borderR">
             <table height="100%" width="100%">
               <?php
-              $screenUrl = 'img/screens/screen';
+              $screenUrl = 'img/screens/screenshot_';
               $screenExt = '.png';
-              $cols = 3;
-              $rows = 2;
+              $cols = 4;
+              $rows = 3;
               $width = 50;
               $height = 50;
+  
+              $screenArray = [];
+              for($i = 1; $i <= 30; ++$i)
+              {
+                array_push($screenArray, $i);
+              }
               for($col = 1; $col <= $cols; ++$col)
               {
                 ?><tr><?php
                 for($row = 1; $row <= $rows; ++$row)
                 {
-                  $screenID =  (($col-1) * $rows) + $row;
+                  $screenPos = rand(0,count($screenArray)-1);
+                  $screenID = $screenArray[$screenPos];
+                  array_splice($screenArray, $screenPos, 1);
                   $screenImg = $screenUrl.$screenID.$screenExt;
                   ?><td align="center"><a href="<?php echo $screenImg; ?>" target="_blank"><img width="<?php echo $width; ?>px" height="<?php echo $height; ?>px" src="<?php echo $screenImg; ?>"></img></a></td><?php
                 }

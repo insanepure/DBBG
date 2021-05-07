@@ -1,12 +1,39 @@
 <?php 
-function postToDiscord($message)
+function postChangelogToDiscord($text)
 {
-    $data = array("content" => $message, "username" => "DBBG-Spion");
-    $curl = curl_init("https://discordapp.com/api/webhooks/461508519666122773/iP_uTj5VkbQyOv1K4iwSeqidk_0IHUiyMreUcO1PWCHki2r6vrFeKVij87Blc4NGnEbX");
-    curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
-    curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
-    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-    return curl_exec($curl);
+$webhookurl = "";
+$botName = 'DB-BG Changelog-Bot';
+$timestamp = date("c", strtotime("now"));
+
+$json_data = json_encode([
+    // Message
+    "content" => $text,
+    
+    // Username
+    "username" => $botName,
+
+    // Avatar URL.
+    // Uncoment to replace image set in webhook
+    //"avatar_url" => "https://ru.gravatar.com/userimage/28503754/1168e2bddca84fec2a63addb348c571d.jpg?size=512",
+
+    // Text-to-speech
+    "tts" => false
+
+], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+
+
+$ch = curl_init( $webhookurl );
+curl_setopt( $ch, CURLOPT_HTTPHEADER, array('Content-type: application/json'));
+curl_setopt( $ch, CURLOPT_POST, 1);
+curl_setopt( $ch, CURLOPT_POSTFIELDS, $json_data);
+curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1);
+curl_setopt( $ch, CURLOPT_HEADER, 0);
+curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1);
+
+$response = curl_exec( $ch );
+// If you need to debug, or find out why you can't send message uncomment line below, and execute script.
+// echo $response;
+curl_close( $ch );
 }
 
 if(!isset($player) || !$player->IsValid() || $player->GetARank() < 2)
@@ -15,7 +42,9 @@ if(!isset($player) || !$player->IsValid() || $player->GetARank() < 2)
 	exit();  
 }
 
-$limitedTables = array('actions', 'attacks', 'items', 'npcs', 'places', 'story', 'events', 'titel', 'patterns', 'planet', 'wishes');
+$limitedTables = array('actions', 'attacks', 'items', 'npcs', 'places', 'story', 'events', 'titel', 
+                       'patterns', 'planet', 'wishes', 'changelog', 'passives', 'verzeichnis', 'towerfloors',
+                       'eventitems');
 
 if($player->GetARank() < 3 && isset($_GET['table']) && !in_array($_GET['table'], $limitedTables))
 {
@@ -41,7 +70,7 @@ if(isset($_GET['a']) && $_GET['a'] == 'delete' && isset($_POST['sure']))
 {
   $table = $_GET['table'];
   $id = $_POST['id'];
-  $database->Delete($table,'id="'.$id.'"');
+  $database->Delete($table,'id='.$id.'');
   $message = 'Die ID '.$id.' wurde aus Tabelle '.$table.' gelöscht.';
   $log = $log.'Die ID <b>'.$id.'</b> wurde aus Tabelle <b>'.$table.'</b> gelöscht.<br/>';
   AddToLog($database, $ip, $accs, $log);
@@ -53,10 +82,16 @@ else if(isset($_GET['a']) && $_GET['a'] == 'edit')
   $finfo = $result->fetch_fields();
   
   
+  
   $create = false;
   if(!isset($_POST['id']) || $_POST['id'] == '' || $_POST['id'] == 0)
   {
     $create = true;
+  }
+  
+  if($create && $table == 'changelog')
+  {
+    postChangelogToDiscord($_POST['text']);
   }
   
 	if($table == 'npcs' || $table == 'fighters')
@@ -68,6 +103,18 @@ else if(isset($_GET['a']) && $_GET['a'] == 'edit')
 		else
 		{
 			$_POST['patterns'] = '';
+		}
+	}
+  
+	if($table == 'attacks')
+	{
+		if(isset($_POST['attack_passives']))
+		{
+			$_POST['passives'] = implode(';', $_POST['attack_passives']);
+		}
+		else
+		{
+			$_POST['passives'] = '';
 		}
 	}
 	
@@ -343,6 +390,7 @@ else if(isset($_GET['a']) && $_GET['a'] == 'edit')
   {
     $_POST['attacks'] = '';
   }
+  
   if(isset($_POST['needattacks']))
   {
     $_POST['needattacks'] = implode(';', $_POST['needattacks']);
@@ -350,6 +398,15 @@ else if(isset($_GET['a']) && $_GET['a'] == 'edit')
   else
   {
     $_POST['needattacks'] = '';
+  }
+  
+  if(isset($_POST['playerattack']))
+  {
+    $_POST['playerattack'] = implode(';', $_POST['playerattack']);
+  }
+  else
+  {
+    $_POST['playerattack'] = '';
   }
   
   if(isset($_POST['actions']))
@@ -373,6 +430,7 @@ else if(isset($_GET['a']) && $_GET['a'] == 'edit')
   if(isset($_POST['supportnpcs']))
   {
     $_POST['supportnpcs'] = implode(';', $_POST['supportnpcs']);
+    echo $_POST['supportnpcs'];
   }
   else
   {
@@ -410,7 +468,7 @@ else if(isset($_GET['a']) && $_GET['a'] == 'edit')
   $names = '';
   
   $row = array();
-	$result = $database->Select('*',$table,'id = "'.$_POST['id'].'"',1);
+	$result = $database->Select('*',$table,'id = '.$_POST['id'].'',1);
 	if ($result) 
 	{
     $row = $result->fetch_assoc();
@@ -497,7 +555,7 @@ else if(isset($_GET['a']) && $_GET['a'] == 'edit')
     
     $message = 'ID '.$_POST['id'].' in Tabelle '.$table.' wurde bearbeitet.';
     
-    $result = $database->Select('*', $table, 'id="'.$_POST['id'].'"');
+    $result = $database->Select('*', $table, 'id='.$_POST['id'].'');
     $row = $result->fetch_assoc();
     foreach ($finfo as $val) 
     {
@@ -509,7 +567,7 @@ else if(isset($_GET['a']) && $_GET['a'] == 'edit')
       }
     }
     
-	  $database->Update($update,$table,'id = "'.$_POST['id'].'"',1);
+	  $database->Update($update,$table,'id = '.$_POST['id'].'',1);
   }
   AddToLog($database, $ip, $accs, $log);
 }

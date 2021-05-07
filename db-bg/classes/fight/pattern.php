@@ -67,4 +67,14 @@ class Pattern
   {
     return $this->data['patternset'];
   }
+  
+  public function GetPatternSetSuccess()
+  {
+    return $this->data['patternsetsuccess'];
+  }
+  
+  public function GetPatternSetFailed()
+  {
+    return $this->data['patternsetfailed'];
+  }
 }

@@ -3,7 +3,7 @@ $valid = false;
 if(isset($_GET['id']) && isset($_GET['code']))
 {
 	$id = $accountDB->EscapeString($_GET['id']);
-	$result = $accountDB->Select('*','users','id = "'.$id.'"',1);
+	$result = $accountDB->Select('*','users','id = '.$id.'',1);
 	if ($result) 
 	{
     $row = $result->fetch_assoc();

@@ -5,7 +5,7 @@ if(isset($_GET['a']) && $_GET['a'] == 'change')
   if(isset($_GET['id']) && isset($_GET['code']))
   {
 		$id = $accountDB->EscapeString($_GET['id']);
-		$result = $accountDB->Select('*','users','id = "'.$id.'"',1);
+		$result = $accountDB->Select('*','users','id = '.$id.'',1);
 		if ($result) 
 		{
       $row = $result->fetch_assoc();
@@ -17,7 +17,7 @@ if(isset($_GET['a']) && $_GET['a'] == 'change')
         {
 		      $pw = $accountDB->EscapeString($pw1);
           $pw = Account::GetPassword($pw1);
-		      $accountDB->Update('password="'.$pw.'"','users','id = "'.$id.'"',1);
+		      $accountDB->Update('password="'.$pw.'"','users','id = '.$id.'',1);
           $message = 'Das Passwort wurde geändert.';
         }
         else

@@ -42,18 +42,13 @@ if (isset($_GET['place']) && $_GET['place'] != '')
     $where = $where.' AND ';
   $where = $where.'place="'.$place.'"';
 }
-if (isset($_GET['status']) && $_GET['status'] != '') 
+if (isset($_GET['planet']) && $_GET['planet'] != '') 
 {
+  $planet = $database->EscapeString($_GET['planet']);
+  
   if($where != '')
     $where = $where.' AND ';
-  if($_GET['status'] == 'On')
-  {
-    $where = $where.'TIMESTAMPDIFF(MINUTE, lastaction, NOW()) < '.$timeOut;
-  }
-  else
-  {
-    $where = $where.'TIMESTAMPDIFF(MINUTE, lastaction, NOW()) >= '.$timeOut;
-  }
+  $where = $where.'planet="'.$planet.'"';
 }
 $list = new Generallist($database, 'accounts', 'userid,id,name,rank,race,place,level,titel,planet,arank,clan,clanname, lastaction', $where, 'rank', $start.','.$limit, 'ASC');
 
@@ -86,7 +81,6 @@ $list = new Generallist($database, 'accounts', 'userid,id,name,rank,race,place,l
       $entry = $places->GetEntry($id);
       while($entry != null)
       {
-        
       ?>
         <option value="<?php echo $entry['name']; ?>" <?php if(isset($_GET['place']) && $_GET['place'] == $entry['name']) echo 'selected'; ?>><?php echo $entry['name']; ?></option>
         <?php
@@ -97,11 +91,21 @@ $list = new Generallist($database, 'accounts', 'userid,id,name,rank,race,place,l
     </td>
   
     <td width="20%" style ="boxSchatten">  
-    <select class="select" name="status" id="online" style="width:100%">
-        <option value="" <?php if(isset($_GET['status']) && $_GET['status'] == '') echo 'selected'; ?>>Status</option>
-        <option value="On" <?php if(isset($_GET['status']) && $_GET['status'] == 'On') echo 'selected'; ?>>Online</option>
-        <option value="Off" <?php if(isset($_GET['status']) && $_GET['status'] == 'Off') echo 'selected'; ?>>Offline</option>
-       </select>
+    <select class="select" name="planet" id="racelist"  style="width:100%">
+      <option value="" <?php if(isset($_GET['planet']) && $_GET['planet'] == '') echo 'selected'; ?>>Planeten</option>
+      <?php
+      $planets = new Generallist($database, 'planet', '*', 'display="1"', '', 99999999999, 'ASC');
+      $id = 0;
+      $entry = $planets->GetEntry($id);
+      while($entry != null)
+      {
+      ?>
+        <option value="<?php echo $entry['name']; ?>" <?php if(isset($_GET['planet']) && $_GET['planet'] == $entry['name']) echo 'selected'; ?>><?php echo $entry['name']; ?></option>
+        <?php
+        ++$id;
+        $entry = $planets->GetEntry($id);
+      }
+      ?>
     </td>
   <td width="20%"><center> <input type="submit" style="width:100%" value="Suchen"></center></td>
 	</tr>
@@ -185,7 +189,7 @@ if($pages != 1)
     if(isset($_GET['race'])) echo '&race='.$_GET['race']; 
     if(isset($_GET['username'])) echo '&username='.$_GET['username']; 
     if(isset($_GET['place'])) echo '&place='.$_GET['place']; 
-    if(isset($_GET['status'])) echo '&status='.$_GET['status']; 
+    if(isset($_GET['planet'])) echo '&planet='.$_GET['planet']; 
              
              ?> ">Seite <?php echo $i+1; ?></a> 
     <?php

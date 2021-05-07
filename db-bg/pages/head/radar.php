@@ -286,6 +286,7 @@ else if($player->CanWish() && isset($_GET['a']) && $_GET['a'] == 'fight' && coun
 					{
 						//Challenge
 						$createdFight = Fight::CreateFight($player, $database, $type, $name, $mode, 0, $actionManager, 0, '', 0, $target->GetID(), 0, 0, 0, 0, 0, 0, 0, $db->GetID());
+            $createdFight->Join($player, 0, false);
 						$target->Challenge($createdFight->GetID());
 						$message = 'Der Gegner befindet sich im Kampf. Er hat 10 Minuten Zeit die Herausforderung anzunehmen.';
 					}
@@ -302,6 +303,7 @@ else if($player->CanWish() && isset($_GET['a']) && $_GET['a'] == 'fight' && coun
 						{
 																	 //CreateFight($player, $database, $type, $name, $mode, $levelup=0, $actionManager=null, $zeni=0,$items=0, $story=0, $challenge=0, $survivalteam=0, $survivalrounds=0, $survivalwinner=0, $event=0, $healing=0, $eventfight=0, $tournament=0
 							$createdFight = Fight::CreateFight($player, $database, $type, $name, $mode, 0, $actionManager, 0, '', 0, $target->GetID(), 0, 0, 0, 0, 0, 0, 0, $db->GetID());
+              $createdFight->Join($player, 0, false);
 						}
 						$createdFight->Join($target, 1, false);
             if($createdFight->IsStarted())
@@ -350,6 +352,7 @@ else if($player->CanWish() && isset($_GET['a']) && $_GET['a'] == 'fight' && coun
 					else
 					{
 						$createdFight = Fight::CreateFight($player, $database, $type, $name, $mode, 0, $actionManager, 0, '', 0, $target->GetID(), 0, 0, 0, 0, 0, 0, 0, $db->GetID());
+            $createdFight->Join($player, 0, false);
 					}
     			$createdFight->Join($target, 1, false);
           if($createdFight->IsStarted())

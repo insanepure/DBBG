@@ -1,23 +1,10 @@
 <?php
-$zorders = array();
-$zorders['aura'] = 0;
-$zorders['weapon'] = 1;
-$zorders['saiyatail'] = 2;
-$zorders['holyshine'] = 3;
-$zorders['body'] = 4;
-$zorders['schuhe'] = 5;
-$zorders['hose'] = 6;
-$zorders['hand'] = 6;
-$zorders['brust'] = 7;
-$zorders['reise'] = 8;
-$zorders['accessoire'] = 8;
-$zorders['clan'] = 9;
-$zorders['tooltip'] = 10;
+include_once 'pages/itemzorder.php';
 
-$clan = null;
+$displayedClan = null;
 if($player->GetClan() != 0)
 {
-	$clan = new Clan($database, $player->GetClan());
+	$displayedClan = new Clan($database, $player->GetClan());
 }
  ?>
 <!---Ausrüstung--->
@@ -25,14 +12,14 @@ if($player->GetClan() != 0)
 <div class="spacer"></div>
 <div style="position:relative;">
 <div class="char">
-	<div class="char2" style="z-index:<?php echo $zorders['body']; ?>; background-image: url('img/races/<?php echo $player->GetRaceImage(); ?>.png')">
+	<div class="char2" style="z-index:<?php echo $zorders[0]; ?>; background-image: url('img/races/<?php echo $player->GetRaceImage(); ?>.png')">
 	</div>
- <?php if($clan != null && $clan->GetBanner() != '')
+ <?php if($displayedClan != null && $displayedClan->GetBanner() != '')
 {
 ?>
- <div class="tooltip" style="z-index:<?php echo $zorders['tooltip']; ?>; position:absolute; left:119px; top:155px;"> 
-	 <img src="<?php echo $clan->GetBanner(); ?>" style="z-index:<?php echo $zorders['clan']; ?>; position:absolute; left:50px; top:50px;" width="30px" height="30px"></img>
-    <span class="tooltiptext"><?php echo $clan->GetName(); ?></span>
+ <div class="tooltip" style="z-index:<?php echo $zorders[12]; ?>; position:absolute; left:119px; top:155px;"> 
+	 <img src="<?php echo $displayedClan->GetBanner(); ?>" style="z-index:<?php echo $zorders[11]; ?>; position:absolute; left:50px; top:50px;" width="30px" height="30px"></img>
+    <span class="tooltiptext"><?php echo $displayedClan->GetName(); ?></span>
     </div> 
 <?php
 }
@@ -40,23 +27,27 @@ if($player->GetClan() != 0)
 <div class="SideMenuKat catGradient borderB"><div class="schatten">Charakter</div></div>
 	<!-- Kleidung an Körper wie angezogen test -->
 	<?php
+  if(date("Y-m-d") == '2021-04-01')
+  {
+    ?><div class="char2" style="z-index:999; background-image: url('img/ausruestung/Huhnmaske.png'"></div><?php
+  }
   
   if($player->GetPlanet() == 'Jenseits')
   {
-    ?><div class="char2" style="z-index:<?php echo $zorders['holyshine']; ?>; background-image: url('img/ausruestung/heiligenschein.png'"></div><?php
+    ?><div class="char2" style="z-index:<?php echo $zorders[10]; ?>; background-image: url('img/ausruestung/heiligenschein.png'"></div><?php
   }
   if($player->GetApeTail() == 3)
   {
-    ?><div class="char2" style="z-index:<?php echo $zorders['saiyatail']; ?>; background-image: url('img/races/saiyajintail.png'"></div><?php
+    ?><div class="char2" style="z-index:<?php echo $zorders[9]; ?>; background-image: url('img/races/saiyajintail.png'"></div><?php
   }
-	ShowSlotEquippedImage(6, $inventory, $zorders['weapon']); //Waffe
-	ShowSlotEquippedImage(1, $inventory, $zorders['aura']); //Aura 
-	ShowSlotEquippedImage(5, $inventory, $zorders['brust']); // Brust
-	ShowSlotEquippedImage(8, $inventory, $zorders['accessoire']); //Accessoire
-	ShowSlotEquippedImage(2, $inventory, $zorders['hand']); //Hände
-	ShowSlotEquippedImage(3, $inventory, $zorders['hose']); //Hose
-	ShowSlotEquippedImage(7, $inventory, $zorders['schuhe']); //Schuhe
-	ShowSlotEquippedImage(4, $inventory, $zorders['reise']); //Reise
+	ShowSlotEquippedImage(6, $inventory, $zorders, $zordersOnTop); //Waffe
+	ShowSlotEquippedImage(1, $inventory, $zorders, $zordersOnTop); //Aura 
+	ShowSlotEquippedImage(5, $inventory, $zorders, $zordersOnTop); // Brust
+	ShowSlotEquippedImage(8, $inventory, $zorders, $zordersOnTop); //Accessoire
+	ShowSlotEquippedImage(2, $inventory, $zorders, $zordersOnTop); //Hände
+	ShowSlotEquippedImage(3, $inventory, $zorders, $zordersOnTop); //Hose
+	ShowSlotEquippedImage(7, $inventory, $zorders, $zordersOnTop); //Schuhe
+	ShowSlotEquippedImage(4, $inventory, $zorders, $zordersOnTop); //Reise
   
 if($clan != null && $clan->GetBanner() != '')
 {
@@ -235,7 +226,18 @@ else if($player->GetTrainBonus() == 3)
     }
     ?>
   <tr height="120px">
-    <td class="borderT"><center><img class="boxSchatten borderT borderR borderL borderB" src="img/items/<?php echo $item->GetImage(); ?>.png" style="width:80px;height:80px;"></img></center></td>
+    <td class="borderT"><center>
+      <div style="width:80px; height:80px; position:relative; top:-5px; left:-40px;">
+        <?php if($item->HasOverlay())
+        {
+          ?>
+        <img class="boxSchatten borderT borderR borderL borderB" src="img/items/<?php echo $item->GetOverlay(); ?>.png" style="width:80px;height:80px; position:absolute; z-index:1;"> 
+          <?php
+        }
+        ?>
+        <img class="boxSchatten borderT borderR borderL borderB" src="img/items/<?php echo $item->GetImage(); ?>.png" style="width:80px;height:80px; position:absolute; z-index:0;"> 
+      </div>
+  </center></td>
     <td class="borderT"><center><?php echo $item->GetName(); ?></center></td>
     <td class="borderT"><center>
       <?php 

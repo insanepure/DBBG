@@ -5,7 +5,7 @@ $where = '';
 $i = 0;
 while(isset($trainers[$i]))
 {
-	$string = 'id="'.$trainers[$i].'"';
+	$string = 'id='.$trainers[$i].'';
 	if($where == '')
 	{
 		$where = $string;

@@ -1,18 +1,17 @@
 <?php
-include_once 'classes/clan/clan.php';
 include_once 'classes/bbcode/bbcode.php';
 
-$clan = null;
+$displayClan = null;
 if(isset($_GET['id']) && is_numeric($_GET['id']))
 {
-  $clan = new Clan($database, $_GET['id']);
-  if(!$clan->IsValid())
+  $displayClan = new Clan($database, $_GET['id']);
+  if(!$displayClan->IsValid())
   {
-    $clan = null;
+    $displayClan = null;
   }
 }
 
-if($clan == null)
+if($displayClan == null)
 {
   header('Location: ?p=news');
   exit();

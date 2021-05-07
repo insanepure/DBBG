@@ -4,8 +4,8 @@ if($database == NULL)
 	print 'This File ('.__FILE__.') should be after Datatabase!';
 }
 
-include 'clanlogmessage.php';
-include 'clanshoutboxmsg.php';
+include_once 'clanlogmessage.php';
+include_once 'clanshoutboxmsg.php';
 
 function CreateClan($database, $name, $tag, $player)
 {
@@ -20,7 +20,7 @@ function CreateClan($database, $name, $tag, $player)
 		}
 		$result->close();
 	}
-	$result = $database->Insert('name, tag, points, leader, members','"'.$name.'","'.$tag.'","0","'.$player->GetID().'","1"', 'clans');
+	$result = $database->Insert('name, tag, points, leader, members','"'.$name.'","'.$tag.'",0,'.$player->GetID().',1', 'clans');
   $clanID = $database->GetLastID();
   
   $player->SetClan($clanID);
@@ -34,9 +34,9 @@ function CreateClan($database, $name, $tag, $player)
     $rank = $row['total'];
 		$result->close();
 	}
-	$result = $database->Update('rang="'.$rank.'"','clans','id = "'.$clanID.'"',1);
+	$result = $database->Update('rang="'.$rank.'"','clans','id = '.$clanID.'',1);
   
-	$result = $database->Update('clan="'.$clanID.'",clanname="'.$name.'"','accounts','id = "'.$player->GetID().'"',1);
+	$result = $database->Update('clan="'.$clanID.'",clanname="'.$name.'"','accounts','id = '.$player->GetID().'',1);
   return true;
 }
 
@@ -111,7 +111,7 @@ class Clan
 		$members = $this->GetMembers();
 		$members = $members+1;
 		$this->SetMembers($members);
-		$result = $this->database->Update('members="'.$members.'"','clans','id = "'.$this->GetID().'"',1);
+		$result = $this->database->Update('members="'.$members.'"','clans','id = '.$this->GetID().'',1);
 	}
 	
 	public function PlayerLeaves()
@@ -119,7 +119,7 @@ class Clan
 		$members = $this->GetMembers();
 		$members = $members-1;
 		$this->SetMembers($members);
-		$result = $this->database->Update('members="'.$members.'"','clans','id = "'.$this->GetID().'"',1);
+		$result = $this->database->Update('members="'.$members.'"','clans','id = '.$this->GetID().'',1);
 	}
 	
 	public function PostShoutbox($id, $name, $text)
@@ -164,7 +164,7 @@ class Clan
 			$this->shoutbox = $msgs;
 		}
 		
-		$result = $this->database->Update('shoutbox="'.$this->GetShoutbox().'"','clans','id = "'.$this->GetID().'"',1);
+		$result = $this->database->Update('shoutbox="'.$this->GetShoutbox().'"','clans','id = '.$this->GetID().'',1);
 	}
 	
 	public function GetShoutboxMSG()
@@ -227,8 +227,22 @@ class Clan
 	public function GetLog()
 	{
 		return $this->data['log'];
-	}
+  }
 	
+  
+  public function HasApplicants()
+  {
+    $has = false;
+    $result = $this->database->Select('*', 'accounts', 'clanapplication='.$this->GetID(), 1);
+		if ($result) 
+		{
+      $has = $result->num_rows > 0;
+			$result->close();
+		}
+    
+    return $has;
+  }
+  
 	public function AddZeni($zeni, $byacc, $byname, $toacc, $toname)
 	{
 		$date = date('d.m.Y H:i', time());
@@ -237,7 +251,7 @@ class Clan
 		
 		
 		$zeni = $zeni + $this->GetZeni();
-		$result = $this->database->Update('zeni="'.$zeni.'", log="'.$this->GetLog().'"','clans','id = "'.$this->GetID().'"',1);
+		$result = $this->database->Update('zeni='.$zeni.', log="'.$this->GetLog().'"','clans','id = '.$this->GetID().'',1);
 		$this->SetZeni($zeni);
 	}
 	
@@ -248,7 +262,7 @@ class Clan
 		$this->AddToLog($msg);
 		
 		$zeni = $this->GetZeni() - $zeni;
-		$result = $this->database->Update('zeni="'.$zeni.'", log="'.$this->GetLog().'"','clans','id = "'.$this->GetID().'"',1);
+		$result = $this->database->Update('zeni='.$zeni.', log="'.$this->GetLog().'"','clans','id = '.$this->GetID().'',1);
 		$this->SetZeni($zeni);
 	}
 	
@@ -264,24 +278,24 @@ class Clan
 		$this->SetText($text);
 		$this->SetRules($rules);
 		$this->SetRequirements($requirements);
-		$result = $this->database->Update('image="'.$image.'",banner="'.$banner.'",text="'.$text.'",rules="'.$rules.'",requirements="'.$requirements.'"','clans','id = "'.$this->GetID().'"',1);
+		$result = $this->database->Update('image="'.$image.'",banner="'.$banner.'",text="'.$text.'",rules="'.$rules.'",requirements="'.$requirements.'"','clans','id = '.$this->GetID().'',1);
 	}
 	
 	public function MakeLeader($player)
 	{
-		$result = $this->database->Update('leader="'.$player->GetID().'"','clans','id = "'.$this->GetID().'"',1);	
+		$result = $this->database->Update('leader="'.$player->GetID().'"','clans','id = '.$this->GetID().'',1);	
 		$this->SetLeader($player->GetID());
 	}
 	
 	public function MakeCoLeader($player)
 	{
-		$result = $this->database->Update('coleader="'.$player->GetID().'"','clans','id = "'.$this->GetID().'"',1);	
+		$result = $this->database->Update('coleader="'.$player->GetID().'"','clans','id = '.$this->GetID().'',1);	
 		$this->SetCoLeader($player->GetID());
 	}
 	
 	public function RemoveCoLeader()
 	{
-		$result = $this->database->Update('coleader="0"','clans','id = "'.$this->GetID().'"',1);	
+		$result = $this->database->Update('coleader="0"','clans','id = '.$this->GetID().'',1);	
 		$this->SetCoLeader(0);
 	}
 	
@@ -289,17 +303,17 @@ class Clan
 	{
 		if($this->GetCoLeader() != 0)
 		{
-			$result = $this->database->Update('leader="'.$this->GetCoLeader().'" AND coleader="0"','clans','id = "'.$this->GetID().'"',1);	
+			$result = $this->database->Update('leader='.$this->GetCoLeader().' AND coleader="0"','clans','id = '.$this->GetID().'',1);	
 			return;
 		}
 		
-    $result = $this->database->Select('*', 'accounts', 'clan="'.$this->GetID().'" AND id != "'.$this->GetLeader().'"', 1);
+    $result = $this->database->Select('*', 'accounts', 'clan='.$this->GetID().' AND id != '.$this->GetLeader().'', 1);
 		if ($result) 
 		{
 			if ($result->num_rows > 0)
 			{
 				$row = $result->fetch_assoc();
-				$this->database->Update('leader="'.$row['id'].'"','clans','id = "'.$this->GetID().'"',1);	
+				$this->database->Update('leader="'.$row['id'].'"','clans','id = '.$this->GetID().'',1);	
 			}
 			$result->close();
 		}
@@ -307,8 +321,8 @@ class Clan
 	
 	public function Delete($player)
 	{
-		$result = $this->database->Delete('clans','id = "'.$this->GetID().'"',1);
-		$result = $this->database->Update('clan="0",clanname=""','accounts','id = "'.$player->GetID().'"',1);	
+		$result = $this->database->Delete('clans','id = '.$this->GetID().'',1);
+		$result = $this->database->Update('clan="0",clanname=""','accounts','id = '.$player->GetID().'',1);	
 		$player->SetClan(0);
 		$player->SetClanName('');
 	}
@@ -435,7 +449,7 @@ class Clan
   
   private function LoadData($id, $select = '*')
   {
-    $result = $this->database->Select($select, 'clans', 'id="'.$id.'"', 1);
+    $result = $this->database->Select($select, 'clans', 'id='.$id.'', 1);
 		if ($result) 
 		{
 			if ($result->num_rows > 0)

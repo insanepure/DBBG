@@ -25,7 +25,61 @@ for ($i = 0; $i < $newsCount; $i++)
      <?php echo $bbcode->parse($news->GetText()); ?>
   </div>
   </article>
-<div class="spacer"></div>
+<table width="40%">
+  <tr>
+<?php
+  echo '<td align="center">';
+  $liked = $news->HasLiked($account->Get('id'));
+if($liked)
+  echo '<b>';
+  
+  $likeLink = $liked ? 'removelikes' : 'like';
+  if($player->IsLogged())
+  {
+  ?>
+  <a href="?p=news&a=<?php echo $likeLink; ?>&id=<?php echo $news->GetID(); ?>">
+  <?php 
+  }  
+  echo $news->GetLikeCount(); ?> <img src="img/like.png?1"></img>
+  <?php
+  if($player->IsLogged())
+  {
+  ?>
+  </a>
+  <?php 
+  }  
+if($liked)
+  echo '</b>';
+  
+  echo '</td><td align="center">';
+  $disliked = $news->HasDisLiked($account->Get('id'));
+if($disliked)
+  echo '<b>';
+  
+  $dislikeLink = $disliked ? 'removelikes' : 'dislike';
+  if($player->IsLogged())
+  {
+  ?>
+  <a href="?p=news&a=<?php echo $dislikeLink; ?>&id=<?php echo $news->GetID(); ?>">
+  <?php 
+  }  
+  echo $news->GetDisLikeCount(); ?> <img src="img/dislike.png?1"></img>
+  <?php
+  if($player->IsLogged())
+  {
+  ?>
+  </a>
+  <?php 
+  }  
+  
+if($disliked)
+  echo '</b>';
+  
+  echo '</td>';
+?>
+  </tr>
+</table>
+<hr>
    <details>
       <summary><b> <?php $commentCount = $news->GetCommentCount(); echo $commentCount; if($commentCount == 1) echo ' Kommentar'; else echo ' Kommentare'; ?></b></summary>  
   <?php 

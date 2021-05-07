@@ -12,7 +12,7 @@
   </tr>
 	<?php
 	$id = $_GET['id'];
-$places = new Generallist($database, 'fights', '*', 'id = "'.$id.'"', '', 99999, 'ASC');
+$places = new Generallist($database, 'fights', '*', 'id = '.$id.'', '', 99999, 'ASC');
   $id = 0;
   $place = $places->GetEntry($id);
   while($place != null)

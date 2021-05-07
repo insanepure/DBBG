@@ -17,7 +17,14 @@
   while(isset($actions[$i]))
   {
     $action = $actions[$i];
-    if($action->GetLevel() <= $player->GetLevel())
+    $canSee = true;
+    if($action->GetLevel() > $player->GetLevel())
+      $canSee = false;
+    
+    if($action->GetID() == 92 && $player->CanTeleport())
+      $canSee = false;
+    
+    if($canSee)
     {
     ?>
   <tr>

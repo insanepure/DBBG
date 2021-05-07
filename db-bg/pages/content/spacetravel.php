@@ -20,7 +20,9 @@ grecaptcha.ready(function() {
       $y = $entry['y'];
     }
     
-    $canSee = ($entry['minstory'] == 0 || $player->GetStory() >= $entry['minstory']) && ($entry['maxstory'] == 0 || $player->GetStory() <= $entry['maxstory']);
+    $canSee = 
+      $player->IsTimeTravelled() && $player->GetPlanet() == $entry['name'] || 
+      !$player->IsTimeTravelled() && (($entry['minstory'] == 0 || $player->GetStory() >= $entry['minstory']) && ($entry['maxstory'] == 0 || $player->GetStory() <= $entry['maxstory']));
     
 		if($entry['display'] == 1 && $canSee)
 		{

@@ -13,6 +13,23 @@ return preg_replace ("/\015\012|\015|\012/", "\n", $text);
 function bbcode_stripcontents ($text) {
 return preg_replace ("/[^\n]/", '', $text);
 }
+function do_bbcode_ref ($action, $attributes, $content, $params, $node_object) {
+if (!isset ($attributes['default'])) {
+$url = $content;
+$text = htmlspecialchars ($content);
+} else {
+$url = $attributes['default'];
+$text = $content;
+}
+if ($action == 'validate') {
+if (substr ($url, 0, 5) == 'data:' || substr ($url, 0, 5) == 'file:'
+|| substr ($url, 0, 11) == 'javascript:' || substr ($url, 0, 4) == 'jar:') {
+return false;
+}
+return true;
+}
+return '<b><a href="?p=verzeichnis&name='.htmlspecialchars ($url).'">'.$text.'</a></b>';
+}
 function do_bbcode_url ($action, $attributes, $content, $params, $node_object) {
 if (!isset ($attributes['default'])) {
 $url = $content;
@@ -100,6 +117,8 @@ $bbcode->addCode ('u', 'simple_replace', null, array ('start_tag' => '<u>', 'end
 $bbcode->addCode ('i', 'simple_replace', null, array ('start_tag' => '<i>', 'end_tag' => '</i>'),
 'inline', array ('listitem', 'block', 'inline', 'link'), array ());
 $bbcode->addCode ('url', 'usecontent?', 'do_bbcode_url', array ('usecontent_param' => 'default'),
+'link', array ('listitem', 'block', 'inline'), array ('link'));    
+$bbcode->addCode ('ref', 'usecontent?', 'do_bbcode_ref', array ('usecontent_param' => 'default'),
 'link', array ('listitem', 'block', 'inline'), array ('link'));    
 $bbcode->addCode ('a', 'usecontent?', 'do_bbcode_anker', array ('usecontent_param' => 'default'),
                   'link', array ('listitem', 'block', 'inline'), array ('link'));

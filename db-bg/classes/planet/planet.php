@@ -32,6 +32,11 @@ class Planet
     return $this->data['name'];
   }
   
+  public function GetMap()
+  {
+    return $this->data['map'];
+  }
+  
   public function IsTravelable()
   {
     return $this->data['travelable'];
@@ -85,6 +90,26 @@ class Planet
   public function GetDragon()
   {
     return $this->data['dragon'];
+  }
+  
+  public function GetLinkedPlanet()
+  {
+    return $this->data['linkedplanet'];
+  }
+  
+  public function CanTimeTravel()
+  {
+    return $this->data['cantimetravel'];
+  }
+  
+  public function IsSamePlanet($otherPlanet)
+  {
+    return $this->GetName() == $otherPlanet || $this->GetLinkedPlanet() == $otherPlanet;
+  }
+  
+  public function IsTimeTravellable($userStory)
+  {
+    return $this->GetMaxStory() <= $userStory && $this->CanTimeTravel();
   }
   
   public function CanSee($playerStory)

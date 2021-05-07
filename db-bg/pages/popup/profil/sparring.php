@@ -3,6 +3,7 @@ include_once $_SERVER['DOCUMENT_ROOT'].'../../main/www/classes/session.php';
 include_once '../../../classes/header.php';
 if(!isset($_GET['id']) || !is_numeric($_GET['id']))
 {
+  echo 'a';
   exit();
 }
 
@@ -21,6 +22,7 @@ if($_GET['id'] == $player->GetID())
 $otherPlayer = new Player($database, $_GET['id'], $actionManager);
 if(!$otherPlayer->IsValid())
 {
+  echo 'b';
   exit();
 }
 ?>

@@ -5,9 +5,7 @@ if($player->GetClan() == 0)
   exit();
 }
 
-include_once 'classes/clan/clan.php';
 include_once 'classes/bbcode/bbcode.php';
-$clan = new Clan($database, $player->GetClan());
 
 if(isset($_GET['a']) && $_GET['a'] == 'post' &&isset($_POST['shoutboxtext']) && $_POST['shoutboxtext'] != '')
 {
@@ -84,7 +82,7 @@ if(isset($_GET['a']) && $_GET['a'] == 'decline' && ($clan->GetLeader() == $playe
 		}
 	}
 }
-else if(isset($_GET['a']) && $_GET['a'] == 'leave' && $clan->GetLeader() != $player->GetID())
+else if(isset($_GET['a']) && $_GET['a'] == 'leave' && $clan->GetLeader() != $player->GetID()&& isset($_POST['realcheck']))
 {
 	$player->LeaveClan();
 	$clan->PlayerLeaves();
@@ -284,7 +282,7 @@ else if(isset($_GET['a']) && $_GET['a'] == 'change' && ($clan->GetLeader() == $p
     $message = 'Du hast die Clandaten geändert.';
   }
 }
-else if(isset($_GET['a']) && $_GET['a'] == 'delete' && $clan->GetLeader() == $player->GetID())
+else if(isset($_GET['a']) && $_GET['a'] == 'delete' && $clan->GetLeader() == $player->GetID() && isset($_POST['realcheck']))
 {
 	if($clan->GetMembers() > 1)
 	{

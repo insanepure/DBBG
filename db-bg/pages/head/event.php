@@ -13,7 +13,7 @@ if(isset($_GET['a']) && $_GET['a'] == 'start')
 		{
       $message = 'Das Event ist ein Bosskampf.';
 		}
-		else if($event->GetLevel() > $player->GetLevel())
+		else if($event->GetLevel() > $player->GetLevel() && $player->GetARank() < 0)
 		{
     $message = 'Dieses Event ist ungültig.';
 		}
@@ -45,7 +45,8 @@ if(isset($_GET['a']) && $_GET['a'] == 'start')
     {
       //create Fight and invite group members if not enough, like challenge
       $group = $player->GetGroup();
-      $validPlayers = $event->GetValidPlayers($player, $group);
+      $planet = new Planet($database, $player->GetPlanet());
+      $validPlayers = $event->GetValidPlayers($player, $group, $planet);
       $players = $_POST['players'];
       if($validPlayers < $players)
       {
@@ -77,10 +78,11 @@ if(isset($_GET['a']) && $_GET['a'] == 'start')
           $createdFight->Join($npc, $team, true);
           ++$i;
         }
+        $createdFight->Join($player, 0, false);
 				
 				if($players > 1)
 				{
-					$event->Invite($createdFight->GetID(), $group, $player);
+					$event->Invite($createdFight->GetID(), $group, $player, $planet);
 				}
         
         if($createdFight->IsStarted())

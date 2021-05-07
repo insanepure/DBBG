@@ -79,7 +79,16 @@ if($item->IsEquipped() || $item->GetRace() != '' || $item->GetType() != 3 && $it
         echo $firstItem->GetName(); 
       ?>
         <div class="spacer"></div>
-        <img class="boxSchatten borderT borderR borderL borderB" src="img/items/<?php echo $firstItem->GetImage(); ?>.png" style="width:80px;height:80px;"></img>
+        <div style="width:80px; height:80px; position:relative; top:0px; left:0px;">
+        <?php if($firstItem->HasOverlay())
+        {
+          ?>
+            <img src="img/items/<?php echo $firstItem->GetOverlay(); ?>.png" style="width:80px; height:80px; left:0px; top:0px; position:absolute; z-index:1;"></img><br/> 
+          <?php
+        }
+        ?>
+        <img src="img/items/<?php echo $firstItem->GetImage(); ?>.png" style="width:80px; height:80px; left:0px; top:0px; position:absolute; z-index:0;"></img><br/> 
+        </div>
         <div class="spacer"></div>
       <?php 
         echo $firstItem->DisplayEffect();
@@ -99,7 +108,16 @@ if($item->IsEquipped() || $item->GetRace() != '' || $item->GetType() != 3 && $it
     <td align="center" class="borderL borderR" id="visualitem">
       <?php echo $item->GetName(); ?>
       <div class="spacer"></div>
-      <img class="boxSchatten borderT borderR borderL borderB" src="img/items/<?php echo $item->GetImage(); ?>.png" style="width:80px;height:80px;"></img>
+        <div style="width:80px; height:80px; position:relative; top:0px; left:0px;">
+        <?php if($item->HasOverlay())
+        {
+          ?>
+            <img src="img/items/<?php echo $item->GetOverlay(); ?>.png" style="width:80px; height:80px; left:0px; top:0px; position:absolute; z-index:1;"></img><br/> 
+          <?php
+        }
+        ?>
+        <img src="img/items/<?php echo $item->GetImage(); ?>.png" style="width:80px; height:80px; left:0px; top:0px; position:absolute; z-index:0;"></img><br/> 
+        </div>
       <div class="spacer"></div>
       <?php echo $item->DisplayEffect(); ?>
     </td>

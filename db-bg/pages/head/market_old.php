@@ -106,7 +106,7 @@ $message = "Du hast das Item aus dem Marktplatz entfernt. Dem User Wurde eine Na
 $PMManager = new PMManager($database, $player->GetID());
 $text = "<center>Ein Item Wurde aus dem Marktplatz entfernt.<br> Dein Item wurde nicht zurückerstattet.<br> Grund: überteuerter Preis oder Marktplatz Spam.</center>";		
 $PMManager->SendPM(0, 'img/money.png', 'SYSTEM','Ein Item auf dem MP wurde entfernt!', $text, $item->GetSeller(), 1);
-$result = $database->Delete('market','id = "'.$item->GetID().'"',1);
+$result = $database->Delete('market','id = '.$item->GetID().'',1);
       
 }
 }

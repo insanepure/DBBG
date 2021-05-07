@@ -20,7 +20,7 @@ if(isset($_GET['a']) && $_GET['a'] == 'edit' && isset($_POST['main']) && is_nume
   
   $preBanned = 0;
   $preReason = '';
-	$result = $accountDB->Select('id, banned, banreason','users', 'id = "'.$mainID.'"',1);
+	$result = $accountDB->Select('id, banned, banreason','users', 'id = '.$mainID.'',1);
 	if ($result) 
 	{
 	  if ($result->num_rows > 0)
@@ -37,7 +37,7 @@ if(isset($_GET['a']) && $_GET['a'] == 'edit' && isset($_POST['main']) && is_nume
     $banned = 1;
   $banreason = $accountDB->EscapeString($_POST['banreason']);
   
-	$result = $accountDB->Update('banned="'.$banned.'",banreason="'.$banreason.'"','users','id = "'.$mainID.'"',1);
+	$result = $accountDB->Update('banned="'.$banned.'",banreason="'.$banreason.'"','users','id = '.$mainID.'',1);
   
   
   $ip = $account->GetIP();

@@ -173,11 +173,10 @@ class InventoryItem
   public function GetName()
   {
     $returnValue = $this->data['name'];
-    $type = $this->GetType();
-    if($type == 1 || $type == 2 || $type == 4 || $type == 5 || $type == 6 && $this->GetStatsID() != 184 )
-      return $returnValue;
-    
-    $returnValue = $returnValue.' '.$this->GetTypeName();
+    $type = $this->GetType();;
+        
+    if($type == 3 && $this->data['value'] != 0|| $this->GetStatsID() == 184)
+      $returnValue = $returnValue.' '.$this->GetTypeName();
     
     if($this->GetUpgrade() != 0)
       $returnValue = $returnValue.' Level '.$this->GetCalculateUpgrade();
@@ -202,7 +201,12 @@ class InventoryItem
   
   public function IsSellable()
   {
-    return $this->data['sellable'];
+    return $this->data['ItemSellable'];
+  }
+  
+  public function IsMarketSellable()
+  {
+    return $this->data['ItemMarketSellable'];
   }
   
   public function GetNeedItem()
@@ -218,6 +222,11 @@ class InventoryItem
   public function GetFightAttack()
   {
     return $this->data['fightattack'];
+  }
+  
+  public function IsOnTop()
+  {
+    return $this->data['ontop'];
   }
   
   public function GetEquippedImage()
@@ -400,6 +409,22 @@ class InventoryItem
     }
   }
   
+  public function HasOverlay()
+  {
+    return $this->data['overlay'] != 0;
+  }
+  
+  public function GetOverlay()
+  {
+    switch($this->data['overlay'])
+    {
+      case 1:
+        return 'OverlayEvent';
+        break;
+    }
+    return '';
+  }
+  
 }
 
 
@@ -571,10 +596,10 @@ class Inventory
     $statsitem->SetImage($visualitem->GetImage());
     $statsitem->SetEquippedImage($visualitem->GetEquippedImage());
     
-		$result = $this->database->Update('visualid="'.$visualitem->GetVisualID().'"','inventory','id = "'.$statsitem->GetID().'"',1);
+		$result = $this->database->Update('visualid='.$visualitem->GetVisualID().'','inventory','id = '.$statsitem->GetID().'',1);
     
     array_splice($this->items, $id, 1);
-		$result = $this->database->Delete('inventory','id = "'.$visualitem->GetID().'"',1);
+		$result = $this->database->Delete('inventory','id = '.$visualitem->GetID().'',1);
   }
   
   
@@ -583,7 +608,7 @@ class Inventory
     $slot = $item->GetSlot();
     $item->SetEquipped(1);
     $this->equippedItems[$slot] = $item;
-		$result = $this->database->Update('equipped="1"','inventory','id = "'.$item->GetID().'"',1);
+		$result = $this->database->Update('equipped="1"','inventory','id = '.$item->GetID().'',1);
   }
   
   public function UnequipItem($item)
@@ -591,7 +616,7 @@ class Inventory
     $slot = $item->GetSlot();
     $item->SetEquipped(0);
     unset($this->equippedItems[$slot]);
-		$result = $this->database->Update('equipped="0"','inventory','id = "'.$item->GetID().'"',1);
+		$result = $this->database->Update('equipped="0"','inventory','id = '.$item->GetID().'',1);
   }
   
   public function AddItem($statsitem, $visualitem, $amount, $statstype=0, $upgrade=0)
@@ -644,7 +669,7 @@ class Inventory
 		{
       $itemAmount = $inventoryItem->GetAmount() + $amount;
 			$inventoryItem->SetAmount($itemAmount);
-		  $result = $this->database->Update('amount="'.$itemAmount.'"','inventory','id = "'.$inventoryItem->GetID().'"',1);
+		  $result = $this->database->Update('amount="'.$itemAmount.'"','inventory','id = '.$inventoryItem->GetID().'',1);
 		}
     
     return $inventoryItem;
@@ -661,7 +686,7 @@ class Inventory
     if($itemAmount > 0)
     {
       $item->SetAmount($itemAmount);
-		  $result = $this->database->Update('amount="'.$itemAmount.'"','inventory','id = "'.$item->GetID().'"',1);
+		  $result = $this->database->Update('amount="'.$itemAmount.'"','inventory','id = '.$item->GetID().'',1);
     }
     else
     {
@@ -674,7 +699,7 @@ class Inventory
         $this->SetHasDBs(false);
       }
       array_splice($this->items, $id, 1);
-		  $result = $this->database->Delete('inventory','id = "'.$item->GetID().'"',1);
+		  $result = $this->database->Delete('inventory','id = '.$item->GetID().'',1);
     }
   }
   
@@ -692,6 +717,7 @@ class Inventory
     visualitem.image,
     visualitem.equippedimage,
     visualitem.description,
+    visualitem.ontop,
     statsitem.type,
     statsitem.lp, 
     statsitem.kp,
@@ -708,7 +734,17 @@ class Inventory
     statsitem.race,
     statsitem.trainbonus,
     statsitem.upgradeid,
-    statsitem.slot';
+    statsitem.slot,
+    CASE
+    WHEN visualitem.sellable = 0 THEN 0
+    WHEN statsitem.sellable = 0 THEN 0
+    ELSE 1
+    END as ItemSellable,
+    CASE
+    WHEN visualitem.marketsellable = 0 THEN 0
+    WHEN statsitem.marketsellable = 0 THEN 0
+    ELSE 1
+    END as ItemMarketSellable';
     $where = 'inventory.id = '.$id;
     $order = 'inventory.id';
     $join = 'items statsitem ON inventory.statsid = statsitem.id JOIN items visualitem ON inventory.visualid = visualitem.id';
@@ -765,6 +801,8 @@ class Inventory
     visualitem.image,
     visualitem.equippedimage,
     visualitem.description,
+    visualitem.ontop,
+    visualitem.overlay,
     statsitem.type,
     statsitem.lp, 
     statsitem.kp,
@@ -785,7 +823,17 @@ class Inventory
     statsitem.changetype,
     statsitem.changeupgrade,
     statsitem.maxupgrade,
-    statsitem.upgradedivider';
+    statsitem.upgradedivider,
+    CASE
+    WHEN visualitem.sellable = 0 THEN 0
+    WHEN statsitem.sellable = 0 THEN 0
+    ELSE 1
+    END as ItemSellable,
+    CASE
+    WHEN visualitem.marketsellable = 0 THEN 0
+    WHEN statsitem.marketsellable = 0 THEN 0
+    ELSE 1
+    END as ItemMarketSellable';
     $where = 'inventory.ownerid = '.$ownerid;
     $order = 'inventory.id';
     $join = 'items statsitem ON inventory.statsid = statsitem.id JOIN items visualitem ON inventory.visualid = visualitem.id';

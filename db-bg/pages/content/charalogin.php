@@ -54,7 +54,7 @@ if ($account->IsLogged() && $userLoginActive)
             if($action->GetType() == 5)
             {
 			        $attackName = 'invalidAttack';
-              $result = $database->Select('id, name','attacks','id = "'.$displayedPlayer->GetLearningAttack().'"',1);
+              $result = $database->Select('id, name','attacks','id = '.$displayedPlayer->GetLearningAttack().'',1);
               $attackID = 0;
               if ($result) 
               {

@@ -1,13 +1,13 @@
 <div class="spacer"></div>
-<?php if($clan->GetImage() != '')
+<?php if($displayClan->GetImage() != '')
 {
 	?>
 <div  class="catGradient borderT borderB" style="width:600px;">
 	<h2>
-		<?php echo $clan->GetName(); ?>
+		<?php echo $displayClan->GetName(); ?>
 	</h2>
 </div>
-<img src="<?php echo $clan->GetImage(); ?>" style="width:600px; height:400px;"></img>
+<img src="<?php echo $displayClan->GetImage(); ?>" style="width:600px; height:400px;"></img>
 	<?php
 }
 else
@@ -15,7 +15,7 @@ else
 ?>
 <div  class="catGradient borderT borderB" style="width:600px;">
 	<h2>
-		<?php echo $clan->GetName(); ?>
+		<?php echo $displayClan->GetName(); ?>
 	</h2>
 </div>
 <div style="min-width:100%; max-width:100%;">
@@ -31,9 +31,9 @@ else
 	</h2>
 </div>
 <div class="profileBox " style="width:600px; min-height:200px; word-wrap: break-word; overflow:hidden;"?>
-  <?php echo $bbcode->parse($clan->GetText()); ?>
+  <?php echo $bbcode->parse($displayClan->GetText()); ?>
 </div>
-<?php if($clan->GetRules() != '')
+<?php if($displayClan->GetRules() != '')
 {
 	?>
 <div class="spacer"></div>
@@ -43,11 +43,11 @@ else
 	</h2>
 </div>
 <div class="profileBox" style="width:600px; min-height:200px; word-wrap: break-word; overflow:hidden;"?>
-  <?php echo $bbcode->parse($clan->GetRules()); ?>
+  <?php echo $bbcode->parse($displayClan->GetRules()); ?>
 </div>
 	<?php
 }
-if($clan->GetRequirements() != '')
+if($displayClan->GetRequirements() != '')
 {
 	?>
 <div class="spacer"></div>
@@ -57,7 +57,7 @@ if($clan->GetRequirements() != '')
 	</h2>
 </div>
 <div class="profileBox" style="width:600px; min-height:200px; word-wrap: break-word; overflow:hidden;"?>
-  <?php echo $bbcode->parse($clan->GetRequirements()); ?>
+  <?php echo $bbcode->parse($displayClan->GetRequirements()); ?>
 </div>
 	<?php
 }
@@ -79,7 +79,7 @@ if($clan->GetRequirements() != '')
 if(!isset($titelManager)) $titelManager = new TitelManager($database);
   
 $id = 0;
-$list = new Generallist($database, 'accounts', 'id,name,rank,race,arank,titel,level', 'clan="'.$clan->GetID().'"', 'rank', 999, 'ASC');
+$list = new Generallist($database, 'accounts', 'id,name,rank,race,arank,titel,level', 'clan="'.$displayClan->GetID().'"', 'rank', 999, 'ASC');
 $entry = $list->GetEntry($id);
 while($entry != null)
 {
@@ -97,8 +97,8 @@ while($entry != null)
   <tr>
     <td width="5%"><?php echo $entry['level']; ?></td>
     <td width="30%">
-		<?php if($clan->GetLeader() == $entry['id']) { echo '<img src="../img/stern2.png" width="15px" height="15px"></img>'; } 
-		else if($clan->GetCoLeader() == $entry['id']) { echo '<img src="../img/stern.png" width="15px" height="15px"></img>'; } ?> 
+		<?php if($displayClan->GetLeader() == $entry['id']) { echo '<img src="../img/stern2.png" width="15px" height="15px"></img>'; } 
+		else if($displayClan->GetCoLeader() == $entry['id']) { echo '<img src="../img/stern.png" width="15px" height="15px"></img>'; } ?> 
 			<a href="?p=profil&id=<?php echo $entry['id']; ?>"><?php echo $titelText.' '.$entry['name']; ?></a></td>
     <td width="10%"><?php echo $entry['rank']; ?></td>
     <td width="15%"><?php echo $entry['race']; ?></td>

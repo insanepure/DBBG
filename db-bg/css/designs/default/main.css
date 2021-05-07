@@ -1,28 +1,28 @@
 html{
   color: #000;
-  background-color: #0065bf;
-  background-image: -webkit-gradient(linear, top, bottom, from(#00d8ff), to(#0065bf));
-  background-image: -webkit-linear-gradient(#00d8ff, #0065bf);
-  background-image: -moz-linear-gradient(#00d8ff, #0065bf);
-  background-image: -o-linear-gradient(#00d8ff, #0065bf);
-  background-image: linear-gradient(#00d8ff, #0065bf);
+  background-color: #0069c7;
+  background-image: -webkit-gradient(linear, top, bottom, from(#1dc9ff), to(#0069c7));
+  background-image: -webkit-linear-gradient(#1dc9ff, #0069c7);
+  background-image: -moz-linear-gradient(#1dc9ff, #0069c7);
+  background-image: -o-linear-gradient(#1dc9ff, #0069c7);
+  background-image: linear-gradient(#1dc9ff, #0069c7);
 }
 body {
   color: #000;
-  background-color: #0065bf;
-  background-image: -webkit-gradient(linear, top, bottom, from(#00d8ff), to(#0065bf));
-  background-image: -webkit-linear-gradient(#00d8ff, #0065bf);
-  background-image: -moz-linear-gradient(#00d8ff, #0065bf);
-  background-image: -o-linear-gradient(#00d8ff, #0065bf);
-  background-image: linear-gradient(#00d8ff, #0065bf)
+  background-color: #0069c7;
+  background-image: -webkit-gradient(linear, top, bottom, from(#1dc9ff), to(#0069c7));
+  background-image: -webkit-linear-gradient(#1dc9ff, #0069c7);
+  background-image: -moz-linear-gradient(#1dc9ff, #0069c7);
+  background-image: -o-linear-gradient(#1dc9ff, #0069c7);
+  background-image: linear-gradient(#1dc9ff, #0069c7)
 }
 
 .header {
-  background-image: url(../../../img/defaultBanner.png)
+  background-image: url(../../../img/header/default.png?2)
 }
 
 .logo {
-  background-image: url(../../../img/logo.png)
+  background-image:
 }
 .logo2 {
   background-image: url(../../../img/wartung.gif)
@@ -79,8 +79,8 @@ body {
 .catGradient {
   color: #fff;
   text-shadow: 1px 1px 1px #000;
-  background-color: #0186ba;
-  background-image: linear-gradient(#04acec, #0186ba)
+  background-color: #0071d6;
+  background-image: linear-gradient(#00acff, #0071d6)
 }
 
 .textColor {
@@ -102,8 +102,8 @@ a:hover {
 
 .navigationbarbutton a:hover {
   color: #fafafa;
-  background-color: #0186ba;
-  background-image: linear-gradient(#2abef7, #0186ba)
+  background-color: #1a7dd6;
+  background-image: linear-gradient(#21b7ff, #1a7dd6)
 }
 
 .SideMenuButton {
@@ -123,8 +123,8 @@ a:hover {
 
 .SideMenuButton:hover {
   color: #fafafa;
-  background-color: #0186ba;
-  background-image: linear-gradient(#04acec, #0186ba)
+  background-color: #1a7dd6;
+  background-image: linear-gradient(#21b7ff, #1a7dd6)
 }
 
 .SideMenuNotification,

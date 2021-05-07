@@ -7,7 +7,7 @@ if(isset($_GET['a']) && $_GET['a'] == 'train' && isset($_GET['id']) && isset($_P
 {
   $hours = $_POST['hours'];
   $id = $_GET['id'];
-  if(!is_numeric($hours) || $hours < 0)
+  if(!is_numeric($hours))
   {
     $message = 'Die Stundenzahl ist ungültig.';
   }
@@ -52,7 +52,7 @@ if(isset($_GET['a']) && $_GET['a'] == 'train' && isset($_GET['id']) && isset($_P
     {
       $message = 'Du hast nicht genug Zeni.';
     }
-    else if($player->GetAction() != 0)
+    else if($actionHours != 0 && $player->GetAction() != 0)
     {
       $message = 'Du tust bereits etwas.';
     }

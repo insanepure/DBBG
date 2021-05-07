@@ -45,7 +45,6 @@ class PatternManager
     if($value == null)
       return false;
     
-    $returnValue = null;
     
     $operator = $pattern->GetOperator();
     $fight->AddDebugLog(' - - - Value ('.$pattern->GetValueName().'): '.$value);
@@ -62,10 +61,10 @@ class PatternManager
           $value = ($value / $object->GetPatternValue('mki'))*100;
           break;
         case 'lp':
-          $value = ($value / $object->GetPatternValue('mlp'))*100;
+          $value = ($value / $object->GetPatternValue('ilp'))*100;
           break;
         case 'kp':
-          $value = ($value / $object->GetPatternValue('mkp'))*100;
+          $value = ($value / $object->GetPatternValue('ikp'))*100;
           break;
         case 'energy':
           $value = ($value / $object->GetPatternValue('menergy'))*100;
@@ -75,38 +74,77 @@ class PatternManager
     
     $fight->AddDebugLog(' - - - Calculated Value: '.$value);
     
-    $patternValue = $pattern->GetValue();
+    $patternValues = $pattern->GetValue();
     
-    $fight->AddDebugLog(' - - - PatternValue: '.$patternValue);
+    $fight->AddDebugLog(' - - - PatternValue: '.$patternValues);
     
-    if($operator == 6 && $patternValue == 0)
-      return false;
+    $patternValuesORArray = explode('||', $patternValues);
     
-    switch($operator)
+    $returnValue = false;
+    foreach ($patternValuesORArray as $patternValuesOR) 
     {
-      case 0: //Weniger Als
-        $returnValue = $value < $pattern->GetValue();
+      $fight->AddDebugLog(' - - - Testing OR-Value: '.$patternValuesOR);
+      $patternValuesANDArray = explode('&&', $patternValuesOR);
+      $andValue = true;
+      foreach ($patternValuesANDArray as $patternValueAND) 
+      {
+        $fight->AddDebugLog(' - - - - Testing AND-Value: '.$patternValueAND);
+        if($operator == 6 && $patternValueAND == 0)
+        {
+          $fight->AddDebugLog(' - - - - - patternValue equal 0 at modulo');
+          $andValue = false;
+          break;
+        }
+        
+        $operatorValue = false;
+        $operatorName = '';
+        switch($operator)
+        {
+          case 0: //Weniger Als
+            $operatorValue = $value < $patternValueAND;
+            $operatorName = '<';
+            break;
+          case 1: //Weniger Gleich
+            $operatorValue = $value <= $patternValueAND;
+            $operatorName = '<=';
+            break;
+          case 2: //Gleich
+            $operatorValue = $value == $patternValueAND;
+            $operatorName = '==';
+            break;
+          case 3: //Nicht Gleich
+            $operatorValue = $value != $patternValueAND;
+            $operatorName = '!=';
+            break;
+          case 4: //Mehr als
+            $operatorValue = $value > $patternValueAND;
+            $operatorName = '>';
+            break;
+          case 5: //Mehr Gleich
+            $operatorValue = $value >= $patternValueAND;
+            $operatorName = '>=';
+            break;
+          case 6: //Modulo
+            $operatorValue = $value % $patternValueAND == 0;
+            $operatorName = '%';
+            break;
+        }
+        
+        if($operatorValue == false)
+        {
+          $andValue = false;
+          $fight->AddDebugLog(' - - - - - Value '.$value.' '.$operatorName.' patternValue '.$patternValueAND.' is false');
+          break;
+        }
+      }
+      
+      if($andValue)
+      {
+        $fight->AddDebugLog(' - - - - All andValues are true!');
+        $returnValue = true;
         break;
-      case 1: //Weniger Gleich
-        $returnValue = $value <= $pattern->GetValue();
-        break;
-      case 2: //Gleich
-        $returnValue = $value == $pattern->GetValue();
-        break;
-      case 3: //Nicht Gleich
-        $returnValue = $value != $pattern->GetValue();
-        break;
-      case 4: //Mehr als
-        $returnValue = $value > $pattern->GetValue();
-        break;
-      case 5: //Mehr Gleich
-        $returnValue = $value >= $pattern->GetValue();
-        break;
-      case 6: //Modulo
-        $returnValue = $value % $pattern->GetValue() == 0;
-        break;
+      }
     }
-    
     return $returnValue;
   }
   

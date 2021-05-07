@@ -1032,10 +1032,15 @@ else if(isset($_GET['info']) && $_GET['info'] == 'regeln')
                   <td> Es darf nur mit einen Charakter die Dragonballs gesucht werden.</td>
                 </tr>
                 <tr>
-                <tr>
                   <td>
                     <b><font color="0066FF">Nr4:</font></b></td>
                   <td> Nur Spaßkämpfe sind mit eigenen Charakteren erlaubt.</td>
+                </tr>
+                <tr>
+                <tr>
+                  <td>
+                    <b><font color="0066FF">Nr5:</font></b></td>
+                  <td> Charaktere eines Accounts dürfen zudem nicht in den selben Clan sein.</td>
                 </tr>
                 <tr>
                   <td>

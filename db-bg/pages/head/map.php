@@ -1,12 +1,13 @@
 <?php
   include_once 'classes/story/story.php';
+$planet = new Planet($database, $player->GetPlanet());
 if(isset($_GET['a']) && $_GET['a'] == 'travel')
 {
 	if(isset($_POST['destination']) && isset($_POST['planet']))
 	{
 		$name = $_POST['destination'];
-		$planet = $_POST['planet'];
-		$place = new Place($database, $name, $planet, null);
+		$destPlanet = $_POST['planet'];
+		$place = new Place($database, $name, $destPlanet, null);
 		if($place->IsValid() && $place->GetPlanet() == $player->GetPlanet())
 		{
 			if(($place->IsTravelable() || !$place->IsTravelable() && $player->GetARank() >= 2) && $place->GetName() != $player->GetPlace())

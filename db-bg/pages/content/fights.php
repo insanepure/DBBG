@@ -5,7 +5,11 @@ if(isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 0)
 {
   $start = $limit * ($_GET['page']-1);
 }
-$fightList = new Generallist($database, 'fights', '*', 'state = 2', 'id', $start.','.$limit, 'DESC');
+$canSeeTest = $player->GetARank() >= 2;
+$where = 'state = 2';
+if(!$canSeeTest)
+  $where = $where.' AND testfight=0';
+$fightList = new Generallist($database, 'fights', '*', $where, 'id', $start.','.$limit, 'DESC');
 ?>
 <div class="spacer"></div>
 <a href="?p=fight">Zurück</a>
@@ -42,36 +46,7 @@ while($entry != null)
   </td>
   <td class="boxSchatten" align="center">
     <?php
-    switch($entry['type'])
-    {
-      case 0:
-        echo 'Spaß';
-        break;
-      case 1:
-        echo 'Wertung';
-        break;
-      case 2:
-        echo 'Tod';
-        break;
-      case 3:
-        echo 'NPC';
-        break;
-      case 4:
-        echo 'Story';
-        break;
-      case 5:
-        echo 'Event';
-        break;
-      case 6:
-        echo 'Turnier';
-        break;
-      case 7:
-        echo 'Dragonball';
-        break;
-      case 8:
-        echo 'Arena';
-        break;
-    }
+    echo Fight::GetTypeName($entry['type']);
     ?>
   </td>
   <td class="boxSchatten" align="center">
@@ -92,7 +67,7 @@ $entry = $fightList->GetEntry($id);
 </table>
 
 <?php
-  $result = $database->Select('COUNT(id) as total','fights','');
+  $result = $database->Select('COUNT(id) as total','fights',$where);
   $total = 0;
   if ($result) 
   {

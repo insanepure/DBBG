@@ -1,5 +1,4 @@
 <?php
-include 'classes/clan/clan.php';
 include_once 'classes/bbcode/bbcode.php';
 
 
@@ -38,10 +37,10 @@ else if(isset($_GET['a']) && $_GET['a'] == 'join')
     }
     else
     {
-    	$clan = new Clan($database, $clanID);
-      $player->SendClanApplication($clan, $_POST['text']);
-      $clanapplication = $clan;
-      $message = 'Du hast eine Beitrittsanfrage an den Clan '.$clan->GetName().' geschickt.';
+    	$applyClan = new Clan($database, $clanID);
+      $player->SendClanApplication($applyClan, $_POST['text']);
+      $clanapplication = $applyClan;
+      $message = 'Du hast eine Beitrittsanfrage an den Clan '.$applyClan->GetName().' geschickt.';
     }
   }
 }

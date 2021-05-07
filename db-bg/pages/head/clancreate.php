@@ -1,7 +1,5 @@
 <?php
 
-include 'classes/clan/clan.php';
-
 if(isset($_GET['a']) && $_GET['a'] == 'create')
 {
 	$cost = 2000;

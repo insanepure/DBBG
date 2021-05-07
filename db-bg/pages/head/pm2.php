@@ -8,7 +8,7 @@ if(isset($_GET['p2']) && $_GET['p2'] == 'read')
     $PMManager->Read($id, $player->GetID());
   }
 }
-else if(isset($_GET['a']) && $_GET['a'] == 'action' && isset($_REQUEST['deleteID']))
+else if(isset($_GET['a']) && $_GET['a'] == 'action')
 {
   $deleteIDs = array();
   if(isset($_GET['deleteID']))
@@ -33,6 +33,10 @@ else if(isset($_GET['a']) && $_GET['a'] == 'action' && isset($_REQUEST['deleteID
     else if($_POST['action'] == 'markread')
     {
       $PMManager->ReadAllOnly($deleteIDs, $player->GetID());
+    }
+    else if($_REQUEST['action'] == 'deleteall')
+    {
+      $PMManager->DeleteAll(true, $player->GetID());
     }
   }
 }

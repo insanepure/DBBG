@@ -33,7 +33,7 @@ while($entry != null)
   $month = date('n');
   $year = date('Y');
   $isToday = Event::IsToday($player->GetPlanet(), $player->GetPlace(), $entry['placeandtime']);
-  if($isToday && $player->GetLevel() >= $entry['level'])
+  if($isToday && ($player->GetARank() >= 2 || $player->GetLevel() >= $entry['level']))
   {
 	$group = $player->GetGroup();
   $amount = 1;
@@ -112,7 +112,7 @@ while($entry != null)
               while($j <= $amount)
               {
               ?>
-              <option value="<?php echo $j; ?>"><?php echo $j; ?> Spieler</option>
+              <option value="<?php echo $j; ?>" <?php if($j == $amount) { ?> selected <?php } ?>><?php echo $j; ?> Spieler</option>
               <?php
               ++$j;
               }

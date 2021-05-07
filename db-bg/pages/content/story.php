@@ -7,7 +7,15 @@ if($story == null)
 <div class="newsspan"></div>
 <div class="newscontainer smallBG borderR borderL borderT borderB">
   <div class="SideMenuKat catGradient borderB">
-    <div class="schatten"><?php echo $story->GetTitel(); ?></div>
+    <div class="schatten">
+      <?php 
+      if($player->GetARank() >= 2)
+      {
+        echo '('.$story->GetID().') ';
+      }
+      echo $story->GetTitel(); 
+      ?>
+    </div>
   </div>
   <div class="newscontent smallBG">
     <?php

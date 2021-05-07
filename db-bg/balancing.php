@@ -9,6 +9,7 @@ $database->UpdateEnable(false);
 $showChangeOnly = isset($_GET['changeonly']);
 $updateEquippedPlayers = true;
 $slotOnly = $_GET['slot'];
+$typeOnly = $_GET['type'];
 //$database->Debug();
 ?>
 <table>
@@ -119,7 +120,7 @@ $slotOnly = $_GET['slot'];
       
       if($nAccuracy > 100) $nAccuracy = 100;
       echo '<br/>';
-      $result = $database->Update('value="'.$nValue.'", energy="'.$nEnergy.'", kp="'.$nKP.'", accuracy="'.$nAccuracy.'"','attacks','id = "'.$entry['id'].'"',1);
+      $result = $database->Update('value="'.$nValue.'", energy="'.$nEnergy.'", kp="'.$nKP.'", accuracy="'.$nAccuracy.'"','attacks','id = '.$entry['id'].'',1);
       ++$id;
       $entry = $list->GetEntry($id);
     }
@@ -458,7 +459,17 @@ if($p == 'items')
     $accessoire = 294;
     addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Vegeta
   
-    $value = 710;
+    $value = 720;
+    $level = 64;
+    $schuhe = 401;
+    $hose = 397;
+    $hemd = 400;
+    $handschuhe = 399;
+    $aura = 396;
+    $accessoire = 398;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Wald
+  
+    $value = 740;
     $level = 74;
     $schuhe = 227;
     $hose = 226;
@@ -567,13 +578,93 @@ if($p == 'items')
     addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Garlic
   
     $value = 1200;
-    $level = 102;
+    $level = 101;
     $hemd = 325;
     $hose = 328;
     $schuhe = 326;
     $handschuhe = 324;
     $aura = 327;
     addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Mecha Freezer
+  
+    $value = 1210;
+    $level = 102;
+    $hemd = 354;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Kapput Trunks
+  
+    $value = 1230;
+    $level = 102;
+    $hemd = 340;
+    $hose = 339;
+    $schuhe = 341;
+    $accessoire = 372;
+    $waffe = 342;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Trunks
+  
+    $value = 1250;
+    $level = 106;
+    $handschuhe = 408;
+    $hemd = 332;
+    $hose = 330;
+    $schuhe = 331;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //C19
+  
+    $value = 1305;
+    $level = 111;
+    $hemd = 454;
+    $hose = 453;
+    $schuhe = 455;
+    $accessoire = 452;
+    $waffe = 457;
+    $aura = 456;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //C17
+  
+    $value = 1305;
+    $level = 111;
+    $hemd = 464;
+    $hose = 465;
+    $schuhe = 463;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //C18
+  
+    $value = 1305;
+    $level = 111;
+    $hemd = 461;
+    $hose = 460;
+    $schuhe = 462;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //C16
+  
+    $value = 1305;
+    $level = 111;
+    $handschuhe = 466;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //C18
+  
+    $value = 1305;
+    $level = 111;
+    $handschuhe = 458;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //C16
+  
+    $value = 1305;
+    $level = 111;
+    $handschuhe = 459;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //C16
+  
+    $value = 1330;
+    $level = 115;
+    $hemd = 469;
+    $handschuhe = 471;
+    $hose = 470;
+    $schuhe = 468;
+    $aura = 467;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Imperfect
+  
+    $value = 1380;
+    $level = 125;
+    $hemd = 474;
+    $handschuhe = 476;
+    $hose = 475;
+    $schuhe = 473;
+    $aura = 472;
+    addSet($sets, $value, $level, $schuhe, $hose, $hemd, $handschuhe, $waffe, $aura, $accessoire); //Imperfect
+  
     
     ?>
     <table>
@@ -632,7 +723,7 @@ if($p == 'items')
       
       $previousSlotArray[$slot] = $value;
       
-      if(isset($slotOnly) && $slotOnly != $slot || ($showChangeOnly && $value == $preValue && $price == $entry['price'] && $arenaPoints == $entry['arenapoints']))
+      if(isset($typeOnly) && $typeOnly != $type || isset($slotOnly) && $slotOnly != $slot || ($showChangeOnly && $value == $preValue && $price == $entry['price'] && $arenaPoints == $entry['arenapoints']))
       {
         ++$id;
         $entry = $list->GetEntry($id);
@@ -674,38 +765,38 @@ if($p == 'items')
       echo '</td>';
       
       echo '<td>';
-      echo $price;
-      echo '</td>';
-      
-      echo '<td>';
       echo $entry['price'];
       echo '</td>';
       
       echo '<td>';
-      echo $arenaPoints;
+      echo $price;
       echo '</td>';
       
       echo '<td>';
       echo $entry['arenapoints'];
       echo '</td>';
       
+      echo '<td>';
+      echo $arenaPoints;
+      echo '</td>';
+      
       echo '</tr>';
       
       
       
-      $result = $database->Update('value="'.$value.'",price="'.$price.'",arenapoints="'.$arenaPoints.'"','items','id = "'.$entry['id'].'"',1);
+      $result = $database->Update('value="'.$value.'",price="'.$price.'",arenapoints="'.$arenaPoints.'"','items','id = '.$entry['id'].'',1);
       
-      if($updateEquippedPlayers)
+      if($preValue != $value && $updateEquippedPlayers)
       {
-        $where2 = 'statsid="'.$entry['id'].'" AND equipped="1"';
+        $where2 = 'statsid='.$entry['id'].' AND equipped=1';
         $list2 = new Generallist($database, 'inventory', '*', $where2, 'id', 99999, 'ASC');
         $id2 = 0;
         $entry2 = $list2->GetEntry($id2);
         while($entry2 != null)
         {
           echo '- Equipped by: '.$entry2['ownerid'].'<br/>';
-          $result = $database->Update('equipped="0"','inventory','ownerid = "'.$entry2['ownerid'].'"',9999999);
-          $result = $database->Update('equippedstats=""','accounts','id = "'.$entry2['ownerid'].'"',1);
+          $result = $database->Update('equipped=0','inventory','ownerid = '.$entry2['ownerid'].'',9999999);
+          $result = $database->Update('equippedstats=""','accounts','id = '.$entry2['ownerid'].'',1);
           ++$id2;
           $entry2 = $list2->GetEntry($id2);
         }
@@ -728,7 +819,7 @@ else if($p == 'itemrework')
     //{
     //
     //  $row = null;
-    //  $result = $database->Select('*','items','id = "'.$entry['statsid'].'"',1);
+    //  $result = $database->Select('*','items','id = '.$entry['statsid'].'',1);
     //  if ($result) 
     //  {
     //    if ($result->num_rows > 0)
@@ -862,7 +953,7 @@ else if($p == 'story')
         $kis += $npc->GetKI();
         if($names != '')
           $names = $names.', ';
-        $names = $names.$npc->GetName().' ('.$npc->GetLevel().')';
+        $names = $names.$npc->GetName().' ('.$npc->GetID().') Level '.$npc->GetLevel();
       }
       
       $kis = $kis / count($npcs);

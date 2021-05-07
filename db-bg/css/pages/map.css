@@ -10,6 +10,7 @@
 
 .mapplace
 {
+  z-index:1; 
   position:absolute;
   width:13px;
   height:20px;
@@ -19,6 +20,7 @@
 
 .mapplaceevent
 {
+  z-index:1; 
   position:absolute;
   width:13px;
   height:20px;
@@ -28,6 +30,7 @@
 
 .mapplacestory
 {
+  z-index:1; 
   position:absolute;
   width:13px;
   height:20px;
@@ -36,5 +39,6 @@
 }
 .mapcharacter
 {
+  z-index:0; 
   position:absolute;
 }

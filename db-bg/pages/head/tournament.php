@@ -94,6 +94,7 @@ else if(isset($_GET['a']) && $_GET['a'] == 'fight' && $player->GetTournament() !
                                          $survivalteam, $survivalrounds, $survivalwinner, $event, $healing, $eventfight, $pTournament->GetID());
       
       $createdFight->Join($other, 1, $fighter->IsNPC());
+      $createdFight->Join($player, 0, false);
       if($createdFight->IsStarted())
         header('Location: ?p=infight');
 			exit();

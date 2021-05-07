@@ -1,6 +1,5 @@
 <?php
 include_once 'classes/bbcode/bbcode.php';
-include_once 'classes/clan/clan.php';
 $inventory = $player->GetInventory();
 
 if(isset($_GET['a']) && $_GET['a'] == 'combine')
@@ -186,13 +185,17 @@ else if(isset($_GET['a']) && $_GET['a'] == 'unequip')
   }
 }
 
-function ShowSlotEquippedImage($slot, $inventory, $zindex)
+function ShowSlotEquippedImage($slot, $inventory, $zorders, $zordersOnTop)
 {
   $item = $inventory->GetItemAtSlot($slot);
   if($item != null)
   {
+   if($item->IsOnTop())
+     $zindex = $zordersOnTop[$slot];
+    else
+      $zindex = $zorders[$slot];
 		?> 
-		<div class="char2" style="z-index:<?php echo $zindex; ?>; background-image:url('img/ausruestung/<?php echo $item->GetEquippedImage(); ?>.png')"></div>
+		<div class="char2" style="z-index:<?php echo $zindex; ?>; background-image:url('img/ausruestung/<?php echo $item->GetEquippedImage(); ?>')"></div>
 		<?php
   }
 }
@@ -205,7 +208,16 @@ function ShowSlot($slot, $inventory)
     ?>
     <font size="2"><?php echo $item->GetName(); ?></font>
     <div class="spacer"></div>
-    <img class="boxSchatten borderT borderR borderL borderB" src="/img/items/<?php echo $item->GetImage(); ?>.png" style="width:50px;height:50px;"></img>
+      <div style="width:50px; height:50px; position:relative; top:-5px; left:-25px;">
+        <?php if($item->HasOverlay())
+        {
+          ?>
+        <img class="boxSchatten borderT borderR borderL borderB" src="img/items/<?php echo $item->GetOverlay(); ?>.png" style="width:50px;height:50px; position:absolute; z-index:1;"> 
+          <?php
+        }
+        ?>
+        <img class="boxSchatten borderT borderR borderL borderB" src="img/items/<?php echo $item->GetImage(); ?>.png" style="width:50px;height:50px; position:absolute; z-index:0;"> 
+      </div>
 				<form method="POST" action="?p=ausruestung&a=unequip">
 				<input type="hidden" name="slot" value="<?php echo $slot; ?>">
 				<input type="hidden" name="item" value="<?php echo $item->GetID(); ?>">

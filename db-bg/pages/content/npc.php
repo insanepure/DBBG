@@ -23,12 +23,47 @@ $entry = $npcList->GetEntry($id);
 $npcs = $place->GetNPCs();
 while($entry != null)
 {
-  if(in_array($entry['id'], $npcs) && $player->GetLevel() >= $entry['level'])
+  if(in_array($entry['id'], $npcs) && ($player->GetARank() >= 2 || $player->GetLevel() >= $entry['level']))
   {
   ?>
   <tr>
     <td class="boxSchatten"><center><b><?php if($player->GetArank() == 3){echo $entry['name'];} ?></b><img src="img/npc/<?php echo $entry['image']; ?>.png" style="width:100%;height:100%;"></center></td>
-    <td class="boxSchatten"><center><?php echo $bbcode->parse($entry['description']); ?></center></td>
+    <td class="boxSchatten"><center>
+      <?php echo $bbcode->parse($entry['description']); ?><br/>
+      <b><?php
+      $typefight = 3; //NPC
+      $titels = $titelManager->GetTitelsOfNPC($entry['id'], $typefight); 
+      $hasTitel = count($titels) != 0;
+      $lowestTitel = null;
+      $i = 0;
+      for($i = 0; $i < count($titels); ++$i)
+      {
+        $titel = $titels[$i];
+        if(!$player->HasTitel($titel->GetID()))
+        {
+          if($lowestTitel == null || $lowestTitel->GetCondition() > $titel->GetCondition())
+            $lowestTitel = $titel;
+        }
+      }
+      
+      if(!$hasTitel)
+      {
+        ?>Dieser NPC hat keine Titel<?php
+      }
+      else if($lowestTitel != null)
+      {
+        $titelProgress = $titelManager->LoadProgress($player->GetID(), $lowestTitel->GetID());
+        $progress = 0;
+        if(isset($titelProgress))
+          $progress = $titelProgress['progress'];
+        ?>Nächster Titel: <?php echo $progress.'/'.$lowestTitel->GetCondition(); 
+      }
+      else
+      {
+        ?>Du hast alle Titel<?php
+      }
+      ?>
+      </b></center></td>
     <td class="boxSchatten">
       <center>
       <?php

@@ -136,6 +136,10 @@ if($pages != 1)
         <button type="submit" name ="action" value="markread">
         Ungelesene als gelesen markieren
         </button>
+        <br/><br/> 
+        <button type="submit" name ="action" value="deleteall">
+        Alle löschen
+        </button>
     </tr>
 </table>
 </form>
@@ -254,7 +258,7 @@ else if(isset($_GET['p2']) && $_GET['p2'] == 'read')
       }
       else
       {
-        echo $bbcode->parse($pm->GetText()); 
+        echo $bbcode->parse(htmlspecialchars_decode($pm->GetText())); 
       }
       ?>
     </td>

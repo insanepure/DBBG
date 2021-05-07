@@ -1,7 +1,7 @@
 <?php
 if(!isset($fight) || $fight->IsEnded())
 {
-  include 'main.php';
+  include_once 'main.php';
 }
 else
 {

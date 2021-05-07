@@ -21,7 +21,7 @@ class Skill
   
   private function LoadData($id)
   {
-		$result = $this->database->Select('*','skilltree','id="'.$id.'"',1);
+		$result = $this->database->Select('*','skilltree','id='.$id.'',1);
 		if ($result) 
 		{
 			if ($result->num_rows > 0)

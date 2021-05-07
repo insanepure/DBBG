@@ -128,7 +128,16 @@ grecaptcha.ready(function() {
     ?>
   <tr>
     <td class="borderT" style ="boxSchatten" align="center"> 
-      <img class="boxSchatten borderT borderR borderL borderB" src="img/items/<?php echo $marketItem->GetImage(); ?>.png" style="width:50px;height:50px;"> 
+      <div style="width:50px; height:50px; position:relative; top:0px; left:-25px;">
+        <?php if($marketItem->HasOverlay())
+        {
+          ?>
+        <img class="boxSchatten borderT borderR borderL borderB" src="img/items/<?php echo $marketItem->GetOverlay(); ?>.png" style="width:50px;height:50px; position:absolute; z-index:1;"> 
+          <?php
+        }
+        ?>
+        <img class="boxSchatten borderT borderR borderL borderB" src="img/items/<?php echo $marketItem->GetImage(); ?>.png" style="width:50px;height:50px; position:absolute; z-index:0;"> 
+      </div>
       <input type="hidden" name="id" value="<?php echo $i; ?>">
     </td>
     <td class="borderT" style ="boxSchatten" align="center"> <b><?php echo $marketItem->GetName(); ?></b> </td>
@@ -136,7 +145,7 @@ grecaptcha.ready(function() {
       echo $marketItem->DisplayEffect(); 
       if($marketItem->GetLevel() != 0) echo 'Benötigt Level '.$marketItem->GetLevel();  ?> </td>
         <td class="borderT" style ="boxSchatten" align="center"> <a href="?p=profil&id=<?php echo $marketItem->GetSellerID(); ?>"><?php echo $marketItem->GetSeller(); ?></a></td>
-    <td class="borderT" wstyle ="boxSchatten" align="center"> <?php echo $marketItem->GetPrice(); ?> Zeni </td>
+    <td class="borderT" wstyle ="boxSchatten" align="center"> <?php echo number_format($marketItem->GetPrice(), 0, ',', '.'); ?> Zeni </td>
     <td class="borderT" style ="boxSchatten"> 
       <?php if($marketItem->GetSellerID() == $player->GetID())
       {

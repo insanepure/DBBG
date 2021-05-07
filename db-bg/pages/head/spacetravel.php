@@ -1,5 +1,10 @@
 <?php
-if(isset($_GET['a']) && $_GET['a'] == 'travel')
+if($player->GetPlanet() == 'Jenseits')
+{
+	header('Location: ?p=index');
+  exit();
+}
+if(isset($_GET['a']) && $_GET['a'] == 'travel' || isset($_GET['a']) && $_GET['a'] == 'teleport')
 {
 	if(isset($_POST['destination']) )
 	{
@@ -10,7 +15,11 @@ if(isset($_GET['a']) && $_GET['a'] == 'travel')
     else
     {
 		  $planet = new Planet($database, $_POST['destination']);
-      if($planet == null || !$planet->CanSee($player->GetStory()))
+      if($player->IsTimeTravelled())
+      {
+        $message = 'Du musst zunächst in die Gegenwart reisen.';
+      }
+      else if($planet == null || !$planet->CanSee($player->GetStory()))
       {
         $message = 'Dieser Planet existiert nicht.';
       }
@@ -32,10 +41,6 @@ if(isset($_GET['a']) && $_GET['a'] == 'travel')
 				{
 					$message = 'Du tust bereits etwas.';
 				}
-
-        
-
-
         else
         {
 					$playerPlanet = new Planet($database, $player->GetPlanet());
@@ -50,10 +55,31 @@ if(isset($_GET['a']) && $_GET['a'] == 'travel')
           {
             $travelTime = 10;
           }					
-          $travelActionID = 67;
-          $action = $actionManager->GetAction($travelActionID);
-					$player->TravelPlanet($planet->GetName(), $travelTime, $action);
-          $message = 'Du reist nun nach '.$planet->GetName().'.';
+          if($_GET['a'] == 'travel')
+          {
+            $travelActionID = 67;
+            $action = $actionManager->GetAction($travelActionID);
+            $player->TravelPlanet($planet->GetName(), $travelTime, $action);
+            $message = 'Du reist nun nach '.$planet->GetName().'.';
+          }		
+          else if($_GET['a'] == 'teleport')
+          {
+            $cost = $travelTime;
+            if(!$player->CanTeleport())
+            {
+              $message = 'Du kannst die Momentane Teleportation nicht.';
+            }
+            else if($player->GetKP() < $cost)
+            {
+              $message = 'Du benötigst '.$cost.' KP zum Teleportieren.';
+            }
+            else
+            {
+              $playerPlanet = new Planet($database, $player->GetPlanet());
+              $player->Teleport($planet->GetName(), $planet->GetStartingPlace(), $cost);
+              $message = 'Du hast dich zu den Planeten '.$planet->GetName().' teleportiert.';
+            }
+          }
         }
       }
     }

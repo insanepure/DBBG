@@ -93,6 +93,11 @@ class Action
     return $this->data['stats'];
   }
   
+  public function GetSkillPoints()
+  {
+    return $this->data['skillpoints'];
+  }
+  
   public function GetPlace()
   {
     return $this->data['place'];

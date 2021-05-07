@@ -136,25 +136,21 @@ else if(isset($_GET['a']) && $_GET['a'] == 'sell')
 		else
 		{
 			$i = 0;
-			if(!$item->IsSellable())
+			if(!$item->IsMarketSellable())
 			{
-				$message = 'Das Item kann nicht verkauft werden.';
+				$message = 'Das Item kann nicht auf den Markt verkauft werden.';
 			}
       else if($item->IsEquipped())
       {
         $message = 'Ein ausgerüstet Item kannst du nicht verkaufen.';
       }
-			else if($price < $itemPrice/2)
-			{
-				$message = 'Der Preis ('.$price.') darf nicht geringer sein als die Hälfte ('.($itemPrice/2).').';				
-			}
-			else if($price > $itemPrice*2)
-			{
-				$message = 'Der Preis darf nicht höher sein als das Doppelte.';				
-			}
 			else if($item->GetAmount() < $amount)
 			{
 				$message = 'Du besitzt nicht genügend davon.';
+			}
+			else if($market->HasItemInside($item->GetStatsID(), $item->GetVisualID(), $item->GetStatsType(), $item->GetUpgrade(), $player->GetID()))
+			{
+				$message = 'Du hast so ein Item schom im Markt.';
 			}
 			else
 			{

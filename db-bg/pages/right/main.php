@@ -66,7 +66,7 @@ if ($player->IsLogged())
 					</div>
 					<div class="spacer"></div>
 					<div class="info smallBG borderT borderB borderR borderL boxSchatten">Zeni:
-						<?php echo $player->GetZeni(); ?>
+            <?php echo number_format($player->GetZeni(), 0, ',', '.'); ?>
 					</div>
 					<div class="spacer"></div>
 					<div class="info smallBG borderT borderB borderR borderL boxSchatten">Planet:
@@ -114,7 +114,7 @@ if ($player->IsLogged())
             if($action->GetType() == 5)
             {
 			        $attackName = 'invalidAttack';
-              $result = $database->Select('id, name','attacks','id = "'.$player->GetLearningAttack().'"',1);
+              $result = $database->Select('id, name','attacks','id = '.$player->GetLearningAttack().'',1);
               $attackID = 0;
               if ($result) 
               {
@@ -196,11 +196,11 @@ if ($player->IsLogged())
 					{
 						if($where == '')
 						{
-							$where = 'id = "'.$group[$i].'"';
+							$where = 'id = '.$group[$i].'';
 						}
 						else
 						{
-							$where = $where.' OR id = "'.$group[$i].'"';
+							$where = $where.' OR id = '.$group[$i].'';
 						}
 						++$i;
 					}
@@ -259,9 +259,21 @@ if ($player->IsLogged())
 						</div>
 					</div>
 					<div class="SideMenuInfo borderB borderR">
-						Version: 0.1<br> Spieler Online:
-						<?php echo $gameData->GetOnline(); ?><br> Spieler:
-						<?php echo $gameData->GetTotal(); ?><br> <?php $clanCount = $gameData->GetClans(); if($clanCount == 1) echo 'Clan: ' . $clanCount; else echo 'Clans: ' . $clanCount; ?><br>
+						Version: 0.1<br> 
+            Spieler Online: <?php echo $gameData->GetOnline(); ?><br> 
+            Spieler: <?php echo $gameData->GetTotal(); ?><br> 
+            <?php if($player != null && $player->IsLogged() && $player->GetARank() > 0)
+            {
+              ?>
+              Unique Online: <?php echo $gameData->GetUniqueOnline(); ?><br> 
+              Unique: <?php echo $gameData->GetUniqueTotal(); ?><br> 
+              <?php
+            }
+            ?>
+            <?php $clanCount = $gameData->GetClans(); if($clanCount == 1) echo 'Clan: ' . $clanCount; else echo 'Clans: ' . $clanCount; ?><br>
+					<a id="no-link" href="?p=changelog">
+						<div style="cursor:pointer;" class="SideMenuButton borderT">Changelog</div>
+					</a>
 
 					</div>
 				</div>
@@ -275,20 +287,6 @@ if ($player->IsLogged())
 else
 {
 ?>
-					<div class="SideMenuContainer borderL borderR">
-						<div class="SideMenuKat catGradient borderB borderT">
-							<div class="schatten">
-								<div class="schatten">Vote</div>
-							</div>
-						</div>
-						<div class="SideMenuInfo borderB borderR">
-							<div class="spacer"></div>
-							<a id="no-link" title="dragonball,browsergame" href="http://de.mmofacts.com/dbbg-das-online-browsergame-7363#track" target="_blank"><img src="img/mmofacts.png" width="120" height="30" alt="dragonball,browsergame" title="dragonball,browsergame"/></a>
-							<a id="no-link" title="dragonball,browsergame" href="https://www.webwiki.de/db-bg.de" target="_blank"><img src="img/webwiki.png" width="120" height="30" alt="dragonball,browsergame"  title="dragonball,browsergame"/></a>
-							<a id="no-link" title="dragonball,browsergame" href="https://www.browsergames.info" target="_blank"><img src="img/browsergames.png" width="120" height="30" alt="dragonball,browsergame" title="dragonball,browsergame"/></a>
-							<div class="spacer"></div>
-						</div>
-					</div>
 					<div class="spacer"></div>
 					<div class="SideMenuContainer borderL borderR">
 						<div class="SideMenuKat catGradient borderB borderT">
@@ -353,6 +351,9 @@ if($player->GetArank() >= 2)
 										<a id="no-link" href="?p=admin">
 											<div style="cursor:pointer;" class="SideMenuButton borderB">Admin Menu</div>
 										</a>
+										<a id="no-link" href="?p=adminmain">
+											<div style="cursor:pointer;" class="SideMenuButton borderB">Main Menu</div>
+										</a>
 										<a id="no-link" href="?p=adminlog">
 											<div style="cursor:pointer;" class="SideMenuButton borderB">Admin Log</div>
 										</a>
@@ -361,6 +362,9 @@ if($player->GetArank() >= 2)
 										</a>
 										<a id="no-link" href="?p=adminmod">
 											<div style="cursor:pointer;" class="SideMenuButton borderB">Moderation</div>
+										</a>
+										<a id="no-link" href="?p=admininteractions">
+											<div style="cursor:pointer;" class="SideMenuButton borderB">Interaktionen</div>
 										</a>
 	<?php
 }

@@ -19,8 +19,8 @@ class NewsManager
     $this->LoadNews($num);
 	}
   
-	public function Post($player, $id, $text)
-	{
+  public function GetNewsByID($id)
+  {
 		$newsCount = $this->GetNewsCount();
 		$currentNews = null;
 		for ($i = 0; $i < $newsCount; $i++) 
@@ -31,13 +31,15 @@ class NewsManager
 				$currentNews = $news;
 				break;
 			}
-			++$i;
 		}
-		
+    return $currentNews;
+  }
+  
+	public function Post($player, $id, $text)
+	{
+		$currentNews = $this->GetNewsByID($id);
 		if($currentNews == null)
-		{
 			return 0;
-		}
 		
 		if(!preg_match("/^[A-Za-z0-9,.\+\-!:;()\s?äöüÄÖÜ]+$/", $text))
 		{
@@ -51,10 +53,48 @@ class NewsManager
 		$currentNews->AddComment($comment);
 		
 		$commentsString = $currentNews->GetCommentsString();
-		$result = $this->database->Update('kommentare="'.$commentsString.'"','News','id = "'.$id.'"',1);
+		$result = $this->database->Update('kommentare="'.$commentsString.'",likes="'.$currentNews->GetLikesString().'", dislikes="'.$currentNews->GetDisLikesString().'"','News','id = '.$id.'',1);
 		
 		return 1;
 	}
+  
+	public function Like($accountID, $id)
+	{
+		$currentNews = $this->GetNewsByID($id);
+		if($currentNews == null)
+    {
+			return 0;
+    }
+    
+    $currentNews->RemoveLike($accountID);    
+    $currentNews->RemoveDisLike($accountID);
+    $currentNews->AddLike($accountID);
+		$result = $this->database->Update('likes="'.$currentNews->GetLikesString().'", dislikes="'.$currentNews->GetDisLikesString().'"','News','id = '.$id.'',1);
+  }
+  
+	public function DisLike($accountID, $id)
+	{
+		$currentNews = $this->GetNewsByID($id);
+		if($currentNews == null)
+			return 0;
+    
+    $currentNews->RemoveLike($accountID);    
+    $currentNews->RemoveDisLike($accountID);
+    $currentNews->AddDisLike($accountID);
+		$result = $this->database->Update('likes="'.$currentNews->GetLikesString().'", dislikes="'.$currentNews->GetDisLikesString().'"','News','id = '.$id.'',1);
+  }
+  
+	public function RemoveLikes($accountID, $id)
+	{
+		$currentNews = $this->GetNewsByID($id);
+		if($currentNews == null)
+			return 0;
+    
+    $currentNews->RemoveLike($accountID);    
+    $currentNews->RemoveDisLike($accountID);
+		$result = $this->database->Update('likes="'.$currentNews->GetLikesString().'", dislikes="'.$currentNews->GetDisLikesString().'"','News','id = '.$id.'',1);
+  }
+  
   private function LoadNews($num)
   {
 		$result = $this->database->Select('*','News','',$num,'id','DESC');

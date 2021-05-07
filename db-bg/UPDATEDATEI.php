@@ -84,7 +84,7 @@ else if($page == 'deleteaccs')
 						{
 							if($clan->GetMembers() == 1)
 							{
-								$this->database->Delete('clans','id = "'.$clan->GetID().'"',1);
+								$this->database->Delete('clans','id = '.$clan->GetID().'',1);
 							}
 							else
 							{
@@ -119,9 +119,10 @@ else if($page == 'update')
 	$database->Truncate('registers');
 	$database->Truncate('arenafighter');
 
-	$database->Update('lp=mlp, kp=mkp, fight="0", dailyfights="0", dailynpcfights="0", challengefight="0", debuglog=""','accounts','',999999999999);
+	$database->Update('lp=mlp, kp=mkp, fight=0, dailyfights=0, dailynpcfights=0, challengefight=0, debuglog=""','accounts','',999999999999);
 	$database->Update('apetail=apetail+1','accounts','apetail != 0 AND apetail != 3',999999999999);
 	$database->Update('finishedplayers=""','events','dailyreset="1"',999999999999);
+	$database->Delete('pms',' time < NOW() - INTERVAL 30 DAY',9999999999);
 
   $titelManager = new titelManager($database);
   foreach($titelManager->GetTitels() as &$titel)
@@ -169,7 +170,7 @@ else if($page == 'update')
     if($entry != null)
     {
       echo $entry['name'].' ('.$entry['acc'].') erhält mit '.$entry[$sort].': '.$titel->GetName().'<br/>';
-      $result = $database->Select('*','accounts','id="'.$entry['acc'].'"',1);
+      $result = $database->Select('*','accounts','id='.$entry['acc'].'',1);
       if ($result) 
       {
         if ($result->num_rows > 0)
@@ -187,7 +188,7 @@ else if($page == 'update')
           {
             array_push($titels, $titel->GetID());
             $titels = implode(';',$titels);
-	          $database->Update('titels="'.$titels.'"','accounts','id="'.$entry['acc'].'"',1);
+	          $database->Update('titels="'.$titels.'"','accounts','id='.$entry['acc'].'',1);
             
             echo ' - erfolgreich hinzugefügt.<br/>';
           }
@@ -219,7 +220,7 @@ else if($page == 'ranking')
 				$id = $row['id'];
 				$members = $row['members'];
         echo $members;
-				$result2 = $database->Select('((mlp/10)+(mkp/10)+attack+defense)/4 as total','accounts','clan="'.$id.'" AND arank = "0" AND banned = "0"', 9999999);
+				$result2 = $database->Select('((mlp/10)+(mkp/10)+attack+defense)/4 as total','accounts','clan="'.$id.'" AND arank = 0 AND banned = 0', 9999999);
 				$total = 0;
       	while($row2 = $result2->fetch_assoc()) 
 				{	
@@ -231,7 +232,7 @@ else if($page == 'ranking')
           $total2 = 0;
         }
 				$result2->close();
-				$database->Update('memberki="'.$total2.'"','clans','id="'.$id.'"',1);
+				$database->Update('memberki="'.$total2.'"','clans','id='.$id.'',1);
 			}
 		}
 		$result->close();

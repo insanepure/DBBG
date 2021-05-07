@@ -1,6 +1,9 @@
 <?php
 $select = "fights.*, GROUP_CONCAT(CONCAT(fighters.acc,';',fighters.name,';',fighters.team,';',fighters.isnpc) ORDER BY fighters.team SEPARATOR '@') as fighters";
+$canSeeTest = $player->GetARank() >= 2;
 $where = 'fights.id = fighters.fight';
+if(!$canSeeTest)
+  $where = $where.' AND testfight=0';
 $order = 'state, id, fighters.team';
 $join = 'fighters';
 $from = 'fights';
@@ -14,12 +17,13 @@ $currentID = 0;
 //preSort the arrays, so that we can easily show them
 $id = 0;
 $entry = $list->GetEntry($id);
+$planet = new Planet($database, $player->GetPlanet());
 while($entry != null)
 {
   if($entry['challenge'] != 0 && $player->GetFight() == $entry['id'] ||
      $entry['event'] != 0 && $player->GetFight() == $entry['id'] ||
     $entry['challenge'] == 0 && $entry['state'] == 0 && $entry['event'] == 0 && 
-     ($entry['type'] != 3 && $entry['type'] != 4 || ($entry['type'] == 3 || $entry['type'] == 4) && $entry['place'] == $player->GetPlace() && $entry['planet'] == $player->GetPlanet()))
+     ($planet->IsSamePlanet($entry['planet']) || $entry['type'] == 0))
   {
     $openFights[$openID] = $entry;
     $openID++;
@@ -45,36 +49,7 @@ function ShowEntry($entry, $player)
   </td>
   <td width="15%" class="boxSchatten" align="center">
     <?php
-    switch($entry['type'])
-    {
-      case 0:
-        echo 'Spaß';
-        break;
-      case 1:
-        echo 'Wertung';
-        break;
-      case 2:
-        echo 'Tod';
-        break;
-      case 3:
-        echo 'NPC';
-        break;
-      case 4:
-        echo 'Story';
-        break;
-      case 5:
-        echo 'Event';
-        break;
-      case 6:
-        echo 'Turnier';
-        break;
-      case 7:
-        echo 'Dragonball';
-        break;
-      case 8:
-        echo 'Arena';
-        break;
-    }
+    echo Fight::GetTypeName($entry['type']);
     ?>
   </td>
   <td width="15%" class="boxSchatten" align="center">

@@ -11,7 +11,8 @@ if(isset($fight) && $fight->IsStarted())
   $attackCode = '';
   if($pFighter != null)
   {
-	  $pFighter->CalculateItemAttacks($itemManager);
+    if($fight->GetRound() >= 100)
+      $pFighter->AddAttack(606);
     $attackCode = $pFighter->GetAttackCode();
   }
 	
@@ -63,6 +64,16 @@ else if(isset($_GET['fight']))
 {
   $fight = new Fight($database, $_GET['fight'], $player, $actionManager);
 }
+
+if(isset($fight) && $fight->IsStarted())
+{
+  $teams = $fight->GetTeams();
+}
+else if(!isset($fight) || !$fight->IsStarted())
+{
+	header('Location: ?p=news');
+	exit();  
+}
     
 if(isset($_GET['a']) && $_GET['a'] == 'meld' && $fight != null && $player->GetName() != 'Google')
 {
@@ -70,27 +81,6 @@ if(isset($_GET['a']) && $_GET['a'] == 'meld' && $fight != null && $player->GetNa
   $fight->DebugSend(false, $title);
   $message = 'Du hast den Kampf gemeldet.';
 }
-
-if(!isset($fight) || $fight->IsStarted() == false)
-{
-if(!isset($_POST['kampfid']))
-{
-	$test23 = $_GET['kampfid'];
-}
-else
-{
-	$test23 = $_POST['kampfid'];
-}
-if(!isset($test23))
-{
-		header("Location: ?p=news");
-}
-else
-{
-		header("Location: ?p=infight&fight=".$test23);
-}
-}
-$teams = $fight->GetTeams();
 
 function interpolateColor($corA, $corB, $lerp)
 {

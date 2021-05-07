@@ -16,7 +16,17 @@ if($item == null)
 if($item->GetSellerID() == $player->GetID())
   exit();
 ?>
-<img src="img/items/<?php echo $item->GetImage(); ?>.png"></img><br/>
+<div style="width:100px; height:100px; position:relative; top:0px; left:0px;">
+  <?php if($item->HasOverlay())
+  {
+    ?>
+<img src="img/items/<?php echo $item->GetOverlay(); ?>.png" style="left:0px; top:0px; position:absolute; z-index:1;"></img><br/> 
+    <?php
+  }
+  ?>
+<img src="img/items/<?php echo $item->GetImage(); ?>.png" style="left:0px; top:0px; position:absolute; z-index:0;"></img><br/> 
+  </div>
+<br/>
 <?php 
 echo '<b>'.$item->GetName().'</b><br/>'; 
 echo $item->GetDescription();

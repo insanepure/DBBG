@@ -12,6 +12,12 @@ function SetCell(cell, url)
   xhttp.send();
 }
 
+function ChangeEdit(documentName, baseUrl, selectedObject)
+{
+  var selectedID = selectedObject.value;
+  document.getElementById(documentName).href = baseUrl+selectedID;
+}
+
 function AddTableRow(tablename, cells)
 {
   var table = document.getElementById(tablename);
@@ -19,12 +25,22 @@ function AddTableRow(tablename, cells)
   var row = table.insertRow(-1);
   for (i = 0; i < cells; i++) 
   { 
-    SetCell(row.insertCell(i), "../pages/adminJS.php?table="+tablename+"&row="+rowIndex+"&cell="+i)
+    SetCell(row.insertCell(i), "../pages/adminJS.php?table="+tablename+"&row="+rowIndex+"&cell="+i);
   }
+  SetCell(row.insertCell(cells), "../pages/adminJS.php?table="+tablename+"&row="+rowIndex+"&cell="+cells+"&delete");
 }
 
-function RemoveTableRow(tablename)
+function RemoveTableRow(elem)
 {
-  var table = document.getElementById(tablename);
-  table.deleteRow(-1);
+  var table = elem.parentNode.parentNode.parentNode;
+  var rowCount = table.rows.length;
+
+  if(rowCount === 1) {
+    alert('Cannot delete the last row');
+    return;
+  }
+
+  // get the "<tr>" that is the parent of the clicked button
+  var row = elem.parentNode.parentNode; 
+  row.parentNode.removeChild(row); // remove the row
 }

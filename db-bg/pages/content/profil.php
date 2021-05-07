@@ -1,19 +1,5 @@
 <?php
-$zorders = array();
-$zorders['aura'] = 0;
-$zorders['weapon'] = 1;
-$zorders['saiyatail'] = 2;
-$zorders['holyshine'] = 3;
-$zorders['body'] = 4;
-$zorders['schuhe'] = 5;
-$zorders['hose'] = 6;
-$zorders['hand'] = 6;
-$zorders['brust'] = 7;
-$zorders['reise'] = 8;
-$zorders['accessoire'] = 8;
-$zorders['clan'] = 9;
-$zorders['tooltip'] = 10;
-
+include_once 'pages/itemzorder.php';
 
 $displayedPlayer = null;
 $displayedAccount = null;
@@ -30,10 +16,23 @@ if(!isset($displayedPlayer) || isset($displayedPlayer) && !$displayedPlayer->IsV
   $isLocalPlayer = true;
 }
 $inventory = $displayedPlayer->GetInventory();
-$clan = null;
+$displayedClan = null;
 if($displayedPlayer->GetClan() != 0)
 {
-	$clan = new Clan($database, $displayedPlayer->GetClan());
+	$displayedClan = new Clan($database, $displayedPlayer->GetClan());
+}
+
+
+  
+$titel = $titelManager->GetTitel($displayedPlayer->GetTitel());
+$titelText = '';
+if($titel != null)
+{
+  $titelText = $titel->GetName();
+  if($titel->GetColor() != '')
+  {
+    $titelText = '<font color="#'.$titel->GetColor().'">'.$titelText.'</font>';
+  }
 }
 ?>
 <div style="height:600px; position:relative;">
@@ -42,7 +41,7 @@ if($displayedPlayer->GetClan() != 0)
 <center>
 <table width="100%" cellspacing="0" border="0">
   <tr>
-    <td class="catGradient borderB borderT" colspan="6" align="center"> <b>&#187; <?php echo $displayedPlayer->GetName(); ?> &#171;</b></td>
+    <td class="catGradient borderB borderT" colspan="6" align="center"> <b>&#187; <?php echo $titelText.' '.$displayedPlayer->GetName(); ?> &#171;</b></td>
   </tr>
 </table>   
 </center>
@@ -66,7 +65,7 @@ if($displayedPlayer->GetClan() != 0)
   {
 		  $money = $displayedPlayer->GetZeni();
   ?>
-  <b>Zeni:</b> <?php echo $money ; ?><br/>
+  <b>Zeni:</b> <?php echo number_format($money, 0, ',', '.'); ?><br/>
   <?php
   }
   ?>
@@ -157,53 +156,57 @@ if($displayedPlayer->GetClan() != 0)
 </div>
 
 				<?php 
-if($clan != null)
+if($displayedClan != null)
 {
 ?>
 <div class="profileBox boxSchatten"  style="position:absolute; left:15px; top:390px; width:250px; height:110px;">  
 <center>
 <table width="100%" cellspacing="0" border="0">
   <tr>
-    <td class="catGradient borderB borderT" colspan="6" align="center"> <b>&#187; <font color="#fffffff"><a style="color:#ffffff;" href="?p=clan&id=<?php echo $clan->GetID(); ?>"><b>[<?php echo $clan->GetTag(); ?>] <?php echo $clan->GetName(); ?></b></a></font> &#171;</b></td>
+    <td class="catGradient borderB borderT" colspan="6" align="center"> <b>&#187; <font color="#fffffff"><a style="color:#ffffff;" href="?p=clan&id=<?php echo $displayedClan->GetID(); ?>"><b>[<?php echo $displayedClan->GetTag(); ?>] <?php echo $displayedClan->GetName(); ?></b></a></font> &#171;</b></td>
   </tr>
 </table>  
-<?php if($clan->GetImage() != '')
+<?php if($displayedClan->GetImage() != '')
 {
 	?>
-  <br/><img src="<?php echo $clan->GetImage(); ?>" width="70px" height="60px"></img>
+  <br/><img src="<?php echo $displayedClan->GetImage(); ?>" width="70px" height="60px"></img>
 	<?php
 }
  ?>
 </center>
 </div>
 <?php } ?>
-<div class="profilecharacter" style="top:20px; left:185px; z-index:<?php echo $zorders['body']; ?>; background-image: url('img/races/<?php echo $displayedPlayer->GetRaceImage(); ?>.png'"></div>
-<?php if($clan != null && $clan->GetBanner() != '')
+<div class="profilecharacter" style="top:20px; left:185px; z-index:<?php echo $zorders[0]; ?>; background-image: url('img/races/<?php echo $displayedPlayer->GetRaceImage(); ?>.png'"></div>
+<?php if($displayedClan != null && $displayedClan->GetBanner() != '')
 {
 ?>
- <div class="tooltip" style="z-index:<?php echo $zorders['tooltip']; ?>; position:absolute; left:305px; top:145px;"> 
-	 <img src="<?php echo $clan->GetBanner(); ?>" style="z-index:<?php echo $zorders['clan']; ?>; position:absolute; left:50px; top:50px;" width="30px" height="30px"></img>
-    <span class="tooltiptext"><?php echo $clan->GetName(); ?></span>
+ <div class="tooltip" style="z-index:<?php echo $zorders[12]; ?>; position:absolute; left:305px; top:145px;"> 
+	 <img src="<?php echo $displayedClan->GetBanner(); ?>" style="z-index:<?php echo $zorders[11]; ?>; position:absolute; left:50px; top:50px;" width="30px" height="30px"></img>
+    <span class="tooltiptext"><?php echo $displayedClan->GetName(); ?></span>
     </div> 
 <?php
 }
+  if(date("Y-m-d") == '2021-04-01')
+  {
+    ?><div class="profilecharacter" style="top:20px; left:185px; z-index:999; background-image: url('img/ausruestung/Huhnmaske.png'"></div><?php
+  }
 
   if($displayedPlayer->GetPlanet() == 'Jenseits')
   {
-    ?><div class="profilecharacter" style="top:20px; left:185px; z-index:<?php echo $zorders['holyshine']; ?>; background-image: url('img/ausruestung/heiligenschein.png'"></div><?php
+    ?><div class="profilecharacter" style="top:20px; left:185px; z-index:<?php echo $zorders[10]; ?>; background-image: url('img/ausruestung/heiligenschein.png'"></div><?php
   }
   if($displayedPlayer->GetApeTail() == 3)
   {
-    ?><div class="profilecharacter" style="top:20px; left:185px; z-index:<?php echo $zorders['saiyatail']; ?>; background-image: url('img/races/saiyajintail.png'"></div><?php
+    ?><div class="profilecharacter" style="top:20px; left:185px; z-index:<?php echo $zorders[9]; ?>; background-image: url('img/races/saiyajintail.png'"></div><?php
   }
-	ShowSlotEquippedImage(6, $inventory, $zorders['weapon']); //Waffe
-	ShowSlotEquippedImage(1, $inventory, $zorders['aura']); //Aura 
-	ShowSlotEquippedImage(5, $inventory, $zorders['brust']); // Brust
-	ShowSlotEquippedImage(8, $inventory, $zorders['accessoire']); //Accessoire
-	ShowSlotEquippedImage(2, $inventory, $zorders['hand']); //Hände
-	ShowSlotEquippedImage(3, $inventory, $zorders['hose']); //Hose
-	ShowSlotEquippedImage(7, $inventory, $zorders['schuhe']); //Schuhe
-	ShowSlotEquippedImage(4, $inventory, $zorders['reise']); //Reise
+	ShowSlotEquippedImage(6, $inventory, $zorders, $zordersOnTop); //Waffe
+	ShowSlotEquippedImage(1, $inventory, $zorders, $zordersOnTop); //Aura 
+	ShowSlotEquippedImage(5, $inventory, $zorders, $zordersOnTop); // Brust
+	ShowSlotEquippedImage(8, $inventory, $zorders, $zordersOnTop); //Accessoire
+	ShowSlotEquippedImage(2, $inventory, $zorders, $zordersOnTop); //Hände
+	ShowSlotEquippedImage(3, $inventory, $zorders, $zordersOnTop); //Hose
+	ShowSlotEquippedImage(7, $inventory, $zorders, $zordersOnTop); //Schuhe
+	ShowSlotEquippedImage(4, $inventory, $zorders, $zordersOnTop); //Reise
 ?>
 
 <div class="profileBox boxSchatten"  style="position:absolute; right:10px; top:25px; width:240px; height:120px;"> 
@@ -465,7 +468,7 @@ if($player->GetARank() >= 3)
 		<span style="position:absolute; left:5px;"><b>Multi: </b>
     <?php
 $select = "id, name";
-$where = 'userid="'.$displayedPlayer->GetUserID().'"';
+$where = 'userid='.$displayedPlayer->GetUserID().'';
 $order = 'id';
 $from = 'accounts';
 $list = new Generallist($database, $from, $select, $where, $order, 100, 'DESC');
@@ -573,7 +576,16 @@ foreach ($titleArray as &$titel)
     <td class="catGradient borderB borderT" colspan="6" align="center">  <b>Beschreibung</b></td>
   </tr>
 </table> 
-<?php echo $bbcode->parse($displayedPlayer->GetText()); ?>
+<?php 
+  if(!$displayedAccount->IsBanned())
+  {
+    echo $bbcode->parse($displayedPlayer->GetText()); 
+  }
+  else
+  {
+    ?><b><font color="#ff0000">Dieser Spieler ist gebannt.</font></b><?php
+  }
+  ?>
 </div>
 <div class="spacer"></div>
 <div class="spacer"></div>
@@ -592,7 +604,7 @@ foreach ($titleArray as &$titel)
     <td class="boxSchatten" align="center"><b>Aktion</b></td>
   </tr>
 <?php
-$select = "*";
+$select = "id, name, type, mode, fighters, state";
 $pID = '['.$displayedPlayer->GetID().']';
 $where = 'fights.fighters LIKE "%'.$pID.'%" AND state = 2';
 $order = 'id';
@@ -620,36 +632,7 @@ while($entry != null && $displayedPlayer->GetARank() < 2)
   </td>
   <td class="boxSchatten" align="center">
     <?php
-    switch($entry['type'])
-    {
-      case 0:
-        echo 'Spaß';
-        break;
-      case 1:
-        echo 'Wertung';
-        break;
-      case 2:
-        echo 'Tod';
-        break;
-      case 3:
-        echo 'NPC';
-        break;
-      case 4:
-        echo 'Story';
-        break;
-      case 5:
-        echo 'Event';
-        break;
-      case 6:
-        echo 'Turnier';
-        break;
-      case 7:
-        echo 'Dragonball';
-        break;
-      case 8:
-        echo 'Arena';
-        break;
-    }
+    echo Fight::GetTypeName($entry['type']);
     ?>
   </td>
   <td class="boxSchatten" align="center">
@@ -742,13 +725,20 @@ foreach ($playerTitels as &$pTitel)
 <b>Design</b><br/><br/>
 <form name="form1" action="?p=profil&a=style" method="post" enctype="multipart/form-data">
 <select style="height:30px; width:310px;" name="design" id="design" class="select" selected="<?php echo $player->GetDesign(); ?>">
-	<option value="default" <?php if($player->GetDesign() == 'default') { ?> selected <?php } ?> >Standard</option>
-	<option value="dark" <?php if($player->GetDesign() == 'dark') { ?> selected <?php } ?>>Dark</option>
-	<option value="gruen" <?php if($player->GetDesign() == 'gruen') { ?> selected <?php } ?>>Grün</option>
-	<option value="pink" <?php if($player->GetDesign() == 'pink') { ?> selected <?php } ?>>Pink</option>
-	<option value="pink2" <?php if($player->GetDesign() == 'pink2') { ?> selected <?php } ?>>New Pink</option>
-	<option value="dark2" <?php if($player->GetDesign() == 'dark2') { ?> selected <?php } ?>>New Black</option>
-	<option value="gruen2" <?php if($player->GetDesign() == 'gruen2') { ?> selected <?php } ?>>New Grün</option>
+	<option value="default" <?php if($player->GetDesign() == 'default') { ?> selected <?php } ?> >Standard - Hell</option>
+	<option value="darkdefault" <?php if($player->GetDesign() == 'darkdefault') { ?> selected <?php } ?> >Standard - Dunkel</option>
+	<option value="lightblue" <?php if($player->GetDesign() == 'lightblue') { ?> selected <?php } ?> >Vegito - Hell</option>
+	<option value="darkblue" <?php if($player->GetDesign() == 'darkblue') { ?> selected <?php } ?> >Vegito - Dunkel</option>
+	<option value="lightred" <?php if($player->GetDesign() == 'lightred') { ?> selected <?php } ?> >Jiren - Hell</option>
+	<option value="darkred" <?php if($player->GetDesign() == 'darkred') { ?> selected <?php } ?> >Jiren - Dunkel</option>
+	<option value="lightdark" <?php if($player->GetDesign() == 'lightdark') { ?> selected <?php } ?> >Black - Hell</option>
+	<option value="darkdark" <?php if($player->GetDesign() == 'darkdark') { ?> selected <?php } ?> >Black - Dunkel</option>
+	<option value="lightgreen" <?php if($player->GetDesign() == 'lightgreen') { ?> selected <?php } ?> >Shenlong - Hell</option>
+	<option value="darkgreen" <?php if($player->GetDesign() == 'darkgreen') { ?> selected <?php } ?> >Shenlong - Dunkel</option>
+	<option value="lightpink" <?php if($player->GetDesign() == 'lightpink') { ?> selected <?php } ?> >Buu - Hell</option>
+	<option value="darkpink" <?php if($player->GetDesign() == 'darkpink') { ?> selected <?php } ?> >Buu - Dunkel</option>
+	<option value="lightyellow" <?php if($player->GetDesign() == 'lightyellow') { ?> selected <?php } ?> >C18 - Hell</option>
+	<option value="darkyellow" <?php if($player->GetDesign() == 'darkyellow') { ?> selected <?php } ?> >C18 - Dunkel</option>
 </select>
 <input type="submit" value="Ändern">
 </form>
@@ -756,37 +746,49 @@ foreach ($playerTitels as &$pTitel)
 <div class="spacer2"></div>
 <hr></hr>
 <b>Kampf Techniken</b><br/><br/>
-Welche Techniken möchtest du mit in den Kampf nehmen?
-<form name="form1" action="?p=profil&a=attacks" method="post" enctype="multipart/form-data">
-    <?php
-	$attacks = explode(';',$player->GetAttacks());
-	$fightAttacks = explode(';',$player->GetFightAttacks());
-  $powerups = array();
-    $id = 0;
-    while(isset($attacks[$id]))
+Du hast die Techniken im Kampf zur Verfügung, die farbig sind.<br/>Klicke auf eine Technik um sie im Kampf hinzuzufügen oder zu entfernen.
+<div class="spacer"></div>
+<?php
+$attacks = explode(';',$player->GetAttacks());
+$fightAttacks = explode(';',$player->GetFightAttacks());
+$powerups = array();
+$id = 0;
+while(isset($attacks[$id]))
+{
+  $attack = $attackManager->GetAttack($attacks[$id]);
+  if($attack != null)
+  {
+    $isSelected = in_array($attack->GetID(), $fightAttacks);
+    if($isSelected && $attack->GetType() == 4)
     {
-      $attack = $attackManager->GetAttack($attacks[$id]);
-      if($attack != null)
-      {
-        $isSelected = in_array($attack->GetID(), $fightAttacks);
-        if($isSelected && $attack->GetType() == 4)
-        {
-          array_push($powerups, $attack);
-        }
-        ?>
-        <div class="tooltip" style="position:relative; height:60px; width:40px; display:inline-block">
-        <img class="attack" width="40px" height="40px" src="<?php echo $attack->GetImage(); ?>"></img> 
-        <input type="checkbox" name="attacks[]" value="<?php echo $attack->GetID(); ?>" <?php if($isSelected) { ?>checked<?php } ?>>  	
-         <span class="tooltiptext" style="left:-50px; top:-35px;"><?php echo $attack->GetName(); ?></span>
-         </div>
-        <?php
-      }
-      ++$id;
+      array_push($powerups, $attack);
     }
     ?>
-	<br/>
-<input type="submit" value="ändern">
-</form>
+        <div class="tooltip" style="position:relative; height:60px; width:60px; display:inline-block">
+    <a href="?p=profil&a=fightattack&aid=<?php echo $attack->GetID(); ?>"><img class="attack" width="40px" height="40px" src="<?php echo $attack->GetImage(); ?>" style="
+                                                                      <?php
+                                                                      if(!$isSelected)
+                                                                      {
+                                                                      ?>
+                                                                      filter: gray; /* IE6-9 */
+                                                                      -webkit-filter: grayscale(1); /* Google Chrome, Safari 6+ & Opera 15+ */
+                                                                      filter: grayscale(1); /* Microsoft Edge and Firefox 35+ */
+                                                                      <?php
+                                                                      }
+                                                                      ?>
+                                                                      "></img></a>
+    
+ <span class="tooltiptext" style="position:absolute; z-index:5; width:220px; top:-30px; left:-80px;">
+  <?php
+  echo $attack->GetName();
+  ?>
+  </span>
+  </div>
+    <?php
+  }
+  ++$id;
+}
+?>
 <div class="spacer2"></div>
 <hr></hr>
 <b>Start-Verwandlung</b><br/><br/>

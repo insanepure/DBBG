@@ -1,5 +1,5 @@
 <?php
-if(!$player->HasRadar() && !$player->HasDBs())
+if(!$player->HasRadar() && !$player->HasAllDBs())
 {
 	header('Location: index.php');
 	exit();  
@@ -41,13 +41,13 @@ for($i = 0; $i < $dbCount; ++$i)
 	}
 }
 
-if(!$player->HasDBs() && count($drops) != 7)
+if(!$player->HasAllDBs() && count($drops) != 7)
 {
 	header('Location: ?p=radar');
 	exit();  
 }
 
-if($player->HasDBs())
+if($player->HasAllDBs())
   $wishLeft += 1;
 
 if(isset($_GET['a']) && $_GET['a'] == 'wish')
@@ -135,7 +135,7 @@ if(isset($_GET['a']) && $_GET['a'] == 'wish')
           }
           $player->UpdateWish($wishID, 12); // Block for 12 wishes
         }
-        else if($player->HasDBs())
+        else if($player->HasAllDBs())
         {
           $dbID = 150;
           $statstype = 0;

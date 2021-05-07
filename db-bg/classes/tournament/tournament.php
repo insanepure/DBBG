@@ -153,7 +153,7 @@ class Tournament
   
   public function getSecondsSinceLastAction($fighter)
   {
-		$where = 'id="'.$fighter->GetFighterID().'"';
+		$where = 'id='.$fighter->GetFighterID().'';
 		$result = $this->database->Select('id, lastaction','accounts',$where,1);
 		if ($result) 
 		{

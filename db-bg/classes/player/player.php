@@ -62,7 +62,7 @@ class Player
     if(!$this->valid && isset($_COOKIE['charaid']) && is_numeric($_COOKIE['charaid']))
     {
       $id = $_COOKIE['charaid'];
-      $result = $this->database->Select('userid, id','accounts','id = "'.$id.'" AND userid="'.$userid.'"',1);
+      $result = $this->database->Select('userid, id','accounts','id = '.$id.' AND userid='.$userid.'',1);
       if ($result && $result->num_rows > 0) 
       {
 		    $key = 'id';
@@ -90,7 +90,7 @@ class Player
    if($debuglog == $this->startLog)
      return;
    
-	 $result = $this->database->Update('debuglog="'.$debuglog.'"','accounts', 'id = "'.$this->GetID().'"',1);
+	 $result = $this->database->Update('debuglog="'.$debuglog.'"','accounts', 'id = '.$this->GetID().'',1);
  }
   
   public function DebugSend($withText = false, $title='')
@@ -134,7 +134,7 @@ class Player
       array_push($blocked, $id);
       $blocked = implode(';', $blocked);
 		  $update = 'blocked="'.$blocked.'"';
-		  $result = $this->database->Update($update,'accounts','id = "'.$this->data['id'].'"',1);
+		  $result = $this->database->Update($update,'accounts','id = '.$this->data['id'].'',1);
     }
   }
   
@@ -147,7 +147,7 @@ class Player
       array_splice($blocked, $key, 1);
       $blocked = implode(';', $blocked);
 		  $update = 'blocked="'.$blocked.'"';
-		  $result = $this->database->Update($update,'accounts','id = "'.$this->data['id'].'"',1);
+		  $result = $this->database->Update($update,'accounts','id = '.$this->data['id'].'',1);
     }
   }
   
@@ -197,14 +197,14 @@ class Player
       $this->data['adminlogged'] = true;
     }
     $update = 'session="'.session_id().'",adminlogged="'.$adminLogged.'"';
-		$result = $this->database->Update($update,'accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update($update,'accounts','id = '.$this->data['id'].'',1);
   }
   
   public function Logout()
   {
     $date_of_expiry = time() - 10;
     setcookie( "charaid",  "", $date_of_expiry);
-		$result = $this->database->Update('session="",adminlogged="0"','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('session="",adminlogged="0"','accounts','id = '.$this->data['id'].'',1);
   }
 	
 	public function CheckMulti()
@@ -254,7 +254,7 @@ class Player
 		$banned = 1;
 		$this->SetBanned($banned);
 		$this->SetBanReason($reason);
-		$result = $this->database->Update('banned="'.$banned.'",banreason="'.$reason.'"','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('banned="'.$banned.'",banreason="'.$reason.'"','accounts','id = '.$this->data['id'].'',1);
 	}
   
 	public function HasRadar()
@@ -262,9 +262,24 @@ class Player
 		return $this->GetInventory()->HasRadar();
 	}
   
-	public function HasDBs()
+	public function HasAllDBs()
 	{
 		return $this->GetInventory()->HasDBs();
+	}
+  
+	public function HasDBs()
+	{
+    $total = 0;
+    $where = 'player='.$this->GetID();
+    $result = $this->database->Select('COUNT(player) as total','dragonballs',$where);
+		if ($result) 
+		{
+      $row = $result->fetch_assoc();
+      $total = $row['total'];
+			$result->close();
+		}
+    
+    return $total != 0;
 	}
 	
 	public function HasItem($id)
@@ -284,6 +299,7 @@ class Player
 	
 	public function SpeedUpAction($minutes, $lp, $kp)
 	{
+    $this->AddDebugLog('SpeedUpAction');
     $lp = $this->GetLP()-$lp;
     if($lp < 0) $lp = 0;
     $kp = $this->GetKP()-$kp;
@@ -291,11 +307,16 @@ class Player
     $actionTime = $this->GetActionTime() - $minutes;
     if($actionTime < 0) $actionTime = 0;
     
+    $this->AddDebugLog(' - LP From '.$this->GetLP().' to '.$lp);
     $this->SetLP($lp);
+    $this->AddDebugLog(' - KP From '.$this->GetKP().' to '.$kp);
     $this->SetKP($kp);
+    $this->AddDebugLog(' - ActionTime From '.$this->GetActionTime().' to '.$actionTime);
     $this->SetActionTime($actionTime);
+    
+    $this->AddDebugLog(' ');
     $update = 'lp="'.$lp.'", kp="'.$kp.'", actiontime="'.$actionTime.'"';
-		$result = $this->database->Update($update,'accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update($update,'accounts','id = '.$this->data['id'].'',1);
   }
 	
 	public function ResetStats()
@@ -326,7 +347,7 @@ class Player
     , attack="'.$stats.'"
     , defense="'.$stats.'"
     ';
-		$result = $this->database->Update($update,'accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update($update,'accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	public function ResetSkills()
@@ -360,18 +381,16 @@ class Player
 		$this->SetFightAttacks($attacks);
 		$this->SetAttacks($attacks);
     $this->SetSkillPoints($skillPoints);
-    $stats = $this->GetStats() + $learnedSkillPoints * 24;
-    $this->SetStats($stats);
     
-    $update = 'fightattacks="'.$attacks.'", attacks="'.$attacks.'", skillpoints="'.$skillPoints.'",stats="'.$stats.'"';
-		$result = $this->database->Update($update,'accounts','id = "'.$this->data['id'].'"',1);
+    $update = 'fightattacks="'.$attacks.'", attacks="'.$attacks.'", skillpoints="'.$skillPoints.'"';
+		$result = $this->database->Update($update,'accounts','id = '.$this->data['id'].'',1);
     
 	}
 	
 	public function UpdateStartingPowerup($attack)
 	{
     $this->SetStartingPowerup($attack);
-		$result = $this->database->Update('powerupstart="'.$attack.'"','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('powerupstart="'.$attack.'"','accounts','id = '.$this->data['id'].'',1);
   }
   
 	public function UpdateFightAttacks($attacks)
@@ -401,7 +420,7 @@ class Player
       $update = $update.',powerupstart=0';
       $this->SetStartingPowerup(0);
     }
-		$result = $this->database->Update($update,'accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update($update,'accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	public function LeaveGroup()
@@ -421,11 +440,11 @@ class Player
 			
 			if($where == '')
 			{
-				$where = 'id = "'.$group[$i].'"';
+				$where = 'id = '.$group[$i].'';
 			}
 			else
 			{
-				$where = $where.' OR id = "'.$group[$i].'"';
+				$where = $where.' OR id = '.$group[$i].'';
 			}
 			++$i;
 		}
@@ -444,10 +463,10 @@ class Player
 			$leaderID = $group[0];
 		}
 		$result = $this->database->Update('`group`="'.$groupSQL.'"','accounts',$where, $limit);
-		$result = $this->database->Update('`group`="", `groupleader`="0"','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('`group`="", `groupleader`="0"','accounts','id = '.$this->data['id'].'',1);
 		if($this->IsGroupLeader() && $leaderID != 0)
 		{
-			$result = $this->database->Update('`groupleader`=1','accounts','id = "'.$leaderID.'"',1);
+			$result = $this->database->Update('`groupleader`=1','accounts','id = '.$leaderID.'',1);
 		}
 		$this->SetGroup('');
 		$this->SetGroupLeader(false);
@@ -457,12 +476,12 @@ class Player
 	public function MakeGroupLeader()
 	{
 			$this->SetGroupLeader(true);
-			$result = $this->database->Update('`groupleader`="1"','accounts','id = "'.$this->data['id'].'"',1);
+			$result = $this->database->Update('`groupleader`="1"','accounts','id = '.$this->data['id'].'',1);
 	}
 	public function GiveupGroupLeader()
 	{
 			$this->SetGroupLeader(false);
-			$result = $this->database->Update('`groupleader`="0"','accounts','id = "'.$this->data['id'].'"',1);
+			$result = $this->database->Update('`groupleader`="0"','accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	public function AddToGroup($playerID)
@@ -473,7 +492,7 @@ class Player
 			$group = array();
 			$group[0] = $this->GetID();
 			$this->SetGroupLeader(true);
-			$result = $this->database->Update('`groupleader`="1"','accounts','id = "'.$this->data['id'].'"',1);
+			$result = $this->database->Update('`groupleader`="1"','accounts','id = '.$this->data['id'].'',1);
 		}
 		array_push($group, $playerID);
 		$groupSQL = implode(';',$group);
@@ -484,11 +503,11 @@ class Player
 		{
 			if($where == '')
 			{
-				$where = 'id = "'.$group[$i].'"';
+				$where = 'id = '.$group[$i].'';
 			}
 			else
 			{
-				$where = $where.' OR id = "'.$group[$i].'"';
+				$where = $where.' OR id = '.$group[$i].'';
 			}
 			++$i;
 		}
@@ -501,13 +520,13 @@ class Player
 	public function InviteToGroup($inviter)
 	{
 		$this->SetGroupInvite($inviter);
-		$result = $this->database->Update('groupinvite="'.$inviter.'"','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('groupinvite="'.$inviter.'"','accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	public function DeclineGroupInvite()
 	{
 		$this->SetGroupInvite(0);
-		$result = $this->database->Update('groupinvite="0"','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('groupinvite="0"','accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	public function UpdateWish($wish, $counter)
@@ -520,7 +539,7 @@ class Player
     $this->AddDebugLog(' - New Wishes: '.$wishes);
     $this->AddDebugLog(' - New counter: '.$counter);
     $this->AddDebugLog(' ');
-		$result = $this->database->Update('wishcounter="'.$counter.'", wishes="'.$wishes.'"','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('wishcounter="'.$counter.'", wishes="'.$wishes.'"','accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	public function AddArenaPoints($amount)
@@ -531,7 +550,7 @@ class Player
     $this->AddDebugLog(' - Add Arenapoints: '.$amount);
     $this->AddDebugLog(' - New Arenapoints: '.$points);
     $this->AddDebugLog(' ');
-		$result = $this->database->Update('arenapoints="'.$points.'"','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('arenapoints="'.$points.'"','accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	public function RenoveArenaPoints($amount)
@@ -542,7 +561,7 @@ class Player
     $this->AddDebugLog(' - Remove Arenapoints: '.$amount);
     $this->AddDebugLog(' - New Arenapoints: '.$points);
     $this->AddDebugLog(' ');
-		$result = $this->database->Update('arenapoints="'.$points.'"','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('arenapoints="'.$points.'"','accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	public function AddZeni($amount)
@@ -553,7 +572,7 @@ class Player
     $this->AddDebugLog(' - Add Zeni: '.$amount);
     $this->AddDebugLog(' - New Zeni: '.$zeni);
     $this->AddDebugLog(' ');
-		$result = $this->database->Update('zeni="'.$zeni.'"','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('zeni="'.$zeni.'"','accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	public function RemoveZeni($amount)
@@ -564,7 +583,7 @@ class Player
     $this->AddDebugLog(' - Remove Zeni: '.$amount);
     $this->AddDebugLog(' - New Zeni: '.$zeni);
     $this->AddDebugLog(' ');
-		$result = $this->database->Update('zeni="'.$zeni.'"','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('zeni="'.$zeni.'"','accounts','id = '.$this->data['id'].'',1);
 	}
   
   public function CombineItems($statsitem, $visualitem)
@@ -604,7 +623,7 @@ class Player
 	public function BuyItemFrom($statsitem, $visualitem, $statstype, $upgrade, $amount, $price, $sellerid)
 	{
 		$this->BuyItem($statsitem, $visualitem, $statstype, $upgrade, $amount, $price);
-		$result = $this->database->Update('zeni=zeni+'.$price,'accounts','id = "'.$sellerid.'"',1);
+		$result = $this->database->Update('zeni=zeni+'.$price,'accounts','id = '.$sellerid.'',1);
 	}
 	
 	public function BuyItem($statsitem, $visualitem, $statstype, $upgrade, $amount, $price, $arenaprice=0)
@@ -627,7 +646,7 @@ class Player
     $this->AddDebugLog(' - New Arenapoints: '.$arenaprice);
     $this->AddDebugLog(' - New Zeni: '.$zeni);
     $this->AddDebugLog(' ');
-		$result = $this->database->Update('zeni="'.$zeni.'", arenapoints="'.$arenapoints.'"','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('zeni="'.$zeni.'", arenapoints="'.$arenapoints.'"','accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	public function SellItem($id, $amount=1)
@@ -637,7 +656,7 @@ class Player
 		
 		$zeni = $this->GetZeni() + (round($item->GetPrice() * 0.5) * $amount);
 		$this->SetZeni($zeni);
-		$result = $this->database->Update('zeni="'.$zeni.'"','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('zeni="'.$zeni.'"','accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	public function GetIP()
@@ -668,7 +687,7 @@ class Player
 		$text = $this->database->EscapeString($text);
 		$this->SetClanApplication($clan->GetID());
 		$this->SetClanApplicationText($text);
-		$result = $this->database->Update('clanapplication="'.$clan->GetID().'",clanapplicationtext="'.$text.'"','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('clanapplication="'.$clan->GetID().'",clanapplicationtext="'.$text.'"','accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	public function JoinClan($clan)
@@ -677,27 +696,27 @@ class Player
 		$this->SetClanApplicationText('');
 		$this->SetClan($clan->GetID());
 		$this->SetClanName($clan->GetName());
-		$result = $this->database->Update('clanapplication="0",clanapplicationtext="", clan="'.$clan->GetID().'", clanname="'.$clan->GetName().'"','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('clanapplication="0",clanapplicationtext="", clan="'.$clan->GetID().'", clanname="'.$clan->GetName().'"','accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	public function LeaveClan()
 	{
 		$this->SetClan(0);
 		$this->SetClanName('');
-		$result = $this->database->Update('clan="0", clanname=""','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('clan="0", clanname=""','accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	public function DeleteClanApplication()
 	{
 		$this->SetClanApplication(0);
 		$this->SetClanApplicationText('');
-		$result = $this->database->Update('clanapplication="0",clanapplicationtext=""','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('clanapplication="0",clanapplicationtext=""','accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	public function AcceptNPCWonItems()
 	{
 		$this->SetNPCWonItems('');
-		$result = $this->database->Update('npcwonitems=""','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('npcwonitems=""','accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	public function UnequipItem($item)
@@ -720,7 +739,7 @@ class Player
 		$this->SetTrainBonus($trainBonus);
     
 		$this->GetInventory()->UnequipItem($item);
-		$result = $this->database->Update('equippedstats="'.$equippedStats.'", travelbonus="'.$travelBonus.'", trainingstats="'.$trainBonus.'"','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('equippedstats="'.$equippedStats.'", travelbonus="'.$travelBonus.'", trainingstats="'.$trainBonus.'"','accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	public function AddEquippedStats($item)
@@ -812,15 +831,15 @@ class Player
 		$trainBonus = $trainBonus + $item->GetTrainBonus();
 		$this->SetTrainBonus($trainBonus);
 		
-		$result = $this->database->Update('equippedstats="'.$equippedStats.'", travelbonus="'.$travelBonus.'", trainingstats="'.$trainBonus.'"','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('equippedstats="'.$equippedStats.'", travelbonus="'.$travelBonus.'", trainingstats="'.$trainBonus.'"','accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	public function DeleteAccount()
 	{
-		$result = $this->database->Delete('accounts','id = "'.$this->GetID().'"',1);
-		$result = $this->database->Delete('market','sellerid = "'.$this->GetID().'"',999999999);
-		$result = $this->database->Delete('statslist','acc = "'.$this->GetID().'"',999999999);
-		$result = $this->database->Delete('inventory','ownerid = "'.$this->GetID().'"',999999999);
+		$result = $this->database->Delete('accounts','id = '.$this->GetID().'',1);
+		$result = $this->database->Delete('market','sellerid = '.$this->GetID().'',999999999);
+		$result = $this->database->Delete('statslist','acc = '.$this->GetID().'',999999999);
+		$result = $this->database->Delete('inventory','ownerid = '.$this->GetID().'',999999999);
 	}
   
   public function UpgradeChip()
@@ -849,7 +868,7 @@ class Player
     
     $newLevel = $this->GetLevel()-1;
     $item->SetUpgrade($newLevel);
-		$result = $this->database->Update('upgrade="'.$newLevel.'"','inventory','id = "'.$item->GetID().'"',1);
+		$result = $this->database->Update('upgrade="'.$newLevel.'"','inventory','id = '.$item->GetID().'',1);
     
     if($isEquipped)
       $this->EquipItem($item);
@@ -906,7 +925,7 @@ class Player
 		$this->SetKP($newKP);
 		
 		$items = $this->inventory->Encode();
-		$result = $this->database->Update('inventory="'.$items.'",lp="'.$newLP.'",kp="'.$newKP.'"','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('inventory="'.$items.'",lp="'.$newLP.'",kp="'.$newKP.'"','accounts','id = '.$this->data['id'].'',1);
 		
 	}
 	
@@ -952,7 +971,7 @@ class Player
       {
 		    $onItem = $this->GetInventory()->GetItemByDatabaseID($onItem);
         if($onItem != null && $onItem->CanChangeType())
-		      $result = $this->database->Update('statstype="'.$item->GetStatsType().'"','inventory','id = "'.$onItem->GetID().'"',1);
+		      $result = $this->database->Update('statstype="'.$item->GetStatsType().'"','inventory','id = '.$onItem->GetID().'',1);
       }
       else if($item->GetStatsID() == 185) // Level Stone
       {
@@ -961,7 +980,7 @@ class Player
         {
           $upgrade = $onItem->GetUpgrade() + $amount;
           if($upgrade >= $onItem->GetMaxUpgrade()) $upgrade = $onItem->GetMaxUpgrade();
-		        $result = $this->database->Update('upgrade="'.$upgrade.'"','inventory','id = "'.$onItem->GetID().'"',1);
+		        $result = $this->database->Update('upgrade="'.$upgrade.'"','inventory','id = '.$onItem->GetID().'',1);
         }
       }
     }
@@ -973,16 +992,24 @@ class Player
 		{
 			$newLP = $this->GetMaxLP();
 		}
+		else if($newLP < 0)
+		{
+			$newLP = 0;
+		}
 		
 		if($newKP > $this->GetMaxKP())
 		{
 			$newKP = $this->GetMaxKP();
 		}
+		else if($newKP < 0)
+		{
+			$newKP = 0;
+		}
 		
 		$this->SetLP($newLP);
 		$this->SetKP($newKP);
 		
-		$result = $this->database->Update('lp="'.$newLP.'",kp="'.$newKP.'"','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('lp="'.$newLP.'",kp="'.$newKP.'"','accounts','id = '.$this->data['id'].'',1);
 		
 	}
 	
@@ -1021,7 +1048,7 @@ class Player
 		}
 		
     if(!$this->IsAdminLogged())
-		  $result = $this->database->Update($update,'accounts','id = "'.$this->data['id'].'"',1);
+		  $result = $this->database->Update($update,'accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	public function UpdateLastEventAction()
@@ -1030,7 +1057,7 @@ class Player
 		$update = 'lasteventaction="'.$timestamp.'"';
 		$this->SetLastEventAction($timestamp);
 		
-		$result = $this->database->Update($update,'accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update($update,'accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	public function UpdateCaptcha($alsoClickCount=true)
@@ -1046,7 +1073,7 @@ class Player
 			$this->SetClickCount(0);
 		}
 		
-		$result = $this->database->Update($update,'accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update($update,'accounts','id = '.$this->data['id'].'',1);
 	}
   
   public function GetStartingPowerup()
@@ -1167,7 +1194,7 @@ class Player
     
     if($key == 'id')
     {
-		  $result = $this->database->Select($select,'accounts','id = "'.$id.'"',1);
+		  $result = $this->database->Select($select,'accounts','id = '.$id.'',1);
     }
     else
     {
@@ -1204,19 +1231,19 @@ class Player
 		$this->SetSparringPartner(0);
 		$this->SetSparringCancel(0);
 		
-		$result = $this->database->Update('sparringpartner="0", sparringcancel="0"','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('sparringpartner="0", sparringcancel="0"','accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	public function DoSparringCancelRequest()
 	{
 		$this->SetSparringCancel(1);
-		$result = $this->database->Update('sparringcancel ="1"','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('sparringcancel ="1"','accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	public function DenySparringCancel()
 	{
 		$this->SetSparringCancel(0);
-		$result = $this->database->Update('sparringcancel ="0"','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('sparringcancel ="0"','accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	public function DoSparring($otherID, $time)
@@ -1235,21 +1262,21 @@ class Player
 		$this->SetActionTime($minutes);
 		$this->SetActionStart($timestamp);
 		
-		$result = $this->database->Update('sparringrequest ="0", sparringtime ="0", sparringpartner="'.$otherID.'", action="'.$action.'", actiontime="'.$minutes.'", actionstart="'.$timestamp.'"','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('sparringrequest ="0", sparringtime ="0", sparringpartner="'.$otherID.'", action="'.$action.'", actiontime="'.$minutes.'", actionstart="'.$timestamp.'"','accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	public function SparringRequest($id, $time)
 	{
 		$this->SetSparringRequest($id);
 		$this->SetSparringTime($time);
-		$result = $this->database->Update('sparringrequest ="'.$id.'", sparringtime ="'.$time.'"','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('sparringrequest ="'.$id.'", sparringtime ="'.$time.'"','accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	public function DenySparringRequest()
 	{
 		$this->SetSparringRequest(0);
 		$this->SetSparringTime(0);
-		$result = $this->database->Update('sparringrequest ="0", sparringtime ="0"','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('sparringrequest ="0", sparringtime ="0"','accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	public function Challenge($fightID)
@@ -1262,19 +1289,19 @@ class Player
 			$timestamp = date('Y-m-d H:i:s');
 			$this->SetChallengeTime($timestamp);
 		}
-		$result = $this->database->Update('challengefight ="'.$fightID.'", challengedtime="'.$timestamp.'"','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('challengefight ="'.$fightID.'", challengedtime="'.$timestamp.'"','accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	public function DeclineEvent()
 	{
 		$this->SetEventInvite(0);
-		$result = $this->database->Update('eventinvite="0"','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('eventinvite="0"','accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	public function DeclineChallenge()
 	{
 		$this->SetChallengeFight(0);
-		$result = $this->database->Update('challengefight="0", challengedtime="0"','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('challengefight="0", challengedtime="0"','accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	static public function CalculateSparringWin($database, $player1, $player2)
@@ -1283,10 +1310,10 @@ class Player
 		$actionManager = new ActionManager($database);
     
     if(!$player2->IsValid()) $player2 = $player1;
-		$ki = Player::GetSparringKI($player2->GetKI(), $player2->GetTotalStatsFights(), $player2->GetLevel(), $player2->GetStats(), $player2->GetWishes(), $player2->GetStory(), $player2->GetAttacks(), $attackManager, $actionManager, $database);
+		$ki = Player::GetSparringKI($player2->GetKI(), $player2->GetTotalStatsFights(), $player2->GetLevel(), $player2->GetStats(), $player2->GetWishes(), $player2->GetStory(), $player2->CanTeleport(), $player2->GetAttacks(), $attackManager, $actionManager, $database);
 
     if(!$player1->IsValid()) $player1 = $player2;
-		$playerKI = Player::GetSparringKI($player1->GetKI(), $player1->GetTotalStatsFights(), $player1->GetLevel(), $player1->GetStats(), $player1->GetWishes(), $player1->GetStory(), $player1->GetAttacks(), $attackManager, $actionManager, $database);
+		$playerKI = Player::GetSparringKI($player1->GetKI(), $player1->GetTotalStatsFights(), $player1->GetLevel(), $player1->GetStats(), $player1->GetWishes(), $player1->GetStory(), $player1->CanTeleport(), $player1->GetAttacks(), $attackManager, $actionManager, $database);
     
 		$kiDiff = ($ki - $playerKI);
 		$statsWin = round($kiDiff * 0.015); //Aim KI is 100, 100 x 0.015 = 1.5 Stats
@@ -1298,14 +1325,17 @@ class Player
 		return $statsWin;
 	}
 	
-	static public function GetSparringKI($ki, $totalStatsFights, $level, $stats, $wishes, $story, $attacks, $attackManager, $actionManager, $database)
+	static public function GetSparringKI($ki, $totalStatsFights, $level, $stats, $wishes, $story, $canTeleport, $attacks, $attackManager, $actionManager, $database)
 	{
     $attacks = explode(';',$attacks);
     $learnTime = 0;
     foreach($attacks as &$attack)
     {
-      $attack = $attackManager->GetAttack($attack);
-      $learnTime += $attack->GetLearnTime();
+      if(is_numeric($attack))
+      {
+        $attack = $attackManager->GetAttack($attack);
+        $learnTime += $attack->GetLearnTime();
+      }
     }
     
     if($learnTime != 0)
@@ -1331,6 +1361,7 @@ class Player
       {
          while($row = $result->fetch_assoc()) 
          {
+           //ToDo: For 1.0, set to 1 to fix it
            if($row['type'] == 2 && in_array($row['id'], $wishes))
            {
               $ki = $ki - $row['value']/4;
@@ -1354,12 +1385,40 @@ class Player
       }
       $result->close();
     }
+
+    if($canTeleport)
+    {
+      $ki = $ki - (24/4);
+    }
     
     $storyGain = ceil($storyGain/4);
     $ki = $ki - $storyGain;
 		
 		return $ki;
 	}
+  
+  public function LearnSkill($attackID, $skillPoints)
+  {
+    $this->AddDebugLog('LearnSkill');
+		$attacks = $this->GetAttacks();
+		
+    $this->AddDebugLog(' - add Attack '.$attackID.' to '.$attacks);
+		$attacks = $attacks.';'.$attackID;
+    $this->AddDebugLog(' - Attacks now: '.$attacks);
+    
+    $this->AddDebugLog(' - set SkillPoints: '.$this->GetSkillPoints().' - '.$skillPoints);
+    $points = $this->GetSkillPoints() - $skillPoints;
+    $this->AddDebugLog(' - SkillPoints now: '.$points);
+    
+		$update = 'attacks="'.$attacks.'",skillpoints="'.$points.'"';
+		$this->SetAttacks($attacks);
+		$this->SetSkillPoints($points);
+    
+    $this->AddDebugLog(' ');
+    $debuglog = $this->GetDebugLog();
+    $update = $update.',debuglog="'.$debuglog.'"';
+		$result = $this->database->Update($update,'accounts','id = '.$this->data['id'].'',1);
+  }
 	
 	
 	public function CalculateAction($cancel = false, $force=false)
@@ -1451,6 +1510,14 @@ class Player
         $update = $update.',stats="'.$newPoints.'"';
         $this->SetStats($newPoints);
       }
+      if($action->GetSkillpoints() != 0)
+      {
+        $skillpoints = $action->GetSkillPoints() * $times;
+        $nSkillPoints = $this->GetSkillPoints()+$skillpoints;
+        $this->AddDebugLog(' - SkillPoints From '.$this->GetSkillPoints().' to '.$nSkillPoints);
+        $this->SetSkillPoints($nSkillPoints);
+        $update = $update.',skillpoints="'.$nSkillPoints.'"';
+      }
       if($action->GetPlanet() != '' && $action->GetPlace() != '')
       {
         $place = $action->GetPlace();
@@ -1461,6 +1528,12 @@ class Player
         }
         $this->AddDebugLog(' - Action Move Player to: '.$planet.' - '.$place);
         $update = $update.',planet="'.$planet.'",place="'.$place.'"';
+        if($planet == 'Jenseits' && $this->GetPlanet() != 'Jenseits')
+        {
+          $update = $update.',deathplanet="'.$this->GetPlanet().'",deathplace="'.$this->GetPlace().'"';
+          $this->SetDeathPlace($this->GetPlace());
+          $this->SetDeathPlanet($this->GetPlanet());
+        }
         $this->SetPlace($place);
         $this->SetPlanet($planet);
       }
@@ -1733,6 +1806,15 @@ class Player
 			{
         $this->AddDebugLog(' - KI Unterdrücken');
         $this->SetCanFakeKI(1);
+        $stats = $this->GetStats() + floor($this->GetActionTime()/60);
+        if($this->GetStats() == 0)
+        {
+          $update = $update.',statspopup="1"';
+          $this->SetStatsPopup(true);
+        }
+        $this->AddDebugLog(' - set Stats from '.$this->GetStats().' to '.$stats);
+        $this->SetStats($stats);
+        $update = $update.',stats="'.$stats.'"';
 			  $update = $update.',canfakeki="1"';
       }
 			else if($action->GetID() == 48) //Affenschwanz ab
@@ -1757,6 +1839,21 @@ class Player
 			{
         $this->AddDebugLog(' - UpgradeChip');
         $this->UpgradeChip();
+			}
+			else if($action->GetID() == 92) //Momentan Teleportation
+			{
+        $this->AddDebugLog(' - Momentan Teleportation');
+        $this->SetCanTeleport(1);
+        $stats = $this->GetStats() + floor($this->GetActionTime()/60);
+        if($this->GetStats() == 0)
+        {
+          $update = $update.',statspopup="1"';
+          $this->SetStatsPopup(true);
+        }
+        $this->AddDebugLog(' - set Stats from '.$this->GetStats().' to '.$stats);
+        $this->SetStats($stats);
+        $update = $update.',stats="'.$stats.'"';
+			  $update = $update.',canteleport="1"';
 			}
 			else if($action->GetID() == 31) //Sparring
 			{
@@ -1792,50 +1889,50 @@ class Player
 		$this->SetActionTime(0);
 		
 		
-		$rvguztime = 1440;
-		if($this->GetPlace() == 'Raum von Geist und Zeit' || $this->GetPlace() == 'Trainingsberg')
-		{
-			$newPlace = '';
-			if($this->GetPlace() == 'Raum von Geist und Zeit')
-			{
-				$newPlace = 'Gottespalast';
-			}
-			else if($this->GetPlace() == 'Trainingsberg')
-			{
-				$newPlace = 'Training Insel';
-			}
-			
-			
-			if($this->GetRVGUZTime() == 0)
-			{
-				$rvguztime = 1440;
-				$update = $update.', rvguztime="'.$rvguztime.'"';
-				$this->SetRVGUZTime($rvguztime);
-			}
-			else
-			{
-				$rvguztime = $this->GetRVGUZTime() - $elapsedMinutes;
-				if($rvguztime <= 0)
-				{
-					$rvguztime = 0;
-					$this->SetPlace($newPlace);
-					$update = $update.', place="'.$newPlace.'"';
-				}
-				$update = $update.', rvguztime="'.$rvguztime.'"';
-				$this->SetRVGUZTime($rvguztime);
-			}
-			
-		}
-		else if($this->GetRVGUZTime() != 0)
-		{
-				$update = $update.', rvguztime="0"';
-				$this->SetRVGUZTime(0);
-		}
+		//$rvguztime = 1440;
+		//if($this->GetPlace() == 'Trainingsberg')
+		//{
+		//	$newPlace = '';
+		//	if($this->GetPlace() == 'Raum von Geist und Zeit')
+		//	{
+		//		$newPlace = 'Gottespalast';
+		//	}
+		//	else if($this->GetPlace() == 'Trainingsberg')
+		//	{
+		//		$newPlace = 'Training Insel';
+		//	}
+		//	
+		//	
+		//	if($this->GetRVGUZTime() == 0)
+		//	{
+		//		$rvguztime = 1440;
+		//		$update = $update.', rvguztime="'.$rvguztime.'"';
+		//		$this->SetRVGUZTime($rvguztime);
+		//	}
+		//	else
+		//	{
+		//		$rvguztime = $this->GetRVGUZTime() - $elapsedMinutes;
+		//		if($rvguztime <= 0)
+		//		{
+		//			$rvguztime = 0;
+		//			$this->SetPlace($newPlace);
+		//			$update = $update.', place="'.$newPlace.'"';
+		//		}
+		//		$update = $update.', rvguztime="'.$rvguztime.'"';
+		//		$this->SetRVGUZTime($rvguztime);
+		//	}
+		//	
+		//}
+		//else if($this->GetRVGUZTime() != 0)
+		//{
+		//		$update = $update.', rvguztime="0"';
+		//		$this->SetRVGUZTime(0);
+		//}
     
     $this->AddDebugLog(' ');
     $debuglog = $this->GetDebugLog();
     $update = $update.',debuglog="'.$debuglog.'"';
-		$result = $this->database->Update($update,'accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update($update,'accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	public function GetInventory()
@@ -1941,7 +2038,7 @@ class Player
 		}
 		$this->SetRank($rank);
 		
-		$result = $this->database->Update('rank="'.$rank.'"','accounts','id = "'.$id.'"',1);
+		$result = $this->database->Update('rank="'.$rank.'"','accounts','id = '.$id.'',1);
     return 0;
 	}
 	
@@ -1955,7 +2052,7 @@ class Player
 		$pw = '';
 		$regID = 0;
 		$id = $this->database->EscapeString($id);
-		$result = $this->database->Select('*','registers','id = "'.$id.'"',1);
+		$result = $this->database->Select('*','registers','id = '.$id.'',1);
 		if ($result) 
 		{
       $row = $result->fetch_assoc();
@@ -1977,11 +2074,11 @@ class Player
       return false;
     }
 		
-		$result = $this->database->Insert('LoginName,Password,Email,IP,Datum','"'.$acc.'","'.$pw.'","'.$email.'","'.$this->GetIP().'",NOW()', 'z_user');
+		$result = $this->database->Insert('LoginName,Password,Email,IP,Datum','"'.$acc.'","'.$pw.'","'.$email.'",'.$this->GetIP().',NOW()', 'z_user');
 		
 		$id = $this->database->GetLastID();
     
-		$result = $this->database->Delete('registers','login = "'.$acc.'"',1);
+		$result = $this->database->Delete('registers','login = '.$acc.'',1);
 		
 		return true;
 	}
@@ -1990,7 +2087,7 @@ class Player
 	{
 		$this->SetFakeKI($ki);
 		$set = 'fakeki="'.$ki.'"';
-		$result = $this->database->Update($set,'accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update($set,'accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	public function ChangeDesign($design)
@@ -1998,7 +2095,7 @@ class Player
 		$design = $this->database->EscapeString($design);
 		$this->SetDesign($design);
 		$set = 'design="'.$design.'"';
-		$result = $this->database->Update($set,'accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update($set,'accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	public function ChangeTitel($titel)
@@ -2006,7 +2103,7 @@ class Player
 		$titel = $this->database->EscapeString($titel);
 		$this->SetTitel($titel);
 		$set = 'titel="'.$titel.'"';
-		$result = $this->database->Update($set,'accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update($set,'accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	public function AddTitel($titel)
@@ -2021,7 +2118,7 @@ class Player
     $titels = implode(';',$titels);
 		$this->SetTitels($titels);
 		$set = 'titels="'.$titels.'"';
-		$result = $this->database->Update($set,'accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update($set,'accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	public function ChangeProfile($text, $image, $chatactivate)
@@ -2034,7 +2131,7 @@ class Player
 			$chatActive = 1;
 		}
 		$set = 'text="'.$formatedText.'", charimage="'.$image.'", chatactive="'.$chatActive.'"';
-		$result = $this->database->Update($set,'accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update($set,'accounts','id = '.$this->data['id'].'',1);
 		$this->SetText($text);
 		$this->SetImage($image);
 		$this->SetChatActive($chatActive);
@@ -2042,32 +2139,38 @@ class Player
 	
 	public function UpdateFight($id)
 	{
-		$result = $this->database->Update('fight="'.$id.'"','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('fight="'.$id.'"','accounts','id = '.$this->data['id'].'',1);
 		$this->SetFight($id);
 	}
 	
 	public function CloseStatsPopup()
 	{
-		$result = $this->database->Update('statspopup="0"','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('statspopup="0"','accounts','id = '.$this->data['id'].'',1);
 		$this->SetStatsPopup(false);
 	}
 	
 	public function IncreaseStats($lp, $kp, $attack, $defense)
 	{
+    $this->AddDebugLog('IncreaseStats');
+    
 		$nlp = $this->GetLP() + ($lp * 10);
 		$this->SetLP($nlp);
 		$nmlp = $this->GetMaxLP() + ($lp * 10);
+    $this->AddDebugLog(' - LP from '.$this->GetMaxLP().' to '.$nmlp);
 		$this->SetMaxLP($nmlp);
 		
 		$nkp = $this->GetKP() + ($kp * 10);
 		$this->SetKP($nkp);
 		$nmkp = $this->GetMaxKP() + ($kp * 10);
+    $this->AddDebugLog(' - KP from '.$this->GetMaxKP().' to '.$nmkp);
 		$this->SetMaxKP($nmkp);
 		
 		$nattack = $this->GetAttack() + $attack;
+    $this->AddDebugLog(' - ATK from '.$this->GetAttack().' to '.$nattack);
 		$this->SetAttack($nattack);
 		
 		$ndefense = $this->GetDefense() + $defense;
+    $this->AddDebugLog(' - DEF from '.$this->GetDefense().' to '.$ndefense);
 		$this->SetDefense($ndefense);
 		
 		$stats = $this->GetStats();
@@ -2075,8 +2178,11 @@ class Player
 		$stats = $stats-$kp;
 		$stats = $stats-$attack;
 		$stats = $stats-$defense;
+    $this->AddDebugLog(' - Stats from '.$this->GetStats().' to '.$stats);
 		$this->SetStats($stats);
 		$this->SetStatsPopup(false);
+    
+    $this->AddDebugLog(' ');
 		
 		$update = 'statspopup="0"';
 		$update = $update.', stats="'.$stats.'"';
@@ -2086,13 +2192,13 @@ class Player
 		$update = $update.', mkp="'.$nmkp.'"';
 		$update = $update.', attack="'.$nattack.'"';
 		$update = $update.', defense="'.$ndefense.'"';
-		$result = $this->database->Update($update,'accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update($update,'accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	public function SwitchChannel($channel)
 	{
 		$channel = $this->database->EscapeString($channel);
-		$result = $this->database->Update('chatchannel="'.$channel.'"','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('chatchannel="'.$channel.'"','accounts','id = '.$this->data['id'].'',1);
 		$this->SetChatChannel($channel);
 	}
 	
@@ -2128,6 +2234,32 @@ class Player
 		$this->SetTravelPlanet($planet);
 	}
 	
+	public function Teleport($planet, $place, $cost)
+	{
+    $newKP = $this->GetKP() - $cost;
+		$update = 'planet="'.$planet.'", place = "'.$place.'", kp = '.$newKP;
+    $this->SetKP($newKP);
+    $this->SetPlanet($planet);
+    $this->SetPlace($place);
+		$result = $this->database->Update($update,'accounts','id = '.$this->data['id'].'',1);
+	}
+	
+	public function TimeTravel($planet, $place)
+	{
+    $this->SetPlanet($planet);
+    $this->SetPlace($place);
+    
+    $isTimeTravelled = 1;
+    if($planet == 'Erde')
+    {
+      $isTimeTravelled = 0;
+    }
+    
+    $this->SetIsTimeTravelled($isTimeTravelled);
+		$update = 'planet="'.$planet.'", place = "'.$place.'",istimetravelled="'.$isTimeTravelled.'"';
+		$result = $this->database->Update($update,'accounts','id = '.$this->data['id'].'',1);
+	}
+	
 	public function Travel($place, $minutes, $action, $x, $y, $setAufReise=true)
 	{
 		$previousPlace = $this->GetPlace();
@@ -2145,34 +2277,62 @@ class Player
 	
 	public function DoAction($action, $minutes,$updateArgs='')
 	{
+    $this->AddDebugLog('DoAction');
 		$timestamp = date("Y-m-d H:i:s");
+    $this->AddDebugLog(' - Action '.$action->GetName(). '('.$action->GetID().')');
 		
 		$hours = $minutes / 60;
 		$price = round($action->GetPrice() * $hours);
 		$zeni = $this->GetZeni() - $price;
 		$this->SetZeni($zeni);
 		
-		$this->SetAction($action->GetID());
-		
-		$this->SetActionTime($minutes);
-		$this->SetActionStart($timestamp);
-		
-		$result = $this->database->Update('zeni="'.$zeni.'",action="'.$action->GetID().'",actionstart="'.$timestamp.'",actiontime="'.$minutes.'"'.$updateArgs,'accounts','id = "'.$this->data['id'].'"',1);
+    $updateAction = $action->GetID();
+    $updateTime = $minutes;
+    $updateStart = $timestamp;
+    $this->AddDebugLog(' - Minutes '.$minutes);
+    $this->AddDebugLog(' - timestamp '.$timestamp);
+    
+    if($minutes == 0)
+    {
+      $this->AddDebugLog(' - - minutes is zero');
+      $updateAction = $this->GetAction();
+      $updateTime = $this->GetActionTime();
+      $updateStart = $this->GetActionStart();
+    
+		  $this->SetAction($action->GetID());
+		  $this->SetActionTime($minutes);
+		  $this->SetActionStart($timestamp);
+      
+      $this->CalculateAction();
+    }
+    $this->AddDebugLog(' -Reset Action to '.$updateAction);
+      
+		$this->SetAction($updateAction);
+		$this->SetActionTime($updateTime);
+		$this->SetActionStart($updateStart);
+    
+		$result = $this->database->Update('zeni="'.$zeni.'",action="'.$updateAction.'",actionstart="'.$updateStart.'",actiontime="'.$updateTime.'"'.$updateArgs,'accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	public function UpdateDailyNPCFights()
 	{
-		$result = $this->database->Update('dailynpcfights="'.$this->GetDailyNPCFights().'"','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('dailynpcfights="'.$this->GetDailyNPCFights().'"','accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	public function AddStats($stats)
 	{
-			if($this->GetStats() == 0)
-			{
-				$this->SetStatsPopup(true);
-			}
-			$this->SetStats($this->GetStats()+$stats);
-		$result = $this->database->Update('statspopup="'.$this->GetStatsPopup().'",stats="'.$this->GetStats().'"','accounts','id = "'.$this->data['id'].'"',1);
+		if($this->GetStats() == 0)
+		{
+			$this->SetStatsPopup(true);
+		}
+    $nStats = $this->GetStats() + $stats;
+    
+    $this->AddDebugLog('AddStats');
+    $this->AddDebugLog(' - From '.$this->GetStats().' to '.$nStats);
+    $this->AddDebugLog(' ');
+    
+		$this->SetStats($nStats);
+		$result = $this->database->Update('statspopup="'.$this->GetStatsPopup().'",stats="'.$this->GetStats().'"','accounts','id = '.$this->data['id'].'',1);
 	}
 	public function AddTechnique($technique)
 	{
@@ -2184,35 +2344,49 @@ class Player
 		array_push($attacks, $technique);
 		$attacks = implode(';',$attacks);
 		$this->SetAttacks($attacks);
-		$result = $this->database->Update('attacks="'.$attacks.'"','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('attacks="'.$attacks.'"','accounts','id = '.$this->data['id'].'',1);
 		return true;
 	}
 	
 	public function JumpStory($story)
 	{
 		$this->SetStory($story);
-		$result = $this->database->Update('story="'.$this->GetStory().'"','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('story="'.$this->GetStory().'"','accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	public function ContinueStory($levelup, $zeni, $items, $skillpoints, $itemManager)
 	{
-		$this->SetStory($this->GetStory()+1);
+    $this->AddDebugLog('ContinueStory');
+    
+    $nStory = $this->GetStory()+1;
+    
+    $this->AddDebugLog(' - Story From '.$this->GetStory().' to '.$nStory);
+    
+		$this->SetStory($nStory);
 		if($levelup)
 		{
-			$this->SetLevel($this->GetLevel()+1);
+      $nLevel = $this->GetLevel()+1;
+      $this->AddDebugLog(' - Level From '.$this->GetLevel().' to '.$nLevel);
+			$this->SetLevel($nLevel);
 			if($this->GetStats() == 0)
 			{
 				$this->SetStatsPopup(true);
 			}
-			$this->SetStats($this->GetStats()+10);
+      $nStats = $this->GetStats()+10;
+      $this->AddDebugLog(' - Stats From '.$this->GetStats().' to '.$nStats);
+			$this->SetStats($nStats);
 		}
 		if($zeni != 0)
 		{
-			$this->SetZeni($this->GetZeni()+$zeni);
+      $nZeni = $this->GetZeni()+$zeni;
+      $this->AddDebugLog(' - Zeni From '.$this->GetZeni().' to '.$nZeni);
+			$this->SetZeni($nZeni);
 		}
     if($skillpoints != 0)
     {
-      $this->SetSkillPoints($this->GetSkillPoints()+$skillpoints);
+      $nSkillPoints = $this->GetSkillPoints()+$skillpoints;
+      $this->AddDebugLog(' - SkillPoints From '.$this->GetSkillPoints().' to '.$nSkillPoints);
+      $this->SetSkillPoints($nSkillPoints);
     }
     
     if(isset($items) && count($items) > 0)
@@ -2224,21 +2398,22 @@ class Player
         $this->AddItems($itemObject, $itemObject, $itemData[1]);
       }
     }
+      $this->AddDebugLog(' ');
     $titelManager = new titelManager($this->database);
     $titelManager->AddTitelStory($this, $this->GetStory());
-		$result = $this->database->Update('skillpoints=skillpoints+'.$skillpoints.',statspopup="'.$this->GetStatsPopup().'",stats="'.$this->GetStats().'",story="'.$this->GetStory().'",level="'.$this->GetLevel().'",zeni="'.$this->GetZeni().'"','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('skillpoints=skillpoints+'.$skillpoints.',statspopup="'.$this->GetStatsPopup().'",stats="'.$this->GetStats().'",story="'.$this->GetStory().'",level="'.$this->GetLevel().'",zeni="'.$this->GetZeni().'"','accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	public function JoinTournament($tid)
 	{
 		$this->SetPendingTournament($tid);
-		$result = $this->database->Update('pendingtournament="'.$tid.'"','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('pendingtournament="'.$tid.'"','accounts','id = '.$this->data['id'].'',1);
 	}
 	public function LeaveTournament()
 	{
 		$tid = 0;
 		$this->SetPendingTournament($tid);
-		$result = $this->database->Update('pendingtournament="'.$tid.'"','accounts','id = "'.$this->data['id'].'"',1);
+		$result = $this->database->Update('pendingtournament="'.$tid.'"','accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	public function IsValid()
@@ -2372,14 +2547,15 @@ class Player
   public function Revive()
   {
     $deathPlanet = $this->GetDeathPlanet();
-    if($deathPlanet == '')
-      $deathPlanet = 'Erde';
     $deathPlace = $this->GetDeathPlace();
-    if($deathPlace == '')
+    if($deathPlanet == 'Jenseits' || $deathPlanet == '' || $deathPlace == '')
+    {
+      $deathPlanet = 'Erde';
       $deathPlace = 'Wald';
+    }
     $this->SetPlanet($deathPlanet);
     $this->SetPlace($deathPlace);
-	 $result = $this->database->Update('planet="'.$deathPlanet.'", place="'.$deathPlace.'"','accounts', 'id = "'.$this->GetID().'"',1);
+	 $result = $this->database->Update('planet="'.$deathPlanet.'", place="'.$deathPlace.'"','accounts', 'id = '.$this->GetID().'',1);
   }
 	
 	public function GetSparringPartner()
@@ -2390,7 +2566,7 @@ class Player
   public function GetSparringPartnerName()
   {
     $partnerName = '';
-    $result = $this->database->Select('id, name','accounts','id = "'.$this->GetSparringPartner().'"',1);
+    $result = $this->database->Select('id, name','accounts','id = '.$this->GetSparringPartner().'',1);
     if ($result) 
     {
       $row = $result->fetch_assoc();
@@ -2537,9 +2713,19 @@ class Player
 		return $this->data['deathplace'];
 	}
 	
+	public function SetDeathPlace($value)
+	{
+		$this->data['deathplace'] = $value;
+	}
+	
 	public function GetDeathPlanet()
 	{
 		return $this->data['deathplanet'];
+	}
+	
+	public function SetDeathPlanet($value)
+	{
+		$this->data['deathplanet'] = $value;
 	}
 	
 	public function GetStatsTraining()
@@ -2698,15 +2884,21 @@ class Player
 		$this->data['attacks'] = $value;
 	}
   
-  public function AddFightAttack($technique)
+  public function AddFightAttack($techniques)
   {
-		$attacks = explode(';',$this->GetFightAttacks());
-		if(in_array($technique, $attacks))
-		{
-			return;
-		}
-		array_push($attacks, $technique);
-		$attacks = implode(';',$attacks);
+    if($this->GetFightAttacks() == '')
+      $attacks = array();
+    else
+		  $attacks = explode(';',$this->GetFightAttacks());
+    
+    foreach ($techniques as &$technique) 
+    {
+      if(in_array($technique, $attacks))
+        continue;
+      
+      array_push($attacks, $technique);
+    }
+    $attacks = implode(';',$attacks);
     $this->SetFightAttacks($attacks);
   }
 	
@@ -2905,7 +3097,7 @@ class Player
 	
 	public function GetWishCounter()
 	{
-    $result = $this->database->Select('userid, wishcounter', 'accounts', 'wishcounter != 0 AND userid="'.$this->GetUserID().'"', 1);
+    $result = $this->database->Select('userid, wishcounter', 'accounts', 'wishcounter != 0 AND userid='.$this->GetUserID().'', 1);
 		if ($result) 
 		{
 			if ($result->num_rows > 0)
@@ -3169,6 +3361,11 @@ class Player
 		$this->data['titels'] = $titels;
 	}
 	
+	public function SetTitelsArray($titels)
+	{
+		$this->data['titels'] = implode(';', $titels);
+	}
+	
 	public function GetRank()
 	{
 		return $this->data['rank'];
@@ -3197,6 +3394,16 @@ class Player
 	public function SetApeTail($value)
 	{
 		$this->data['apetail'] = $value;
+	}
+	
+	public function CanTeleport()
+	{
+		return $this->data['canteleport'] == 1;
+	}
+	
+	public function SetCanTeleport($value)
+	{
+		$this->data['canteleport'] = $value;
 	}
 	
 	public function GetApeControl()
@@ -3232,6 +3439,16 @@ class Player
 	public function SetFakeKI($value)
 	{
 		$this->data['fakeki'] = $value;
+	}
+	
+	public function IsTimeTravelled()
+	{
+		return $this->data['istimetravelled'];
+	}
+	
+	public function SetIsTimeTravelled($value)
+	{
+		$this->data['istimetravelled'] = $value;
 	}
 	
 }

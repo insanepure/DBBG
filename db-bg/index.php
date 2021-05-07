@@ -2,6 +2,7 @@
 include_once $_SERVER['DOCUMENT_ROOT'].'../../main/www/classes/session.php';
 ini_set("display_errors", 1);
 ini_set("track_errors", 1);
+ini_set("log_errors", 0);
 ini_set("html_errors", 1);
 error_reporting(E_ALL & ~E_DEPRECATED);
 require_once "recaptchalib.php";
@@ -17,7 +18,7 @@ else if(!isset($_GET['p']) ||isset($_GET['p']) && !file_exists('pages/content/'.
 	include_once 'pages/head/news.php';
 }
 
-if($account->IsLogged() && $player->IsLogged())
+if($account->IsLogged() && $player->IsLogged() && !$player->IsAdminLogged())
 {
   LoginTracker::TrackUser($accountDB, $account->Get('id'), $player->GetName(), 'dbbg', $account->Get('password'), $account->Get('email'), session_id(), $account->GetIP(), $account->GetRealIP());
 }
@@ -32,17 +33,23 @@ $start = $time;
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="de" lang="de">
 <head>
   <!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-141582905-1"></script>
 <?php
-$user_id_analytics = session_id();
+$analyticsID = 'G-ZP59JY4Q6Y';
+?>
+<script async src="https://www.googletagmanager.com/gtag/js?id=<?php echo $analyticsID; ?>"></script>
+<?php
+$user_id_analytics = '';
+$accountTag = '';
+$charaTag = '';
 if($account->IsLogged())
 {
-  $user_id_analytics = $account->Get('id').' ('.$account->Get('login').')';
+  $accountTag = $account->Get('id').' ('.$account->Get('login').')';
+  $user_id_analytics = $account->Get('id');
   if($player->IsLogged())
   {
     $uid = $player->GetID();
     $uname = $player->GetName();
-    $user_id_analytics = $user_id_analytics.' - '.$uid.' ('.$uname.')';
+    $charaTag = $uid.' ('.$uname.')';
   }
 }
 ?>
@@ -50,8 +57,12 @@ if($account->IsLogged())
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-  gtag('set', {'user_id': '<?php echo $user_id_analytics; ?>'}); // Legen Sie die User ID mithilfe des Parameters "user_id" des angemeldeten Nutzers fest.
-  gtag('config', 'UA-141582905-1');
+  gtag('set','user_properties', {
+  sessionid: '<?php echo session_id(); ?>',
+  account: '<?php echo $accountTag; ?>',
+  character: '<?php echo $charaTag; ?>'
+  });
+  gtag('config', '<?php echo $analyticsID; ?>' <?php if($user_id_analytics != '') { ?>,{ 'user_id': '<?php echo $user_id_analytics; ?>' } <?php } ?>);
 </script>
 <script src="https://www.google.com/recaptcha/api.js?render=6Lcd57wUAAAAAMqh2WE8_KEHveQ4Ycw1gRmbZQkI"></script>
 <script>
@@ -111,19 +122,19 @@ else
 }
 ?>
 </title>
-<link rel="stylesheet" href="css/main.css?003">
+<link rel="stylesheet" href="css/main.css?005">
 <?php
 
 if ($player->IsLogged())
 {
 ?>
-<link rel="stylesheet" href="css/designs/<?php echo $player->GetDesign(); ?>/main.css">
+<link rel="stylesheet" href="css/designs/<?php echo $player->GetDesign(); ?>/main.css?1338">
 <?php
 }
 else
 {
 ?>
-<link rel="stylesheet" href="css/designs/default/main.css">
+<link rel="stylesheet" href="css/designs/default/main.css?001">
 <?php
 }
 ?>
@@ -131,7 +142,7 @@ else
 if (isset($_GET['p']) && file_exists('css/pages/'.$_GET['p'].'.css'))
 {
 ?>
-  <link rel="stylesheet" href="css/pages/<?php echo $_GET['p']; ?>.css?005">
+  <link rel="stylesheet" href="css/pages/<?php echo $_GET['p']; ?>.css?009">
 <?php
 }
 else
@@ -152,7 +163,7 @@ if($player->GetChatActive())
 }
 ?>
 <body>
-<center>		
+<center>
 			<div id="popup" class="popup">
   			<div class="popup-container smallBG boxSchatten">
 					<div class="catGradient borderT borderB">
@@ -171,7 +182,19 @@ if($player->GetChatActive())
 					</div>
     		</div>
 			</div>
-<div class = "maincontainer borderBigL borderBigR">
+<div class = "maincontainer borderBigL borderBigR" style="position:relative">
+  <?php
+if($player->IsLogged() && $eventItem)
+{
+  ?>
+  <div style="z-index:10; position:absolute; top:<?php echo $eventItem->GetY(); ?>px; left:<?php echo $eventItem->GetX(); ?>px;">
+  <a href="?<?php echo $eventItemURL.$eventItemPickURL; ?>">  
+    <img src="<?php echo $eventItem->GetImage(); ?>"></img>
+  </a> 
+  </div>
+  <?php
+}  
+?>
 	<header>
 	<div class = "header" role="banner" itemscope itemtype="">
 	<?php
@@ -179,19 +202,12 @@ if($player->GetChatActive())
 		$wartung = 0;
 		if($wartung == 1)
 		{
-    if ($player->IsLogged() && $player->GetCanJoin() == '0')
-    { 
-        //$player->Logout();
-    }
-			?>
-		 <div class="logo2"></div>
-		<?php
-		}
-		else
-		{
-		?>
-		   <div class="logo">
-		   </div>
+      if ($player->IsLogged() && $player->GetCanJoin() == '0')
+      { 
+          //$player->Logout();
+      }
+      ?>
+       <div class="logo2"></div>
 		<?php
 		}
 		?>
@@ -203,12 +219,22 @@ if($player->GetChatActive())
 			<li class = "navigationbarbutton borderR"><a class="navigationbarbuttontext" title="dragonball,browsergame" href="index.php">News</a></li>
 			<li class = "navigationbarbutton borderR"><a class="navigationbarbuttontext" title="dragonball,browsergame" id="no-link" target="_blank" href="https://n-bg.de/" rel="nofollow">N-BG</a></li>
 			<!--<li class = "navigationbarbutton borderR"><a class="navigationbarbuttontext" title="dragonball,browsergame" id="no-link" target="_blank" href="/forum/" rel="nofollow">Forum</a></li>-->
-			<li class = "navigationbarbutton borderR"><a class="navigationbarbuttontext" title="dragonball,browsergame" id="no-link" target="_blank" href="https://discord.gg/PUC5MwT" rel="nofollow">Discord</a></li>
+			<li class = "navigationbarbutton borderR"><a class="navigationbarbuttontext" title="dragonball,browsergame" id="no-link" target="_blank" href="https://discord.gg/Nw9f8cJawv" rel="nofollow">Discord</a></li>
 			<li class = "navigationbarbutton borderR"><a class="navigationbarbuttontext" title="dragonball,browsergame" id="no-link" href="?p=info" >Infos</a></li>
 			<li class = "navigationbarbutton borderR"><a class="navigationbarbuttontext" title="dragonball,browsergame" id="no-link" href="?p=partner" >Partner</a></li>
+      <?php
+      if($account->IsLogged() && $player->IsLogged())
+      {
+       ?>
+			 <li class = "navigationbarbutton borderR"><a class="navigationbarbuttontext" title="dragonball,browsergame" id="no-link" href="?p=support" >Support</a></li>	 
+       <?php
+      }
+      ?>
+      
+      
 			<li class = "navigationbarbutton borderR"><a class="navigationbarbuttontext" title="dragonball,browsergame" id="no-link" href="?p=clans">&nbsp;&nbsp;
 				<?php $clanCount = $gameData->GetClans(); if($clanCount == 1) echo $clanCount.' Clan'; else echo $clanCount.' Clans'; ?>&nbsp;&nbsp;</a></li>
-			<li class = "navigationbarbutton borderR"><a class="navigationbarbuttontext" title="dragonball,browsergame" id="no-link" href="?p=online">&nbsp;&nbsp;<?php echo $gameData->GetOnline(); ?>&nbsp;Spieler Online&nbsp;&nbsp;</a></li>
+			<li class = "navigationbarbutton borderR"><a class="navigationbarbuttontext" title="dragonball,browsergame" id="no-link" href="?p=online">&nbsp;&nbsp;<?php echo $gameData->GetOnline(); ?>&nbsp;Online&nbsp;&nbsp;</a></li>
 			<?php
       if($account->IsLogged())
       {
@@ -223,7 +249,7 @@ if($player->GetChatActive())
         }
         else
         {
-          ?>			 
+          ?>		
           <li class = "navigationbarbutton borderL" style="float:right"><a class="navigationbarbuttontext" href="?p=login&a=charlogout">Logout</a></li>
           <?php
         }
@@ -243,7 +269,7 @@ if($player->GetChatActive())
   
   
   <?php
-  if($account->IsLogged() && $account->Get('id') != 1 && $player->IsLogged())
+  if($account->IsLogged() && $account->Get('id') != 1 && $account->Get('id') != 20 && $player->IsLogged())
   {
     ?>
     <div class="menuBG borderB" style="width:auto; height:110px;">
@@ -342,7 +368,7 @@ if($player->GetChatActive())
 	} //PlayerLogged
 	?>
 	<footer>
-	<div class="footer borderT">
+	<div class="footer borderT" style="font-size:14px;">
 		<?php
   $time = microtime();
 $time = explode(' ', $time);

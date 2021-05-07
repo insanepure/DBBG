@@ -87,7 +87,16 @@
     ?>
   <tr>
     <td class="borderT" style ="boxSchatten" align="center"> 
-      <img class="boxSchatten borderT borderR borderL borderB" src="img/items/<?php echo $item->GetImage(); ?>.png" style="width:50px;height:50px;"> 
+    <div style="width:50px; height:50px; position:relative; top:0px; left:-25px;">
+      <?php if($item->HasOverlay())
+      {
+        ?>
+      <img class="boxSchatten borderT borderR borderL borderB" src="img/items/<?php echo $item->GetOverlay(); ?>.png" style="width:50px;height:50px; position:absolute; z-index:1;"> 
+        <?php
+      }
+      ?>
+      <img class="boxSchatten borderT borderR borderL borderB" src="img/items/<?php echo $item->GetImage(); ?>.png" style="width:50px;height:50px; position:absolute; z-index:0;"> 
+      </div>
       <input type="hidden" name="item" value="<?php echo $item->GetID(); ?>">
     </td>
     <td class="borderT" style ="boxSchatten" align="center"> <b><?php echo $item->GetName(); ?></b> </td>
@@ -98,7 +107,7 @@
     ?>
     </td>
         
-    <td class="borderT" style ="boxSchatten" align="center"> <?php echo $item->GetPrice(); ?> Zeni </td>
+    <td class="borderT" style ="boxSchatten" align="center"><?php echo number_format($item->GetPrice(), 0, ',', '.'); ?> Zeni</td>
     <td class="borderT" style ="boxSchatten"> 
       <button onclick="OpenPopupPage('Item Kaufen','shop/buy.php?item=<?php echo $item->GetID(); if(isset($_GET['itemname'])) echo '&itemname='.$_GET['itemname']; if(isset($_GET['itemcategory'])) echo '&itemcategory='.$_GET['itemcategory']; ?>')">
       Kaufen

@@ -34,6 +34,7 @@ if(isset($fight) && $fight->GetID() == $player->GetFight() && !$fight->IsEnded()
       <?php
         $i = 0;
         $selected = false;
+        $pTarget = $pFighter->GetPreviousTarget();
         while(isset($teams[$i]))
         {
           $players = $teams[$i];
@@ -41,7 +42,25 @@ if(isset($fight) && $fight->GetID() == $player->GetFight() && !$fight->IsEnded()
           while(isset($players[$j]))
           {
             $fighter = $players[$j];
-            if($fighter->IsInactive())
+            if($pFighter->GetTeam() != $fighter->GetTeam() && $fighter->GetLP() == 0 && $fighter->GetID() == $pTarget)
+            {
+              $pTarget = 0;
+            }
+            ++$j;
+            
+          }
+          ++$i;
+        }
+      
+        $i = 0;
+        while(isset($teams[$i]))
+        {
+          $players = $teams[$i];
+          $j = 0;
+          while(isset($players[$j]))
+          {
+            $fighter = $players[$j];
+            if($fighter->IsInactive() || $pFighter->GetTeam() != $fighter->GetTeam() && $fighter->GetLP() == 0)
             {
               ++$j;
               continue;
@@ -49,7 +68,7 @@ if(isset($fight) && $fight->GetID() == $player->GetFight() && !$fight->IsEnded()
             ?>
             <option value="<?php echo $fighter->GetID(); ?>" 
             <?php 
-            if($pFighter->GetPreviousTarget() == $fighter->GetID() || $pFighter->GetPreviousTarget() == 0 && !$selected && $fighter->GetTeam() != $pFighter->GetTeam() && $fighter->GetLP() != 0)
+            if($pTarget == $fighter->GetID() || $pTarget == 0 && !$selected && $fighter->GetTeam() != $pFighter->GetTeam() && $fighter->GetLP() != 0)
             {
               ?> selected<?php
               $selected = true;
@@ -170,9 +189,11 @@ else
 </div>
 
 <div class="spacer"></div>
-<?php if($fight->IsEnded())
+<?php if($player->GetARank() >= 2 || $fight->IsEnded())
 {
   ?>
+Die Melde-Funktion ist nur zum Melden von Fehlern.
+<div class="spacer"></div>
 <form method="post" action="?p=infight&fight=<?php echo $fight->GetID(); ?>&a=meld">
 <input class="submit" type="submit" value="Melden">
 </form>

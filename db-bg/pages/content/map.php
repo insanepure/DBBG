@@ -3,8 +3,11 @@ grecaptcha.ready(function() {
   grecaptcha.execute('6Lcd57wUAAAAAMqh2WE8_KEHveQ4Ycw1gRmbZQkI', {action: 'Map'});
 });
 </script>
+<?php
+$planet = new Planet($database, $player->GetPlanet());
+?>
 <div class="spacer"></div>
-<div class="map boxSchatten borderL borderR borderT borderB" style=" border:1px solid black; background-image: url('img/planets/<?php echo $player->GetPlanet(); ?>.png?004')">
+<div class="map boxSchatten borderL borderR borderT borderB" style=" border:1px solid black; background-image: url('img/planets/<?php echo $planet->GetMap(); ?>.png?004')">
   <?php
   $events = new Generallist($database, 'events', '*', 'isdungeon="0"', '', 9999, 'ASC');
   
@@ -13,7 +16,7 @@ grecaptcha.ready(function() {
   /*if($player->GetARank() >=3) {
     $database->Debug();
   }*/
-  $places = new Generallist($database, 'places', 'id,name,description,display,x,y,image,planet,travelable, adminplace', 'planet = "'.$player->GetPlanet().'"', '', 99999, 'ASC');
+  $places = new Generallist($database, 'places', 'id,name,description,display,x,y,image,planet,travelable, adminplace', 'planet = "'.$player->GetPlanet().'"', 'y', 99999, 'ASC');
   $id = 0;
   $entry = $places->GetEntry($id);
   $x = 0;
@@ -66,7 +69,7 @@ grecaptcha.ready(function() {
 		if($entry['display'] == 1 || $player->GetArank() >= 2 && $entry['adminplace'] == 1)
 		{
 				?>
-			<div class="tooltip" style="position:absolute; left:<?php echo $entry['x']; ?>px; top:<?php echo $entry['y']; ?>px;"> 
+			<div class="tooltip" style="z-index:2; position:absolute; left:<?php echo $entry['x']; ?>px; top:<?php echo $entry['y']; ?>px;"> 
 			<a style="cursor:pointer;" onclick="OpenPopupPage('<?php echo $entry['name']; ?>','map/place.php?name=<?php echo $entry['name']; ?>&planet=<?php echo $entry['planet']; ?>')"><div class="<?php echo $placeCSS; ?>" style="left:59px; top:30px;"></div></a>
 			<span class="tooltiptext" style="width:200px; left:-35px;"><?php echo $entry['name']; ?></span>
 			</div> 

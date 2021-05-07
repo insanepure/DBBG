@@ -12,7 +12,7 @@ if(isset($_GET['name']))
 	  $planet = null;
   }
 }
-if($planet == null || !$planet->CanSee($player->GetStory()))
+if($planet == null || $player->IsTimeTravelled() && $player->GetPlanet() != $planet->GetName() || !$player->IsTimeTravelled() && !$planet->CanSee($player->GetStory()))
 {
 	?>
 	Dieser Planet existiert nicht.
@@ -60,10 +60,29 @@ echo $bbcode->parse($planet->GetDescription());
     Reisedauer: <?php echo $travelTimeHours.':'.$travelTimeMinutes.'H<br/>';?>
     Zeit bis Statspunkt: <?php echo (60-$player->GetTravelTimeLeft()); ?> Minuten<br/>
     <?php if($statstrainintravel > 0) echo "Reise Training: ".$statstrainintravel." Statspunkte";?>
+    <table>
+      <tr>
+        <td>
 		<form method="POST" action="?p=spacetravel&a=travel">
 		<input type="hidden" name="destination" value="<?php echo $planet->GetName(); ?>">
 		<input type="submit" value="Reisen">
 		</form>
+       </td>
+    <?php
+    if($player->CanTeleport())
+    {
+      ?>
+        <td>
+		  <form method="POST" action="?p=spacetravel&a=teleport">
+      <input type="hidden" name="destination" value="<?php echo $planet->GetName(); ?>">
+      <input type="submit" value="Teleportieren">
+      </form>
+       </td>
+      <?php
+    }
+    ?>
+      </tr>
+  </table>
 <div class="spacer"></div>
 		<?php
 	}

@@ -47,7 +47,7 @@ if(isset($_GET['a']) && $_GET['a'] == 'train' && isset($_GET['id']))
         $learnID = 23;
         $action = $actionManager->GetAction($learnID);
         $minutes = $action->GetMinutes() * $attack->GetLearnTime();
-        if($player->GetAction() != 0)
+        if($minutes != 0 && $player->GetAction() != 0)
         {
           $message = 'Du tust bereits etwas.';
         }
