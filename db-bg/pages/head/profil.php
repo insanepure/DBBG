@@ -26,15 +26,27 @@ function generateRandomString($length = 10) {
 function ShowSlotEquippedImage($slot, $inventory, $zorders, $zordersOnTop)
 {
   $item = $inventory->GetItemAtSlot($slot);
+  //$helmEquipt = $inventory->HasHelmetItemEquipt();
+
+
   if($item != null)
   {
-   if($item->IsOnTop())
-     $zindex = $zordersOnTop[$slot];
-    else
-      $zindex = $zorders[$slot];
-		?> 
-		<div class="profilecharacter" style="top:20px; left:185px; z-index:<?php echo $zindex; ?>; background-image:url('img/ausruestung/<?php echo $item->GetEquippedImage(); ?>')"></div>
-		<?php
+
+       if($item->IsOnTop())
+           $zindex = $zordersOnTop[$slot];
+       else
+           $zindex = $zorders[$slot];
+       ?>
+       <div class="profilecharacter" style="top:20px; left:185px; z-index:<?php echo $zindex; ?>; background-image:url('img/characteritems/<?php echo $item->GetEquippedImage(); ?>')"></div>
+       <?php
+       if($item->GetEquippedBGImage() != '')
+       {
+           $zindex = $zorders[10];
+           ?>
+           <div class="profilecharacter" style="top:20px; left:185px; z-index:<?php echo $zindex; ?>; background-image:url('img/characteritems/<?php echo $item->GetEquippedBGImage(); ?>')"></div>
+           <?php
+       }
+      
   }
 }
 
@@ -104,7 +116,7 @@ else if(isset($_GET['a']) && $_GET['a'] == 'meld' && $player != null)
 else if(isset($_GET['a']) && $_GET['a'] == 'acceptcancelsparring')
 {
 	$otherPlayer = new Player($database, $player->GetSparringPartner(), $actionManager);
-	if($otherPlayer->IsValid())
+	if($otherPlayer->IsValid() && $player->GetSparringCancel())
 	{
 		$otherPlayer->DoSparringCancel();
 		$player->DoSparringCancel();
@@ -395,7 +407,15 @@ else if(isset($_GET['a']) && $_GET['a'] == 'style' && isset($_POST['design']))
 else if(isset($_GET['a']) && $_GET['a'] == 'titel' && isset($_POST['titel']))
 {
 	$titel = $_POST['titel'];
-	$player->ChangeTitel($titel);
+  $titels = $player->GetTitels();
+  if(in_array($titel, $titels) || $titel == 0)
+  {
+	  $player->ChangeTitel($titel);
+  }
+  else
+  {
+    $message = 'Du hast diesen Titel nicht.';
+  }
 }
 else if(isset($_GET['a']) && $_GET['a'] == 'change')
 {
@@ -543,7 +563,7 @@ else if(isset($_GET['a']) && $_GET['a'] == 'groupinvite')
 	{
 		$message = 'Dieser User gibt es nicht.';
 	}
-	else if($player->GetARank() < 3 && $player->IsMulti($target))
+	else if($player->GetARank() < 2 && $player->IsMulti($target))
 	{
 		$message = 'Du kannst mit einen deiner Charaktere keine Gruppe bilden machen.';
 	}

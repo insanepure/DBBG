@@ -12,37 +12,103 @@ if($player->GetClan() != 0)
 <div class="spacer"></div>
 <div style="position:relative;">
 <div class="char">
-	<div class="char2" style="z-index:<?php echo $zorders[0]; ?>; background-image: url('img/races/<?php echo $player->GetRaceImage(); ?>.png')">
+	<div class="char2" style="z-index:<?php echo $zorders[0]; ?>; background-image: url('img/characters/<?php echo $player->GetRaceImage(); ?>.png')">
 	</div>
  <?php if($displayedClan != null && $displayedClan->GetBanner() != '')
 {
 ?>
- <div class="tooltip" style="z-index:<?php echo $zorders[12]; ?>; position:absolute; left:119px; top:155px;"> 
-	 <img src="<?php echo $displayedClan->GetBanner(); ?>" style="z-index:<?php echo $zorders[11]; ?>; position:absolute; left:50px; top:50px;" width="30px" height="30px"></img>
+ <div class="tooltip" style="z-index:<?php echo $zorders[12]; ?>; position:absolute; left:115px; top:145px;"> 
+	 <img src="<?php echo $displayedClan->GetBanner(); ?>" style="z-index:<?php echo $zorders[11]; ?>; position:absolute; left:55px; top:30px;" width="30px" height="30px"></img>
     <span class="tooltiptext"><?php echo $displayedClan->GetName(); ?></span>
     </div> 
 <?php
 }
   ?>
 <div class="SideMenuKat catGradient borderB"><div class="schatten">Charakter</div></div>
-	<!-- Kleidung an Körper wie angezogen test -->
+    <?php
+  
+  
+    
+    function displayHair($raceImage, $zIndex, $zIndexBack, $powerupID)
+    {
+        $hairType = 'Hair';
+        $hairBack = '';
+        if(substr($raceImage, 0,-1) == 'Saiyajin')
+        {
+            if($powerupID == 23)
+            {
+              $hairType = 'SSJ';
+              if($raceImage == 'Saiyajin5')
+              {
+                $hairBack = $raceImage.$hairType.'Back';
+              }
+            }
+            else if($powerupID == 24 || $powerupID == 25)
+            {
+              $hairType = 'SSJ2';
+              if($raceImage == 'Saiyajin5')
+              {
+                $hairBack = $raceImage.$hairType.'Back';
+              }
+            }
+            else if($powerupID == 26 || $powerupID == 28)
+            {
+              $hairType = 'SSJ3';
+              if($raceImage != 'Saiyajin5')
+              {
+                $hairBack = 'SSJ3Back';
+              }
+              else
+              {
+                $hairBack = $raceImage.$hairType.'Back';
+              }
+            }
+        }
+        echo '<div class="char2" style="z-index:'.$zIndex."; background-image: url('"."img/characters/".$raceImage.$hairType.'.png'."'".')"'.'></div>';
+        echo '<div class="char2" style="z-index:'.$zIndexBack."; background-image: url('"."img/characters/".$hairBack.'.png'."'".')"'.'></div>';
+    }
+  
+    $itemObject = $inventory->GetItemAtSlot(8);
+    if(empty($itemObject)) {
+      displayHair($player->GetRaceImage(), $zorders[13], $zorders[14], $player->GetStartingPowerup());
+    } else {
+        $itemIsHelm = $itemObject->IsHelmet();
+        $itemIsEquipt = $itemObject->IsEquipped();
+        if ((!$itemIsHelm && $itemIsEquipt) || ($itemIsHelm && !$itemIsEquipt) || (!$itemIsHelm && !$itemIsEquipt)) {
+      displayHair($player->GetRaceImage(), $zorders[13], $zorders[14], $player->GetStartingPowerup());
+
+        }
+    }
+    ?>
+
+    <!-- Kleidung an Körper wie angezogen test -->
 	<?php
   if(date("Y-m-d") == '2021-04-01')
   {
-    ?><div class="char2" style="z-index:999; background-image: url('img/ausruestung/Huhnmaske.png'"></div><?php
+    ?><div class="char2" style="z-index:999; background-image: url('img/characteritems/Huhnmaske.png'"></div><?php
   }
   
-  if($player->GetPlanet() == 'Jenseits')
+  if($playerPlanet->IsInJenseits())
   {
-    ?><div class="char2" style="z-index:<?php echo $zorders[10]; ?>; background-image: url('img/ausruestung/heiligenschein.png'"></div><?php
+    ?><div class="char2" style="z-index:<?php echo $zorders[10]; ?>; background-image: url('img/characteritems/heiligenschein.png'"></div><?php
   }
   if($player->GetApeTail() == 3)
   {
-    ?><div class="char2" style="z-index:<?php echo $zorders[9]; ?>; background-image: url('img/races/saiyajintail.png'"></div><?php
+    $powerupID = $player->GetStartingPowerup();
+    $tail = 'SaiyajinTail';
+    if($powerupID == 23 || $powerupID == 24 || $powerupID == 25)
+    {
+      $tail = 'SaiyajinTailSSJ';
+    }
+    else if($powerupID == 26 || $powerupID == 28)
+    {
+      $tail = 'SaiyajinTailLSS';
+    }
+    ?><div class="char2" style="z-index:<?php echo $zorders[9]; ?>; background-image: url('img/characters/<?php echo $tail; ?>.png'"></div><?php
   }
 	ShowSlotEquippedImage(6, $inventory, $zorders, $zordersOnTop); //Waffe
 	ShowSlotEquippedImage(1, $inventory, $zorders, $zordersOnTop); //Aura 
-	ShowSlotEquippedImage(5, $inventory, $zorders, $zordersOnTop); // Brust
+	ShowSlotEquippedImage(5, $inventory, $zorders, $zordersOnTop); //Brust
 	ShowSlotEquippedImage(8, $inventory, $zorders, $zordersOnTop); //Accessoire
 	ShowSlotEquippedImage(2, $inventory, $zorders, $zordersOnTop); //Hände
 	ShowSlotEquippedImage(3, $inventory, $zorders, $zordersOnTop); //Hose

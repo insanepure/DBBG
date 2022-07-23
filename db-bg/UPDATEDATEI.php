@@ -16,9 +16,9 @@ include_once '/home/users/main/www/classes/session.php';
 include_once '/home/users/main/www/classes/header.php';
 error_reporting(0);
 
-$db = 'db_bg_db1';
-$user = 'db_bg_db1';
-$pw = 'ghG)sdf3FU!gz';
+$db = 'DB';
+$user = 'droot';
+$pw = '';
 $database = new Database($db, $user, $pw);
 
 include_once 'classes/clan/clan.php';

@@ -41,7 +41,7 @@ class NewsManager
 		if($currentNews == null)
 			return 0;
 		
-		if(!preg_match("/^[A-Za-z0-9,.\+\-!:;()\s?äöüÄÖÜ]+$/", $text))
+		if(!preg_match("/^[A-Za-z0-9,.\+\-!:;()\sß?äöüÄÖÜ]+$/", $text))
 		{
 		 return -1;
 		}

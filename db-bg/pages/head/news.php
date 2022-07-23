@@ -26,6 +26,10 @@ else if(isset($_GET['a']) && $_GET['a'] == 'post')
     {
       $message = 'Der Text enthält ungültige Wörter.';
     }
+    else if(strlen($text) > 100)
+    {
+      $message = 'Der Text enthält zuviele Zeichen.';
+    }
     else
     {
       $return = $newsManager->Post($player, $_GET['id'], $text);

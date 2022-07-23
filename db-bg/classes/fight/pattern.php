@@ -77,4 +77,9 @@ class Pattern
   {
     return $this->data['patternsetfailed'];
   }
+  
+  public function GetTriggerCount()
+  {
+    return $this->data['triggercount'];
+  }
 }

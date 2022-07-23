@@ -85,6 +85,11 @@ class Item
   {
     return $this->data['image'];
   }
+
+    public function IsHelmet()
+    {
+        return $this->data['IsHelmet'];
+    }
   
   public function IsSellable()
   {
@@ -116,6 +121,11 @@ class Item
     return $this->data['equippedimage'];
   }
   
+  public function GetEquippedBGImage()
+  {
+    return $this->data['equippedbgimage'];
+  }
+  
   public function GetSlot()
   {
     return $this->data['slot'];
@@ -139,6 +149,11 @@ class Item
   public function GetPrice()
   {
     return $this->data['price'];
+  }
+  
+  public function GetDragonCoins()
+  {
+    return $this->data['dragoncoins'];
   }
   
   public function GetArenaPoints()

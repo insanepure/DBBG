@@ -7,7 +7,7 @@ if(isset($_GET['a']) && $_GET['a'] == 'train' && isset($_GET['id']) && isset($_P
 {
   $hours = $_POST['hours'];
   $id = $_GET['id'];
-  if(!is_numeric($hours))
+  if(!is_numeric($hours) && $hours != 0)
   {
     $message = 'Die Stundenzahl ist ungültig.';
   }

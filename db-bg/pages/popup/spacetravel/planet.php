@@ -12,7 +12,7 @@ if(isset($_GET['name']))
 	  $planet = null;
   }
 }
-if($planet == null || $player->IsTimeTravelled() && $player->GetPlanet() != $planet->GetName() || !$player->IsTimeTravelled() && !$planet->CanSee($player->GetStory()))
+if($planet == null || $player->IsTimeTravelled() && $player->GetPlanet() != $planet->GetName() || !$player->IsTimeTravelled() && !$planet->CanSee($player->GetStory()) || $planet->IsInJenseits() != $playerPlanet->IsInJenseits())
 {
 	?>
 	Dieser Planet existiert nicht.
@@ -35,9 +35,8 @@ echo $bbcode->parse($planet->GetDescription());
   {
     ?> Du befindest dich hier. <?php 
   }
-	else if($planet->IsTravelable() && $player->GetPlanet() != 'Jenseits')
+	else if($planet->IsTravelable())
 	{
-		$playerPlanet = new Planet($database, $player->GetPlanet());
 		$travelTime = 0;
     
 		$x = $playerPlanet->GetX();

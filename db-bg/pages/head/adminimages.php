@@ -36,14 +36,25 @@ else
 }
 else if(isset($_GET['a']) && $_GET['a'] == 'upload' && isset($_GET['directory']))
 {
-    if(isset($_FILES['file_upload']) && $_FILES['file_upload']['size'] != 0)
+    $countfiles = count($_FILES['file_upload']['name']);
+    if($countfiles != 0)
     {
+      $filename = $_FILES['file']['name'][$i];
+
       $path = 'img/'.$_GET['directory'].'/';
       $imgHandler = new ImageHandler($path);
-      $result = $imgHandler->Upload($_FILES['file_upload'], $image, 2000, 2000, false);
-      $imagename = $_FILES['file_upload']['name'];
+      $result = $imgHandler->UploadMultiple($_FILES['file_upload'], $image, 2000, 2000,2097152, false);
+      $countfiles = count($_FILES['file_upload']['name']);
+      $imagename = '';
+      for( $i=0; $i < $countfiles; $i++)
+      {
+        if($imagename == '')
+          $imagename = $_FILES['file_upload']['name'][$i];
+        else
+          $imagename = $imagename.', '.$_FILES['file_upload']['name'][$i];
+      }
       
-      $message = 'Bild '.$imagename.' wurde erfolgreich hochgeladen.';
+      $message = 'Bilder '.$imagename.' wurden erfolgreich hochgeladen.';
       switch($result)
       {
         case -1:
@@ -64,7 +75,7 @@ else if(isset($_GET['a']) && $_GET['a'] == 'upload' && isset($_GET['directory'])
       }
       if($result == 1)
       {
-        $log = 'Bild <b>'.$imagename.'</b> wurde erfolgreich in <b>'.$path.'</b> hochgeladen.';
+        $log = 'Bilder <b>'.$imagename.'</b> wurden erfolgreich in <b>'.$path.'</b> hochgeladen.';
         AddToLog($database, $ip, $accs, $log);
       }
     }   

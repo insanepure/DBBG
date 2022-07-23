@@ -104,13 +104,12 @@ grecaptcha.ready(function() {
     <td width="15%"  align="center"><b> Bild </b></td>
     <td width="15%"  align="center"><b> Name </b></td>
     <td width="30%"  align="center"><b> Wirkung </b></td>
-    <td width="15%"  align="center"><b> Besitzer </b></td>
-    <td width="15%"  align="center"><b> Preis </b></td>
     <td width="15%"  align="center"><b> Aktion </b></td>
   </tr>
    <?php
   $i = 0;
   $marketItem = $market->GetItem($i);
+  $previousItemID = 0;
   while(isset($marketItem))
   {
     if (isset($_GET['itemname']) && $_GET['itemname'] != '' && strpos($marketItem->GetName(), $_GET['itemname']) === false) 
@@ -125,6 +124,14 @@ grecaptcha.ready(function() {
       $marketItem = $market->GetItem($i);
       continue;
     }
+    if($marketItem->GetStatsID() == $previousItemID)
+    {
+      ++$i;
+      $marketItem = $market->GetItem($i);
+      continue;
+    }
+    $previousItemID = $marketItem->GetStatsID();
+    $marketItem->SetStatsType(0);
     ?>
   <tr>
     <td class="borderT" style ="boxSchatten" align="center"> 
@@ -140,30 +147,14 @@ grecaptcha.ready(function() {
       </div>
       <input type="hidden" name="id" value="<?php echo $i; ?>">
     </td>
-    <td class="borderT" style ="boxSchatten" align="center"> <b><?php echo $marketItem->GetName(); ?></b> </td>
+    <td class="borderT" style ="boxSchatten" align="center"> <b><?php echo $marketItem->GetOriginalName(); ?></b> </td>
         <td class="borderT" style ="boxSchatten" align="center"><?php 
       echo $marketItem->DisplayEffect(); 
       if($marketItem->GetLevel() != 0) echo 'Benötigt Level '.$marketItem->GetLevel();  ?> </td>
-        <td class="borderT" style ="boxSchatten" align="center"> <a href="?p=profil&id=<?php echo $marketItem->GetSellerID(); ?>"><?php echo $marketItem->GetSeller(); ?></a></td>
-    <td class="borderT" wstyle ="boxSchatten" align="center"> <?php echo number_format($marketItem->GetPrice(), 0, ',', '.'); ?> Zeni </td>
     <td class="borderT" style ="boxSchatten"> 
-      <?php if($marketItem->GetSellerID() == $player->GetID())
-      {
-      ?>
-      <button onclick="OpenPopupPage('Item Nehmen','market/retake.php?item=<?php echo $marketItem->GetID(); if(isset($_GET['itemname'])) echo '&itemname='.$_GET['itemname']; if(isset($_GET['itemcategory'])) echo '&itemcategory='.$_GET['itemcategory']; ?>')">
-      Nehmen
+      <button onclick="OpenPopupPage('Item Betrachten','market/look.php?item=<?php echo $marketItem->GetStatsID(); if(isset($_GET['itemname'])) echo '&itemname='.$_GET['itemname']; if(isset($_GET['itemcategory'])) echo '&itemcategory='.$_GET['itemcategory']; ?>')">
+      Betrachten
       </button>
-     <?php
-      }
-      else
-      {
-      ?>
-      <button onclick="OpenPopupPage('Item Kaufen','market/buy.php?item=<?php echo $marketItem->GetID(); if(isset($_GET['itemname'])) echo '&itemname='.$_GET['itemname']; if(isset($_GET['itemcategory'])) echo '&itemcategory='.$_GET['itemcategory']; ?>')">
-      Kaufen
-      </button>
-      <?php
-      }
-      ?>
     </td>
     </form>
   </tr>

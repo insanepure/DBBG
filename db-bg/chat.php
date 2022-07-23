@@ -3,7 +3,7 @@ include_once $_SERVER['DOCUMENT_ROOT'].'../../main/www/classes/session.php';
 ini_set("display_errors", 1);
 ini_set("track_errors", 1);
 ini_set("html_errors", 1);
-error_reporting(E_ALL & ~E_DEPRECATED);
+error_reporting(E_ALL ^ E_DEPRECATED);
 include_once 'classes/header.php';
 ?>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="de" lang="de">

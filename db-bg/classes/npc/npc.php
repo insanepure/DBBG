@@ -42,6 +42,11 @@ class NPC
   {
     return $this->data['name'];
   }
+
+    public function GetKeepAlive()
+    {
+        return $this->data['survivalkeepalive'];
+    }
   
   public function SetName($value)
   {
@@ -63,9 +68,19 @@ class NPC
     return $this->data['zeni'];
   }
   
+  public function GetDragonCoins()
+  {
+    return $this->data['dragoncoins'];
+  }
+  
   public function GetPatterns()
   {
     return $this->data['patterns'];
+  }
+  
+  public function GetRandomPatterns()
+  {
+    return $this->data['randompatterns'];
   }
   
   public function GetRace()

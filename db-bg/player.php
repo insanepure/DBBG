@@ -43,12 +43,12 @@ function GetSlotImage($slot, $inventory)
   $item = $inventory->GetItemAtSlot($slot);
   if($item != null)
   {
-    return 'img/ausruestung/'.$item->GetEquippedImage();
+    return 'img/characteritems/'.$item->GetEquippedImage();
   }
   return null;
 }
 
-$raceUrl = 'img/races/'.$player->GetRaceImage().'.png';
+$raceUrl = 'img/characters/'.$player->GetRaceImage().'.png';
 
 if(!$debug)
 {
@@ -97,6 +97,10 @@ for($i = 0; $i < $maxVisuals; ++$i)
     if(!$debug)
     {
         imagecopyresized($dst, $raceImg, $dstX, $dstY, 0, 0, $newWidth, $newHeight, $src_x, $src_y);
+        $raceUrl2 = 'img/characters/'.$player->GetRaceImage().'Hair.png';
+        $img = imagecreatefrompng($raceUrl2);
+        imagecopyresized($dst, $img, $dstX, $dstY, 0, 0, $newWidth, $newHeight, imagesx($img), imagesy($img));
+        imagedestroy($img); 
     }
     else
     {
@@ -107,9 +111,9 @@ for($i = 0; $i < $maxVisuals; ++$i)
   {
     $itemImage = null;
     if($slot == 9 && $player->GetRace() == 'Saiyajin')
-      $itemImage = 'img/races/saiyajintail.png';
+      $itemImage = 'img/characters/SaiyajinTail.png';
     else if($slot == 10&& $player->GetPlanet() == 'Jenseits')
-      $itemImage = 'img/ausruestung/heiligenschein.png';
+      $itemImage = 'img/characteritems/heiligenschein.png';
     else
       $itemImage = GetSlotImage($slot, $inventory);
     if($itemImage != null)

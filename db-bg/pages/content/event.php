@@ -4,12 +4,15 @@ grecaptcha.ready(function() {
 });
 </script>
 <div class="spacer"></div>
+<table>
+<tr>
 <?php
 $events = new Generallist($database, 'events', '*', 'isdungeon="0"', '', 9999, 'ASC');
 $itemManager = new ItemManager($database);
 $active = false;
 $id = 0;
 $entry = $events->GetEntry($id);
+$num = 0;
 while($entry != null)
 {
   //Erde;Wald;1:2:3:4:5;1-31;1-12;0-365;2018-3000
@@ -21,10 +24,10 @@ while($entry != null)
   $month = date('n');
   $year = date('Y');
   $isPlaceAndPlanet = Event::IsPlaceAndPlanet($player->GetPlanet(), $player->GetPlace(), $entry['placeandtime']);
-  if($isPlaceAndPlanet && ($player->GetARank() >= 2 || $player->GetLevel() >= $entry['level']))
+  if(($isPlaceAndPlanet || $entry['iseverywhere']) && ($player->GetARank() >= 2 || $player->GetLevel() >= $entry['level']))
   {
     $active = true;
-    $isToday = Event::IsToday($player->GetPlanet(), $player->GetPlace(), $entry['placeandtime']);
+    $isToday = Event::IsToday($player->GetPlanet(), $player->GetPlace(), $entry['placeandtime'], $entry['iseverywhere']);
     $group = $player->GetGroup();
     $amount = 1;
     if($group != null)
@@ -36,7 +39,14 @@ while($entry != null)
     {
       $amount = $entry['maxplayers'];
     }
+  ++$num;
+  if($num > 3)
+  {
+  ?></tr><tr><?php
+    $num = 0;
+  }
 ?>
+  <td>
 <table width="25%" cellspacing="0" cellpadding="1" border="0">
   <tr>
     <td class="boxSchatten catGradient borderB borderT" colspan="6" align="center"><b><?php echo $entry['name']; ?></b></td>
@@ -55,6 +65,7 @@ while($entry != null)
           else
           {
             if($entry['zeni'] != 0) echo $entry['zeni'].' Zeni<br/>'; 
+            if($entry['dragoncoins'] != 0) echo $entry['dragoncoins'].' Dragoncoins<br/>'; 
             if($entry['item'] != '')
             {
                 $items = explode(';',$entry['item']);
@@ -133,6 +144,7 @@ while($entry != null)
       </td>
     </tr>
 </table>
+  </td>
 <?php
   }
 $id++;
@@ -147,3 +159,4 @@ if(!$active)
   <?php
 }
 ?>
+  </tr></table>

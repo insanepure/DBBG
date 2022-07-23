@@ -20,13 +20,17 @@ if(isset($_GET['a']) && $_GET['a'] == 'edit' && isset($_POST['main']) && is_nume
   
   $preBanned = 0;
   $preReason = '';
-	$result = $accountDB->Select('id, banned, banreason','users', 'id = '.$mainID.'',1);
+  $preBannedGames = array();
+	$result = $accountDB->Select('id, bannedgames, banreason','users', 'id = '.$mainID.'',1);
+  $gameName = 'dbbg';
 	if ($result) 
 	{
 	  if ($result->num_rows > 0)
 		{
 			$row = $result->fetch_assoc();
-      $preBanned = $row['banned'];
+      if($row['bannedgames'] != '')
+        $preBannedGames = explode(';',$row['bannedgames']);
+      $preBanned = in_array($gameName, $preBannedGames);
       $preReason = $row['banreason'];
 		}
 		$result->close();
@@ -37,7 +41,23 @@ if(isset($_GET['a']) && $_GET['a'] == 'edit' && isset($_POST['main']) && is_nume
     $banned = 1;
   $banreason = $accountDB->EscapeString($_POST['banreason']);
   
-	$result = $accountDB->Update('banned="'.$banned.'",banreason="'.$banreason.'"','users','id = '.$mainID.'',1);
+  if($preBanned)
+  {
+    $key = array_search($gameName, $preBannedGames);
+    unset($preBannedGames[$key]);
+    $preBannedGames = array_values($preBannedGames);
+  }
+  
+  if($banned)
+  {
+    array_push($preBannedGames, $gameName);
+    $preBannedGames = array_values($preBannedGames);
+  }
+  
+  $preBannedGames = implode(';', $preBannedGames);
+  
+  
+	$result = $accountDB->Update('bannedgames="'.$preBannedGames.'",banreason="'.$banreason.'"','users','id = '.$mainID.'',1);
   
   
   $ip = $account->GetIP();

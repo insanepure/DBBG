@@ -107,6 +107,12 @@ class InventoryItem
   {
     return $this->data['equipped'];
   }
+
+  public function IsHelmet()
+  {
+    return $this->data['isHelmet'];
+  }
+
   
   public function SetEquipped($value)
   {
@@ -237,6 +243,11 @@ class InventoryItem
   public function SetEquippedImage($value)
   {
     $this->data['equippedimage'] = $value;
+  }
+  
+  public function GetEquippedBGImage()
+  {
+    return $this->data['equippedbgimage'];
   }
   
   public function GetSlot()
@@ -716,8 +727,10 @@ class Inventory
     visualitem.name, 
     visualitem.image,
     visualitem.equippedimage,
+    visualitem.equippedbgimage,
     visualitem.description,
     visualitem.ontop,
+    visualitem.isHelmet,
     statsitem.type,
     statsitem.lp, 
     statsitem.kp,
@@ -800,9 +813,11 @@ class Inventory
     visualitem.name, 
     visualitem.image,
     visualitem.equippedimage,
+    visualitem.equippedbgimage,
     visualitem.description,
     visualitem.ontop,
     visualitem.overlay,
+    visualitem.isHelmet,
     statsitem.type,
     statsitem.lp, 
     statsitem.kp,

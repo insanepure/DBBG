@@ -34,7 +34,7 @@
         <td width="70%" align="center"><input type="text" name="email2"></td>
       </tr>  
       <tr>
-        <td width="100%" align="center" colspan="2"><input type="checkbox" id="c1" name="regeln" /><label for="c1"><font color="#eee" class="schatten"> Ich habe die <a href="?p=info&info=regeln" target="_blank">Regeln</a> gelesen und akzeptiere sie.</font></label></td>
+        <td width="100%" align="center" colspan="2"><input type="checkbox" id="c1" name="regeln" /><label for="c1"><font color="#eee" class="schatten"> Ich habe die <a href="?p=info&info=regeln" target="_blank">Regeln</a> und die <a href="?p=info&info=dsgvo" target="_blank">Datenschutzerklärung</a> gelesen und akzeptiere sie.</font></label></td>
       </tr>  
       <tr>
         <td width="100%" align="center" colspan="2"><input type="submit" value="Registrieren"></td>

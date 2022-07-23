@@ -12,9 +12,14 @@ function get_domain($url)
 if(isset($_GET['url']))
 {
   $url = $_GET['url'];
-  if(get_domain($url) == 'db-bg.de')
+  $domainUrl = get_domain($url);
+  if($domainUrl == 'db-bg.de')
   {
     header('Location: '.$url);
+    exit;
+  }
+  if($domainUrl == 'directupload.net')
+  {
     exit;
   }
   

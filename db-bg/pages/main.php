@@ -32,7 +32,7 @@ else if ($account->IsLogged() && !$player->IsLogged() && isset($_GET['p'])
 	header('Location: ?p=login');
 	exit();  
 }
-else if($account->IsValid() && $account->IsBanned())
+else if($account->IsValid() && $account->IsBannedInGame('DBBG'))
 {
   $message = 'Du wurdest aus folgendem Grund vom Spiel gebannt: '.$account->GetBanReason().'.';
   $account->Logout();

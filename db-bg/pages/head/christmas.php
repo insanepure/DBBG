@@ -1,4 +1,7 @@
 <?php
+header('Location: ?p=news');
+exit();  
+
 include_once 'classes/items/itemmanager.php';
 $itemManager = new ItemManager($database);
 

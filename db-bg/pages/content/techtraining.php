@@ -47,7 +47,7 @@
 				if($attack->GetKP() != 0)
 				{
 					echo $attack->GetKP();
-					if($attack->IsCostProcentual()) echo '%';
+					if($attack->IsCostProcentual() == 1) echo '%';
 					echo ' KP';
 				}
 				?>

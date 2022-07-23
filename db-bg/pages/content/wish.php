@@ -1,9 +1,17 @@
 <div class="spacer2"></div>
-<img src="img/radar/<?php echo $dragon; ?>.png"></img>
+<?php if($dragon != '')
+{
+  ?><img src="img/radar/<?php echo $dragon; ?>.png"></img><?php
+}
+?>
 <br/>
 <br/>
 <?php 
-if($wishLeft == 0)
+if(!isset($wishes) || $wishes[0] == '')
+{
+  ?>Es gibt hier keinen Drachen, um die Dragonballs zu nutzen.<br/><?php
+}
+else if($wishLeft == 0)
 {
   ?>
   <?php echo $dragon; ?> verschwindet wieder in den Dragonballs.<br/>
@@ -14,20 +22,22 @@ else
 {
   ?>
   Sei gegrüßt, <?php echo $player->GetName(); ?>.<br/>
-  Du hast noch <?php if($wishLeft == 1) echo '1 Wunsch'; else echo $wishes.' Wünsche'; ?> frei.<br/>
+  Du hast noch <?php if($wishLeft == 1) echo '1 Wunsch'; else echo $wishLeft.' Wünsche'; ?> frei.<br/>
   Wähle weise, denn deine Wahl kann man nie wieder rückgängig machen.<br/>
   <div class="spacer"></div>
   <form method="POST" action="?p=wish&a=wish">
       <select class="select" name="wish">
     <?php
-  
     $playerWishes = explode(';',$player->GetWishes());
     foreach($wishes as &$wishID)
     {
-      $wish = $wishManager->GetWish($wishID);
-      if($wish->IsRewishable() || !$wish->IsRewishable() && !in_array($wishID, $playerWishes))
+      if(isset($wishID) && $wishID != '')
       {
-        ?><option value="<?php echo $wishID; ?>"><?php echo $wish->GetDisplayName(); ?></option><?php
+        $wish = $wishManager->GetWish($wishID);
+        if($wish->IsRewishable() || !$wish->IsRewishable() && !in_array($wishID, $playerWishes))
+        {
+          ?><option value="<?php echo $wishID; ?>"><?php echo $wish->GetDisplayName(); ?></option><?php
+        }
       }
     }
     ?>

@@ -159,6 +159,23 @@ class PatternManager
       return false;
     }
     
+    $triggeredPatterns = explode(';', $fighter->GetPatternTriggered());
+    $triggerCount = 0;
+    foreach ($triggeredPatterns as &$triggeredPattern) 
+    {
+      if($triggeredPattern == $pattern->GetID())
+        $triggerCount++;
+    }
+    
+    $fight->AddDebugLog(' - - - has been triggered '.$triggerCount);
+    
+    $patternTriggerCount = $pattern->GetTriggerCount();
+    if($patternTriggerCount != 0 && $patternTriggerCount <= $triggerCount)
+    {
+      $fight->AddDebugLog(' - - - has been triggered more often than '.$patternTriggerCount);
+      return false;
+    }
+    
     $patternAttack = $pattern->GetAttack();
     
 		//$attacks = explode(';',$fighter->GetAttacks());

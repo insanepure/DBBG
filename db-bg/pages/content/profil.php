@@ -22,6 +22,8 @@ if($displayedPlayer->GetClan() != 0)
 	$displayedClan = new Clan($database, $displayedPlayer->GetClan());
 }
 
+$displayedPlayerPlanet = new Planet($database, $displayedPlayer->GetPlanet());
+
 
   
 $titel = $titelManager->GetTitel($displayedPlayer->GetTitel());
@@ -70,7 +72,7 @@ if($titel != null)
   }
   ?>
   <?php
-  if($displayedAccount->IsBanned())
+  if($displayedAccount->IsBannedInGame('DBBG'))
   {
     ?><b><font color="red">Gebannt</font></b><?php
   }
@@ -176,28 +178,95 @@ if($displayedClan != null)
 </center>
 </div>
 <?php } ?>
-<div class="profilecharacter" style="top:20px; left:185px; z-index:<?php echo $zorders[0]; ?>; background-image: url('img/races/<?php echo $displayedPlayer->GetRaceImage(); ?>.png'"></div>
+<div class="profilecharacter" style="top:20px; left:185px; z-index:<?php echo $zorders[0]; ?>; background-image: url('img/characters/<?php echo $displayedPlayer->GetRaceImage(); ?>.png'"></div>
+    <?php
+
+    function displayHair($raceImage, $zIndex, $zIndexBack, $powerupID)
+    {
+        $hairType = 'Hair';
+        $hairBack = '';
+        if(substr($raceImage, 0,-1) == 'Saiyajin')
+        {
+            if($powerupID == 23)
+            {
+              $hairType = 'SSJ';
+              if($raceImage == 'Saiyajin5')
+              {
+                $hairBack = $raceImage.$hairType.'Back';
+              }
+            }
+            else if($powerupID == 24 || $powerupID == 25)
+            {
+              $hairType = 'SSJ2';
+              if($raceImage == 'Saiyajin5')
+              {
+                $hairBack = $raceImage.$hairType.'Back';
+              }
+            }
+            else if($powerupID == 26 || $powerupID == 28)
+            {
+              $hairType = 'SSJ3';
+              if($raceImage != 'Saiyajin5')
+              {
+                $hairBack = 'SSJ3Back';
+              }
+              else
+              {
+                $hairBack = $raceImage.$hairType.'Back';
+              }
+            }
+        }
+        echo '<div class="profilecharacter" style="top:20px; left:185px; z-index:'.$zIndex."; background-image: url('"."img/characters/".$raceImage.$hairType.'.png'."'".')"'.'></div>';
+        echo '<div class="profilecharacter" style="top:20px; left:185px; z-index:'.$zIndexBack."; background-image: url('"."img/characters/".$hairBack.'.png'."'".')"'.'></div>';
+    }
+
+    $itemObject = $inventory->GetItemAtSlot(8);
+    if(empty($itemObject)) 
+    {
+      displayHair($displayedPlayer->GetRaceImage(), $zorders[13], $zorders[14], $displayedPlayer->GetStartingPowerup());
+    } else 
+    {
+        $itemIsHelm = $itemObject->IsHelmet();
+        $itemIsEquipt = $itemObject->IsEquipped();
+        if ((!$itemIsHelm && $itemIsEquipt) || ($itemIsHelm && !$itemIsEquipt) || (!$itemIsHelm && !$itemIsEquipt)) 
+        {
+          displayHair($displayedPlayer->GetRaceImage(), $zorders[13], $zorders[14], $displayedPlayer->GetStartingPowerup());
+
+        }
+    }
+    ?>
+
 <?php if($displayedClan != null && $displayedClan->GetBanner() != '')
 {
 ?>
- <div class="tooltip" style="z-index:<?php echo $zorders[12]; ?>; position:absolute; left:305px; top:145px;"> 
-	 <img src="<?php echo $displayedClan->GetBanner(); ?>" style="z-index:<?php echo $zorders[11]; ?>; position:absolute; left:50px; top:50px;" width="30px" height="30px"></img>
+ <div class="tooltip" style="z-index:<?php echo $zorders[12]; ?>; position:absolute; left:300px; top:135px;"> 
+	 <img src="<?php echo $displayedClan->GetBanner(); ?>" style="z-index:<?php echo $zorders[11]; ?>; position:absolute; left:55px; top:30px;" width="30px" height="30px"></img>
     <span class="tooltiptext"><?php echo $displayedClan->GetName(); ?></span>
     </div> 
 <?php
 }
   if(date("Y-m-d") == '2021-04-01')
   {
-    ?><div class="profilecharacter" style="top:20px; left:185px; z-index:999; background-image: url('img/ausruestung/Huhnmaske.png'"></div><?php
+    ?><div class="profilecharacter" style="top:20px; left:185px; z-index:999; background-image: url('img/characteritems/Huhnmaske.png'"></div><?php
   }
 
-  if($displayedPlayer->GetPlanet() == 'Jenseits')
+  if($displayedPlayerPlanet->IsInJenseits())
   {
-    ?><div class="profilecharacter" style="top:20px; left:185px; z-index:<?php echo $zorders[10]; ?>; background-image: url('img/ausruestung/heiligenschein.png'"></div><?php
+    ?><div class="profilecharacter" style="top:20px; left:185px; z-index:<?php echo $zorders[10]; ?>; background-image: url('img/characteritems/heiligenschein.png'"></div><?php
   }
   if($displayedPlayer->GetApeTail() == 3)
   {
-    ?><div class="profilecharacter" style="top:20px; left:185px; z-index:<?php echo $zorders[9]; ?>; background-image: url('img/races/saiyajintail.png'"></div><?php
+    $powerupID = $displayedPlayer->GetStartingPowerup();
+    $tail = 'SaiyajinTail';
+    if($powerupID == 23 || $powerupID == 24 || $powerupID == 25)
+    {
+      $tail = 'SaiyajinTailSSJ';
+    }
+    else if($powerupID == 26 || $powerupID == 28)
+    {
+      $tail = 'SaiyajinTailLSS';
+    }
+    ?><div class="profilecharacter" style="top:20px; left:185px; z-index:<?php echo $zorders[9]; ?>; background-image: url('img/characters/<?php echo $tail; ?>.png'"></div><?php
   }
 	ShowSlotEquippedImage(6, $inventory, $zorders, $zordersOnTop); //Waffe
 	ShowSlotEquippedImage(1, $inventory, $zorders, $zordersOnTop); //Aura 
@@ -577,7 +646,7 @@ foreach ($titleArray as &$titel)
   </tr>
 </table> 
 <?php 
-  if(!$displayedAccount->IsBanned())
+  if(!$displayedAccount->IsBannedInGame('DBBG'))
   {
     echo $bbcode->parse($displayedPlayer->GetText()); 
   }

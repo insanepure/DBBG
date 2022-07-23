@@ -15,6 +15,7 @@ if($account == NULL)
 include_once 'playerinventory.php';
 include_once $_SERVER['DOCUMENT_ROOT'].'/classes/items/itemmanager.php';
 include_once $_SERVER['DOCUMENT_ROOT'].'/classes/fight/attackmanager.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/classes/planet/planet.php';
 
 class Player
 {
@@ -376,6 +377,11 @@ class Player
 			$result->close();
 		}
     
+    //Entferne 0
+    $foundID = array_search(0, $allAttacks);
+    if($foundID != false)
+      array_splice($allAttacks, $foundID, 1);
+    
 		$attacks = implode(';',$allAttacks);
     
 		$this->SetFightAttacks($attacks);
@@ -626,7 +632,7 @@ class Player
 		$result = $this->database->Update('zeni=zeni+'.$price,'accounts','id = '.$sellerid.'',1);
 	}
 	
-	public function BuyItem($statsitem, $visualitem, $statstype, $upgrade, $amount, $price, $arenaprice=0)
+	public function BuyItem($statsitem, $visualitem, $statstype, $upgrade, $amount, $price, $arenaprice=0, $coinprice=0)
 	{
 		$this->GetInventory()->AddItem($statsitem, $visualitem, $amount, $statstype, $upgrade);
     
@@ -634,6 +640,8 @@ class Player
 		$this->SetZeni($zeni);
 		$arenapoints = $this->GetArenaPoints() - $arenaprice;
 		$this->SetArenaPoints($arenapoints);
+		$dragoncoins = $this->GetDragonCoins() - $coinprice;
+		$this->SetDragonCoins($dragoncoins);
     
     $this->AddDebugLog('Buy Item');
     $this->AddDebugLog(' - Stats: '.$statsitem->GetName().' ('.$statsitem->GetID().')');
@@ -643,10 +651,12 @@ class Player
     $this->AddDebugLog(' - Upgrade: '.$upgrade);
     $this->AddDebugLog(' - Price Zeni: '.$price);
     $this->AddDebugLog(' - Price Arenapoints: '.$arenaprice);
-    $this->AddDebugLog(' - New Arenapoints: '.$arenaprice);
+    $this->AddDebugLog(' - Price Coins: '.$coinprice);
     $this->AddDebugLog(' - New Zeni: '.$zeni);
+    $this->AddDebugLog(' - New Arenapoints: '.$arenapoints);
+    $this->AddDebugLog(' - New Coins: '.$dragoncoins);
     $this->AddDebugLog(' ');
-		$result = $this->database->Update('zeni="'.$zeni.'", arenapoints="'.$arenapoints.'"','accounts','id = '.$this->data['id'].'',1);
+		$result = $this->database->Update('zeni="'.$zeni.'", arenapoints="'.$arenapoints.'", dragoncoins="'.$dragoncoins.'"','accounts','id = '.$this->data['id'].'',1);
 	}
 	
 	public function SellItem($id, $amount=1)
@@ -955,11 +965,12 @@ class Player
 		}
     else if($type == 6)
     {
+      $playerPlanet = new Planet($this->database, $this->GetPlanet());
       if($item->GetStatsID() == 172) //StatsReset
       {
         $this->ResetStats();
       }
-      else if($item->GetStatsID() == 204 && $this->GetPlanet() == 'Jenseits') //Revive
+      else if($item->GetStatsID() == 204 && $playerPlanet->IsInJenseits()) //Revive
       {
         $this->Revive();
       }
@@ -1331,7 +1342,7 @@ class Player
     $learnTime = 0;
     foreach($attacks as &$attack)
     {
-      if(is_numeric($attack))
+      if(is_numeric($attack) && $attack != 0)
       {
         $attack = $attackManager->GetAttack($attack);
         $learnTime += $attack->GetLearnTime();
@@ -1528,7 +1539,8 @@ class Player
         }
         $this->AddDebugLog(' - Action Move Player to: '.$planet.' - '.$place);
         $update = $update.',planet="'.$planet.'",place="'.$place.'"';
-        if($planet == 'Jenseits' && $this->GetPlanet() != 'Jenseits')
+        $playerPlanet = new Planet($this->database, $this->GetPlanet());
+        if($planet == 'Jenseits' && !$playerPlanet->IsInJenseits())
         {
           $update = $update.',deathplanet="'.$this->GetPlanet().'",deathplace="'.$this->GetPlace().'"';
           $this->SetDeathPlace($this->GetPlace());
@@ -3037,6 +3049,16 @@ class Player
 	public function SetZeni($value)
 	{
 		$this->data['zeni'] = $value;
+	}
+	
+	public function GetDragonCoins()
+	{
+		return $this->data['dragoncoins'];
+	}
+	
+	public function SetDragonCoins($value)
+	{
+		$this->data['dragoncoins'] = $value;
 	}
 	
 	public function GetArenaPoints()

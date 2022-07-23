@@ -21,6 +21,7 @@ $itemManager = new ItemManager($database);
 
 <?php
 $id = 0;
+$num = 0;
 $entry = $events->GetEntry($id);
 while($entry != null)
 {
@@ -32,7 +33,7 @@ while($entry != null)
   $yearDay = date('z')+1;
   $month = date('n');
   $year = date('Y');
-  $isToday = Event::IsToday($player->GetPlanet(), $player->GetPlace(), $entry['placeandtime']);
+  $isToday = Event::IsToday($player->GetPlanet(), $player->GetPlace(), $entry['placeandtime'], $entry['iseverywhere']);
   if($isToday && ($player->GetARank() >= 2 || $player->GetLevel() >= $entry['level']))
   {
 	$group = $player->GetGroup();
@@ -46,6 +47,12 @@ while($entry != null)
 	{
 		$amount = $entry['maxplayers'];
 	}
+  ++$num;
+  if($num > 3)
+  {
+  ?></tr><tr><?php
+    $num = 0;
+  }
 ?>
   <td>
 <table width="25%" cellspacing="0" cellpadding="1" border="0">
@@ -61,6 +68,7 @@ while($entry != null)
           <hr><b>
           <?php 
           if($entry['zeni'] != 0) echo $entry['zeni'].' Zeni<br/>'; 
+          if($entry['dragoncoins'] != 0) echo $entry['dragoncoins'].' Dragoncoins<br/>'; 
           if($entry['item'] != '')
           {
 				      $items = explode(';',$entry['item']);

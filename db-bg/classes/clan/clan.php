@@ -125,7 +125,6 @@ class Clan
 	public function PostShoutbox($id, $name, $text)
 	{
 		$date = date('d.m.Y H:i', time());
-    $text = html_entity_decode($text);
     $text = str_replace(";", "", $text);
     $text = str_replace("@", "", $text);
 		
@@ -142,29 +141,12 @@ class Clan
 			$this->data['shoutbox'] = $msg.'@'.$this->data['shoutbox'];
 		}
 		
-		$num = 1000;
-		$log = '';
-		$msgs = array();
-		if(count($this->shoutbox) > $num)
-		{
-			for($i = 0; $i < $num; ++$i)
-			{
-				$smsg = $this->shoutbox[$i];
-				if($log == '')
-				{
-					$log = $smsg->GetData();
-				}
-				else
-				{
-					$log = $log.'@'.$smsg->GetData();
-				}
-				array_push($msgs, $smsg);
-			}
-			$this->data['shoutbox'] = $log;
-			$this->shoutbox = $msgs;
-		}
-		
 		$result = $this->database->Update('shoutbox="'.$this->GetShoutbox().'"','clans','id = '.$this->GetID().'',1);
+    
+    $this->valid = false;
+		$this->messages = array();
+		$this->shoutbox = array();
+    $this->LoadData($this->data['id'], '*');
 	}
 	
 	public function GetShoutboxMSG()

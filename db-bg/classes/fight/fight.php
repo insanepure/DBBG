@@ -544,6 +544,8 @@ class Fight
     
     $patterns = $fighter->GetPatterns();
     
+    $randomPatterns = array();
+    
     $pattern = null;
     if($patterns != '')
     {
@@ -556,15 +558,24 @@ class Fight
         $foundPattern = $this->patternManager->GetPattern($patternID);
         if($foundPattern != null && $this->patternManager->IsPatternPossible($fighter, $this, $this->attackManager, $foundPattern))
         {
-          $pattern = $foundPattern;
-          break;
+          array_push($randomPatterns, $foundPattern);
+          if(!$fighter->GetRandomPatterns())
+          {
+            break;
+          }
         }
       }
+    }
+    
+    if(!empty($randomPatterns))
+    {
+      $pattern = $randomPatterns[array_rand($randomPatterns)];
     }
     
     $patternid = 0;
     $patternidSuccess = 0;
     $patternidFailed = 0;
+    $patternLimited = false;
     
     //0 = self
     //1 = Random Enemy
@@ -579,8 +590,10 @@ class Fight
       $patternid = $pattern->GetPatternSet();
       $patternidSuccess = $pattern->GetPatternSetSuccess();
       $patternidFailed = $pattern->GetPatternSetFailed();
+      $patternLimited = $pattern->GetTriggerCount() != 0;
       $this->AddDebugLog(' - - Pattern Success: '.$patternidSuccess);
       $this->AddDebugLog(' - - Pattern Failed: '.$patternidFailed);
+      $this->AddDebugLog(' - - Pattern TriggerCount: '.$pattern->GetTriggerCount());
     }
     else
     {
@@ -603,6 +616,26 @@ class Fight
       $this->AddDebugLog(' - - ERROR: No target for '.$fighter->GetName());
       $this->DebugSend(true);
     }
+    
+    
+    if($fighter->GetPatternTriggered() != '')
+      $triggeredPatterns = explode(';', $fighter->GetPatternTriggered());
+    else
+      $triggeredPatterns = array();
+    
+    if($patternLimited)
+    {
+      $this->AddDebugLog(' - - Add TriggerCount');
+      array_push($triggeredPatterns, $pattern->GetID());
+    }
+    
+    if(count($triggeredPatterns) != 0)
+      $triggeredPatterns = implode(';', $triggeredPatterns);
+    else
+      $triggeredPatterns = '';
+    
+    
+    $this->AddDebugLog(' - - TriggeredPatterns: '.$triggeredPatterns);
 		
     $tID = $target->GetID();
 		$aid = $attack->GetID();
@@ -612,9 +645,11 @@ class Fight
     $fighter->SetPatternID($patternid);
     $fighter->SetPatternIDSuccess($patternidSuccess);
     $fighter->SetPatternIDFailed($patternidFailed);
+    $fighter->SetPatternTriggered($triggeredPatterns);
+    
     $timestamp = date('Y-m-d H:i:s');
 		$result = $this->database->Update('action='.$aid.', target='.$tID.', previoustarget='.$tID.', lastaction="'.$timestamp.'"
-    ,patternid='.$patternid.',patternidsuccess='.$patternidSuccess.',patternidfailed='.$patternidFailed.'','fighters','id = '.$fighter->GetID().'',1);
+    ,patternid='.$patternid.',patternidsuccess='.$patternidSuccess.',patternidfailed='.$patternidFailed.',patterntriggered="'.$triggeredPatterns.'"','fighters','id = '.$fighter->GetID().'',1);
 		
 	}
   
@@ -729,7 +764,7 @@ class Fight
 			return;
 		}
     
-    $cost = $this->CalculateCost($attack->GetKP(), $attack->IsCostProcentual(), $fighter->GetKI(), $fighter->GetRace());
+    $cost = $this->CalculateCost($attack->GetKP(), $attack->GetCostProcentual(), $fighter->GetMaxEnergy(), $fighter->GetKI(), $fighter->GetRace());
 		$energy = $attack->GetEnergy();
     
     if($energy < 0) 
@@ -1070,10 +1105,12 @@ class Fight
 		}
 	}
   
-  private function CalculateCost($value, $procentual, $ki, $race)
+  private function CalculateCost($value, $procentual, $maxValue, $ki, $race)
   {
-    if($procentual)
+    if($procentual == 1)
       $cost = ($value / 100) * $ki;
+    else if($procentual == 2)
+      $cost = ($value / 100) * $maxValue;
     else
       $cost = $value; 
     $cost = round($cost);
@@ -1240,6 +1277,13 @@ class Fight
             $gotSomething = true;
 						$zeni = $zeni + $this->GetZeni();
 					}
+          
+					$dragoncoins = 0;
+					if($this->GetDragonCoins() != 0 && ($wonTeam == $i || $wonTeam == -2))
+					{
+            $gotSomething = true;
+						$dragoncoins = $dragoncoins + $this->GetDragonCoins();
+					}
 					
 					$kampfWinPM = '';
 					if($this->GetItems() != 0 && ($wonTeam == $i || $wonTeam == -2) && $inGainAccs)
@@ -1355,6 +1399,19 @@ class Fight
 						$kampfWinPM = $kampfWinPM.$zeni.' Zeni';
 					}
 					
+					if($dragoncoins != 0)
+					{
+						if($kampfWinPM != '')
+						{
+							$kampfWinPM = $kampfWinPM.' und ';
+						}
+						else
+						{
+							$kampfWinPM = 'Du hast ';
+						}
+						$kampfWinPM = $kampfWinPM.$dragoncoins.' Dragoncoins';
+					}
+					
 					if($kampfWinPM != '')
 					{
 						$kampfWinPM = '<center>'.$kampfWinPM.'</center>';
@@ -1368,6 +1425,14 @@ class Fight
               $this->AddDebugLog(' - - - Zeni now: '.$zeni);
 							$player->SetZeni($zeni);
 							$update = $update.', zeni='.$zeni.'';
+					}
+					if($dragoncoins != 0)
+					{
+              $this->AddDebugLog(' - - add DragonCoins: '.$dragoncoins);
+							$dragoncoins = $player->GetDragonCoins() + $dragoncoins;
+              $this->AddDebugLog(' - - - DragonCoins now: '.$dragoncoins);
+							$player->SetDragonCoins($dragoncoins);
+							$update = $update.', dragoncoins='.$dragoncoins.'';
 					}
 					
           $fightsTillStats = 10;
@@ -1500,6 +1565,7 @@ class Fight
 			if($eventFight == null && $wonTeam == 0)
 			{
 				$this->SetZeni($event->GetZeni());
+				$this->SetDragonCoins($event->GetDragonCoins());
 				$chance = rand(0,100);
 				$items = explode(';',$event->GetItem());
 				$i = 0;
@@ -2434,7 +2500,7 @@ class Fight
 				continue;
 			}
 			
-      $cost = $this->CalculateCost($dotAtk->GetKP(), $dotAtk->IsCostProcentual(), $dotCaster->GetKI(), $dotCaster->GetRace());
+      $cost = $this->CalculateCost($dotAtk->GetKP(), $dotAtk->GetCostProcentual(), $dotCaster->GetMaxKP(), $dotCaster->GetKI(), $dotCaster->GetRace());
 			$kp = $dotCaster->GetKP() - $cost;
 			if($kp < 0)
 			{
@@ -2490,7 +2556,7 @@ class Fight
 			}
         $this->AddDebugLog(' - - Caster: '.$buffCaster->GetName());
 			
-      $cost = $this->CalculateCost($buffAtk->GetKP(), $buffAtk->IsCostProcentual(), $buffCaster->GetKI(), $buffCaster->GetRace());
+      $cost = $this->CalculateCost($buffAtk->GetKP(), $buffAtk->GetCostProcentual(), $buffCaster->GetMaxKP(), $buffCaster->GetKI(), $buffCaster->GetRace());
 			$kp = $buffCaster->GetKP() - $cost;
 			if($kp < 0)
 			{
@@ -2777,8 +2843,8 @@ class Fight
     
 		if($attack->GetType() != 4 && $attack->GetType() != 21 && $attack->GetType() != 22)
     {
-      $lpminus = $this->CalculateCost($attack->GetLP(), $attack->IsCostProcentual(), $player->GetKI(), $player->GetRace());
-      $kpminus = $this->CalculateCost($attack->GetKP(), $attack->IsCostProcentual(), $player->GetKI(), $player->GetRace());
+      $lpminus = $this->CalculateCost($attack->GetLP(), $attack->GetCostProcentual(), $player->GetMaxLP(), $player->GetKI(), $player->GetRace());
+      $kpminus = $this->CalculateCost($attack->GetKP(), $attack->GetCostProcentual(), $player->GetMaxKP(), $player->GetKI(), $player->GetRace());
 		}
     
     $energyMinusConstant = 10;
@@ -2815,13 +2881,13 @@ class Fight
 			$transAttack = $this->GetAttack($trans[$i]);
       if($transAttack->GetLP() != 0)
       {
-        $cost = $this->CalculateCost($transAttack->GetLP(), $transAttack->IsCostProcentual(), $player->GetKI(), $player->GetRace());
+        $cost = $this->CalculateCost($transAttack->GetLP(), $transAttack->GetCostProcentual(), $player->GetMaxLP(), $player->GetKI(), $player->GetRace());
         $lpminus += $cost;
         $revertLP = true;
       }
       if($transAttack->GetKP() != 0)
       {
-        $cost = $this->CalculateCost($transAttack->GetKP(), $transAttack->IsCostProcentual(), $player->GetKI(), $player->GetRace());
+        $cost = $this->CalculateCost($transAttack->GetKP(), $transAttack->GetCostProcentual(), $player->GetMaxKP(), $player->GetKI(), $player->GetRace());
         $kpminus += $cost;
         $revertKP = true;
       }
@@ -3202,7 +3268,7 @@ class Fight
     {
 		  return $action->GetDeadText();
     }
-    $this->addAttackTitel($player, $attack);
+    $this->addAttackTitel($player, $action);
 		return $action->GetText();
 	}
 
@@ -3295,32 +3361,73 @@ class Fight
 		$team = $player->GetTeam();
 		$teamMembers = $this->teams[$team];
 		$j = 0;
+    $npcAmount = 0;
 		while(isset($teamMembers[$j]))
 		{
 			$teamMember = $teamMembers[$j];
 			if($teamMember->GetOwner() == $player->GetID())
 			{
-				return false;
+        $npcAmount++;
 			}
 			++$j;
 		}
 		
-		$stats = $attack->GetValue();
-		if($attack->IsProcentual())
-		{
-			$stats = ceil($player->GetKI() * ($attack->GetValue() / 100));
-		}
+    $maxAmount = $attack->GetMaxNPCAmount();
+    if($maxAmount != 0 && $npcAmount >= $maxAmount)
+      return false;
 		
 		$npcID = $attack->GetNPCID();
-    $npc = new NPC($this->database, $npcID, $stats);
-		$name = $player->GetName();
-		$maxLength = 3;
-		if(strlen($name) > $maxLength)
+    $npc = new NPC($this->database, $npcID, 1);
+		if($attack->IsProcentual())
 		{
-			$name = substr($name, 0, $maxLength);
+      $stats = ceil($player->GetKI() * ($attack->GetValue() / 100));
+      $npc->SetMaxLP($stats*10);
+      $npc->SetMaxKP($stats*10);
+      $npc->SetLP($stats*10);
+      $npc->SetKP($stats*10);
+      $npc->SetAttack($stats);
+      $npc->SetDefense($stats);
 		}
-		$name = $name.'bim';
-		$npcName = $npc->SetName($name);
+		$this->CreateFighter($npc, $team, true, $player->GetID());
+    $this->addAttackTitel($player, $attack);
+		
+		return $attack->GetText();
+	}
+	
+	private function SpawnNPC2($player, $attack)
+	{
+		$team = $player->GetTeam();
+		$teamMembers = $this->teams[$team];
+		$j = 0;
+    
+    $npcAmount = 0;
+		while(isset($teamMembers[$j]))
+		{
+			$teamMember = $teamMembers[$j];
+			if($teamMember->GetOwner() == $player->GetID())
+			{
+        $npcAmount++;
+			}
+			++$j;
+		}
+    
+    $maxAmount = $attack->GetMaxNPCAmount();
+    if($maxAmount != 0 && $npcAmount >= $maxAmount)
+      return false;
+    
+		$npcID = $attack->GetNPCID();
+    $npc = new NPC($this->database, $npcID, 1);
+		if($attack->IsProcentual())
+		{
+      $stats = ceil($player->GetKI() * ($attack->GetValue() / 100));
+      $npc->SetMaxLP($stats*10);
+      $npc->SetMaxKP($stats*10);
+      $npc->SetLP($stats*10);
+      $npc->SetKP($stats*10);
+      $npc->SetAttack($stats);
+      $npc->SetDefense($stats);
+		}
+    
 		$this->CreateFighter($npc, $team, true, $player->GetID());
     $this->addAttackTitel($player, $attack);
 		
@@ -3528,13 +3635,9 @@ class Fight
 			}
 			$atkVal = $playerValue * $atkVal;
     }
-		else if($damageProcentual)
+    else if($damageProcentual)
     {
-      $targetLP = $target->GetIncreasedLP();
-			$atkVal = $targetLP * ($attack->GetValue() / 100);
-      $this->AddDebugLog(' - Damage is procentual');
-      $this->AddDebugLog(' - Target '.$target->GetName().' has LP: <b>'.$targetLP.'</b>');
-      $this->AddDebugLog(' - Attackminvalue is: <b>'.$attack->GetMinValue().'</b>');
+			$atkVal = $attack->GetValue() / 100;
     }
 		else if($attack->IsProcentual())
 		{
@@ -3588,7 +3691,16 @@ class Fight
 		$lp = $target->GetLP();
     $this->AddDebugLog(' - LP was: <b>'.$lp.'</b>');
     $this->AddDebugLog(' - Attack LP Value is: <b>'.$attack->GetLPValue().'</b>');
-    $lpDamage = round($atkVal * ($attack->GetLPValue()/100));
+    $lpDamage = 0;
+    if($damageProcentual)
+    {
+      $lpVal = $target->GetIncreasedLP() * ($attack->GetLPValue()/100);
+      $lpDamage = round($atkVal * $lpVal);
+    }
+    else
+    {
+      $lpDamage = round($atkVal * ($attack->GetLPValue()/100));
+    }
     $damage += $lpDamage;
 		$lp = $lp - $lpDamage;
     
@@ -3637,7 +3749,16 @@ class Fight
 		$kp = $target->GetKP();
     $this->AddDebugLog(' - KP was: <b>'.$kp.'</b>');
     $this->AddDebugLog(' - Attack KP Value is: <b>'.$attack->GetKPValue().'</b>');
-    $kpDamage = round($atkVal * ($attack->GetKPValue()/100));
+    $kpDamage = 0;
+    if($damageProcentual)
+    {
+      $kpVal = $target->GetIncreasedKP() * ($attack->GetKPValue()/100);
+      $kpDamage = round($atkVal * $kpVal);
+    }
+    else
+    {
+      $kpDamage = round($atkVal * ($attack->GetKPValue()/100));
+    }
     $damage += $kpDamage;
 		$kp = $kp - $kpDamage;
 		if($kp <= 0)
@@ -4678,7 +4799,7 @@ private function Revive($player, $target, $attack, &$damage)
           foreach($attacks as &$attackID)
           {
             $attack = $this->attackManager->GetAttack($attackID);
-            if($attack->GetType() == 4)
+            if($attack != null && $attack->GetType() == 4)
             {
               $vwKI = $teamPlayer->GetMaxKI() * (1 + ($attack->GetValue()/100));
               if($vwKI > $playerKI)
@@ -5073,6 +5194,16 @@ private function Revive($player, $target, $attack, &$damage)
 		$this->data['zeni'] = $value;
 	}
 	
+	public function GetDragonCoins()
+	{
+		return $this->data['dragoncoins'];
+	}
+	
+	public function SetDragonCoins($value)
+	{
+		$this->data['dragoncoins'] = $value;
+	}
+	
 	public function GetWeather()
 	{
 		return $this->data['weather'];
@@ -5318,6 +5449,7 @@ private function Revive($player, $target, $attack, &$damage)
       $row['apecontrol'] = 0;
 			$row['patterns'] = $player->GetPatterns();
 		  $row['isstatsprocentual'] = $player->IsStatsProcentual() ? 1 : 0;
+		  $row['randompatterns'] = $player->GetRandomPatterns();
 		}
 		else
 		{
@@ -5327,6 +5459,7 @@ private function Revive($player, $target, $attack, &$damage)
       $row['apecontrol'] = $player->GetApeControl();
       $row['race'] = $player->GetRace();
 		  $row['isstatsprocentual'] = 0;
+		  $row['randompatterns'] = 0;
 		  $ki = ($ilp/10) + ($ikp/10) + $atk + $def;
 		  $ki = round($ki / 4);
 		}
@@ -5427,6 +5560,7 @@ private function Revive($player, $target, $attack, &$damage)
 		, fusetimer
 		, patterns
 		, race
+		, randompatterns
 		, isstatsprocentual'
 		,'"'.$row['acc'].'"
 		,"'.$row['npc'].'"
@@ -5465,6 +5599,7 @@ private function Revive($player, $target, $attack, &$damage)
 		,"'.$row['fusetimer'].'"
 		,"'.$row['patterns'].'"
 		,"'.$row['race'].'"
+		,"'.$row['randompatterns'].'"
 		,"'.$row['isstatsprocentual'].'"','fighters');
 		
     $result = $this->database->Select('*', 'fighters', 'id='.$this->database->GetLastID().'', 1);
@@ -5560,7 +5695,7 @@ private function Revive($player, $target, $attack, &$damage)
   static function CreateFight($player, $database, $type, $name, $mode, $levelup=0, $actionManager=null, $zeni=0, 
 															$items=0, $story=0, $challenge=0, $survivalteam=0, $survivalrounds=0, $survivalwinner=0, 
                               $event=0, $healing=0, $eventfight=0, $tournament=0, $dragonball=0, $npcid=0, $difficulty=0,
-                              $healthRatio=0, $healthRatioTeam=0, $healthRatioWinner=0)
+                              $healthRatio=0, $healthRatioTeam=0, $healthRatioWinner=0, $dragoncoins=0)
   {
     if($player != null && $player->GetFight() != 0)
     {
@@ -5594,11 +5729,11 @@ private function Revive($player, $target, $attack, &$damage)
 		$result = $database->Insert('name, type, mode, place, levelup, planet, zeni, 
                                 items, story, challenge, survivalteam, survivalrounds, survivalwinner, 
                                 event, healing, eventfight, tournament, dragonball, weather, npcid
-                                , npcmode, healthratio, healthratioteam, healthratiowinner', 
+                                , npcmode, healthratio, healthratioteam, healthratiowinner, dragoncoins', 
 																'"'.$name.'","'.$type.'","'.$mode.'", "'.$place.'", "'.$levelup.'", "'.$planet.'","'.$zeni.'",
 																"'.$items.'","'.$story.'","'.$challenge.'","'.$survivalteam.'","'.$survivalrounds.'","'.$survivalwinner.'",
 																"'.$event.'","'.$healing.'","'.$eventfight.'","'.$tournament.'","'.$dragonball.'","'.$weather.'","'.$npcid.'"
-                                ,"'.$difficulty.'","'.$healthRatio.'","'.$healthRatioTeam.'","'.$healthRatioWinner.'"', 'fights');
+                                ,"'.$difficulty.'","'.$healthRatio.'","'.$healthRatioTeam.'","'.$healthRatioWinner.'","'.$dragoncoins.'"', 'fights');
     
 		if(!$result)
     {
@@ -5617,6 +5752,7 @@ private function Revive($player, $target, $attack, &$damage)
 		$fight->SetLevelup($levelup);
 		$fight->SetPlanet($planet);
 		$fight->SetZeni($zeni);
+		$fight->SetDragonCoins($dragoncoins);
 		$fight->SetItems($items);
 		$fight->SetStory($story);
 		$fight->SetChallenge($challenge);

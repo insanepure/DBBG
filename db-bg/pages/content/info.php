@@ -18,6 +18,7 @@ include_once 'classes/fight/attack.php';
 <a href="?p=info&info=faq">• Häufig gestellte Fragen</a><br>
   </center></td><td>
 <a href="?p=info&info=chat">Chat</a><br>  
+<a href="?p=info&info=spenden">Spenden</a><br>
 <a href="?p=info&info=regeln">Regeln</a><br>  
 <a href="?p=info&info=bbcode">BBCode</a><br>
 <a href="?p=info&info=cookies">Cookies</a><br>
@@ -200,13 +201,23 @@ else if(isset($_GET['info']) && $_GET['info'] == 'events')
 <?php
 }
 
+else if(isset($_GET['info']) && $_GET['info'] == 'spenden')
+{
+  ?>
+<table width="100%"><tr><td><div class="catGradient borderT borderB"><center><b>Spenden</b></center></div>
+Wenn ihr das Browsergame cool findet und mich unterstützen wollt, so könnt ihr unter folgenden Link spenden: <b><a href="https://www.paypal.com/paypalme/insanepure?locale.x=de_DE">Paypal</a></b><br/>
+Das Geld wird zusätzlich zur aktiven Werbung für die weitere Bezahlung der Server genutzt.<br/>
+</td></tr></table><br><br>
+<?php
+}
+
 else if(isset($_GET['info']) && $_GET['info'] == 'cookies')
 {
   ?>
 <table width="100%"><tr><td><div class="catGradient borderT borderB"><center><b>Cookies</b></center></div>
-Wir nutzen Cookies um eure Logindaten verschlüsselt zu speichern.<br/>
+Wir nutzen Cookies um eure Logindaten verschlüsselt zu speichern und euch als User zu identifizieren.<br/>
 Damit wird die Funktion "Eingeloggt bleiben" ermöglicht.<br/>
-  
+Ebenfalls werden Cookies für die Werbung (Google Adsense) und analysen (Google Analytics) genutzt, dies kommt jedoch von den entsprechenden Providern.<br/>
 </td></tr></table><br><br>
 <?php
 }
@@ -362,8 +373,12 @@ else if(isset($_GET['info']) && $_GET['info'] == 'rassen')
  <table width="100%">
    <tr><td colspan="2"><div class="catGradient borderT borderB"><center><b>Saiyajin</b></center></div></td></tr>
    <tr>
-   <td height="360px"><img style="position:absolute; z-index:1; top:400px" width="200px" src="img/races/Saiyajin<?php echo rand(1,4); ?>.png">
-   <?php if(rand(0,1) == 0) { ?><img style="position:absolute; top:400px" width="200px" src="img/races/saiyajintail.png"> <?php } ?>
+   <td height="380px" width="200px" >
+     <div style="position:relative; width:200px; height:380px;">
+     <img style="position:absolute; z-index:1;" width="200px" src="img/characters/Saiyajin<?php $randChar = rand(1,5); echo $randChar ?>.png">
+     <img style="position:absolute; z-index:2;" width="200px" src="img/characters/Saiyajin<?php echo $randChar; ?>Hair.png">
+   <?php if(rand(0,1) == 0) { ?><img style="position:absolute;" width="200px" src="img/characters/SaiyajinTail.png"> <?php } ?>
+     </div>
    </td>
    <td valign="top">
    Saiyajin sind starke Krieger die auf dem Planeten Vegeta geboren worden sind.<br/>
@@ -373,7 +388,11 @@ else if(isset($_GET['info']) && $_GET['info'] == 'rassen')
    </tr>
    <tr><td colspan="2"><div class="catGradient borderT borderB"><center><b>Mensch</b></center></div></td></tr>
    <tr>
-   <td><img width="200px" src="img/races/Mensch<?php echo rand(1,4); ?>.png"></td>
+   <td height="380px">
+     <div style="position:relative; width:200px; height:380px;">
+     <img style="position:absolute; z-index:1;" width="200px" src="img/characters/Mensch<?php $randChar = rand(1,4); echo $randChar ?>.png">
+     <img style="position:absolute; z-index:2;" width="200px" src="img/characters/Mensch<?php echo $randChar; ?>Hair.png"></td>
+     </div>
    <td valign="top">
    Menschen sind intelligente Wesen, die auf den Planeten Erde geboren werden.<br/>
    <b>Vorteile:</b><br/>
@@ -382,7 +401,11 @@ else if(isset($_GET['info']) && $_GET['info'] == 'rassen')
    </tr>
    <tr><td colspan="2"><div class="catGradient borderT borderB"><center><b>Freezer</b></center></div></td></tr>
    <tr>
-   <td><img width="200px" src="img/races/Freezer<?php echo rand(1,4); ?>.png"></td>
+   <td height="380px">
+     <div style="position:relative; width:200px; height:380px;">
+     <img style="position:absolute; z-index:1;" width="200px" src="img/characters/Freezer<?php $randChar = rand(1,4); echo $randChar ?>.png">
+     <img style="position:absolute; z-index:2;" width="200px" src="img/characters/Freezer<?php echo $randChar; ?>Hair.png"></td>
+     </div>
    <td valign="top">
    Freezer sind eine Eroberungs-Rasse, die von Planeten zu Planeten reisen und sie erobern.<br/>
    <b>Vorteile:</b><br/>
@@ -391,7 +414,11 @@ else if(isset($_GET['info']) && $_GET['info'] == 'rassen')
    </tr>
    <tr><td colspan="2"><div class="catGradient borderT borderB"><center><b>Android</b></center></div></td></tr>
    <tr>
-   <td><img width="200px" src="img/races/Android<?php echo rand(1,4); ?>.png"></td>
+   <td height="380px">
+     <div style="position:relative; width:200px; height:380px;">
+     <img style="position:absolute; z-index:1;" width="200px" src="img/characters/Android<?php $randChar = rand(1,5); echo $randChar ?>.png">
+     <img style="position:absolute; z-index:2;" width="200px" src="img/characters/Android<?php echo $randChar; ?>Hair.png"></td>
+     </div>
    <td valign="top">
    Androiden sind künstliche Wesen, die von einer anderen Rasse erschaffen worden sind.<br/>
    <b>Vorteile:</b><br/>
@@ -400,7 +427,11 @@ else if(isset($_GET['info']) && $_GET['info'] == 'rassen')
    </tr>
    <tr><td colspan="2"><div class="catGradient borderT borderB"><center><b>Majin</b></center></div></td></tr>
    <tr>
-   <td><img width="200px" src="img/races/Majin<?php echo rand(1,4); ?>.png"></td>
+   <td height="380px">
+     <div style="position:relative; width:200px; height:380px;">
+     <img style="position:absolute; z-index:1;" width="200px" src="img/characters/Majin<?php $randChar = rand(1,4); echo $randChar ?>.png">
+     <img style="position:absolute; z-index:2;" width="200px" src="img/characters/Majin<?php echo $randChar; ?>Hair.png"></td>
+     </div>
    <td valign="top">
    Majin sind magische Wesen, die einen einzigartigen Körper besitzen.<br/>
    <b>Vorteile:</b><br/>
@@ -409,7 +440,11 @@ else if(isset($_GET['info']) && $_GET['info'] == 'rassen')
    </tr>
    <tr><td colspan="2"><div class="catGradient borderT borderB"><center><b>Demon</b></center></div></td></tr>
    <tr>
-   <td><img width="200px" src="img/races/Demon<?php echo rand(1,4); ?>.png"></td>
+   <td height="380px">
+     <div style="position:relative; width:200px; height:380px;">
+     <img style="position:absolute; z-index:1;" width="200px" src="img/characters/Demon<?php $randChar = rand(1,4); echo $randChar ?>.png">
+     <img style="position:absolute; z-index:2;" width="200px" src="img/characters/Demon<?php echo $randChar; ?>Hair.png"></td>
+     </div>
    <td valign="top">
    Demon sind bösartige Wesen, die aus der Hölle kommen.<br/>
    <b>Vorteile:</b><br/>
@@ -418,7 +453,11 @@ else if(isset($_GET['info']) && $_GET['info'] == 'rassen')
    </tr>
    <tr><td colspan="2"><div class="catGradient borderT borderB"><center><b>Kaioshin</b></center></div></td></tr>
    <tr>
-   <td><img width="200px" src="img/races/Kaioshin<?php echo rand(1,4); ?>.png"></td>
+   <td height="380px">
+     <div style="position:relative; width:200px; height:380px;">
+     <img style="position:absolute; z-index:1;" width="200px" src="img/characters/Kaioshin<?php $randChar = rand(1,4); echo $randChar ?>.png">
+     <img style="position:absolute; z-index:2;" width="200px" src="img/characters/Kaioshin<?php echo $randChar; ?>Hair.png"></td>
+     </div>
    <td valign="top">
    Kaioshin sind Wesen, die über alle anderen Wesen wachen.<br/>
    <b>Vorteile:</b><br/>
@@ -427,7 +466,11 @@ else if(isset($_GET['info']) && $_GET['info'] == 'rassen')
    </tr>
    <tr><td colspan="2"><div class="catGradient borderT borderB"><center><b>Namekianer</b></center></div></td></tr>
    <tr>
-   <td><img width="200px" src="img/races/Namekianer<?php echo rand(1,4); ?>.png"></td>
+   <td height="380px">
+     <div style="position:relative; width:200px; height:380px;">
+     <img style="position:absolute; z-index:1;" width="200px" src="img/characters/Namekianer<?php $randChar = rand(1,4); echo $randChar ?>.png">
+     <img style="position:absolute; z-index:2;" width="200px" src="img/characters/Namekianer<?php echo $randChar; ?>Hair.png"></td>
+     </div>
    <td valign="top">
    Namekianer sind ruhige Lebewesen, die auf den Planeten Namek geboren worden sind.<br/>
    Sie haben zwei Besonderheiten:<br/><br/>
@@ -1073,7 +1116,7 @@ else if(isset($_GET['info']) && $_GET['info'] == 'regeln')
                 <tr>
                   <td>
                     <b><font color="0066FF">Nr3:</font></b></td>
-                  <td> Provokationen können auch zu einen Verstoß führen.</td>
+                  <td> Provokationen können auch zu einem Verstoß führen.</td>
                 </tr>
                 <tr>
                   <td>
@@ -1381,17 +1424,17 @@ else if(isset($_GET['info']) && $_GET['info'] == 'regeln')
                   <tr>
                     <td>
                       <b><font color="0066FF">Nr1:</font></b></td>
-                    <td> Dein Kommentar Soll sich nur auf den aktuellen News Post beziehen.</td>
+                    <td> Dein Kommentar soll sich nur auf den aktuellen News Post beziehen.</td>
                   </tr>
                   <tr>
                     <td>
                       <b><font color="0066FF">Nr2:</font></b></td>
-                    <td> Dein Kommentar darf keine Beleidigungen,Rassistischen oder Phonografischen Inhalte und/oder Texte enthalten.</td>
+                    <td> Dein Kommentar darf keine Beleidigungen, rassistischen oder ponografischen Inhalte und/oder Texte enthalten.</td>
                   </tr>
                   <tr>
                     <td>
                       <b><font color="0066FF">Nr3:</font></b></td>
-                    <td> Dein Kommentar darf kein duplicat eines anderen Kommentares sein.</td>
+                    <td> Dein Kommentar darf kein duplikat eines anderen Kommentares sein.</td>
                   </tr>
                   <tr>
                     <td></td>

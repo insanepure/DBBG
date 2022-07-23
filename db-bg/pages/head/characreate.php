@@ -11,6 +11,10 @@ if (isset($_GET['a']) && $charaCreationActive && !$player->IsLogged())
     $raceImage = $_POST['raceimage'];
     $raceImageID = substr($raceImage, -1);
     $raceImage = substr($raceImage, 0, -1);
+    
+    $minRaceID = 4;
+    if($rasse == 'Saiyajin' || $rasse == 'Demon')
+      $minRaceID = 5;
 
     if($database->HasBadWords($chara))
     {
@@ -40,7 +44,7 @@ if (isset($_GET['a']) && $charaCreationActive && !$player->IsLogged())
     {
       $message = 'Die Rasse ist ungültig.';
     }
-    else if($rasse != $raceImage || !is_numeric($raceImageID) || $raceImageID < 1 || $raceImageID > 4)
+    else if($rasse != $raceImage || !is_numeric($raceImageID) || $raceImageID < 1 || $raceImageID > $minRaceID)
     {
       $message = 'Das Bild ist ungültig.';
     }

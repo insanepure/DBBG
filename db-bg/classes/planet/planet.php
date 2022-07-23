@@ -102,6 +102,11 @@ class Planet
     return $this->data['cantimetravel'];
   }
   
+  public function IsInJenseits()
+  {
+    return $this->data['injenseits'] == 1;
+  }
+  
   public function IsSamePlanet($otherPlanet)
   {
     return $this->GetName() == $otherPlanet || $this->GetLinkedPlanet() == $otherPlanet;

@@ -6,6 +6,11 @@
   border-radius: 5px;
 }
 
+.profileBox img
+{
+  max-width:95%;
+}
+
 
 .profilecharacter
 {

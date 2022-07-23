@@ -100,7 +100,16 @@ if($disliked)
          ?>
         <tr>
           <td width="25%"><center><b><a href="?p=profil&id=<?php echo $comment[1] ?>"><?php echo $comment[0]; ?></a>: </b></center></td>
-        <td width="75%"><center><?php echo $comment[2] ?></center></td>
+        <td width="75%"><p style="
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  -ms-word-break: break-all;
+  word-break: break-all;
+  word-break: break-word;
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;"><?php echo $comment[2] ?></p></td>
       </tr>
         <?php
          ++$j;

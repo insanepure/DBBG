@@ -60,7 +60,7 @@ if(isset($fight) && $fight->GetID() == $player->GetFight() && !$fight->IsEnded()
           while(isset($players[$j]))
           {
             $fighter = $players[$j];
-            if($fighter->IsInactive() || $pFighter->GetTeam() != $fighter->GetTeam() && $fighter->GetLP() == 0)
+            if($fighter->IsInactive())
             {
               ++$j;
               continue;

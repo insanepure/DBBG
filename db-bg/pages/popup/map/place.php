@@ -35,9 +35,9 @@ else
    while($eventEntry != null)
    {
      $isPlaceAndPlanet = Event::IsPlaceAndPlanet($place->GetPlanet(), $place->GetName(), $eventEntry['placeandtime']);
-     if($isPlaceAndPlanet)
+     if($isPlaceAndPlanet || $eventEntry['iseverywhere'])
      {
-       $isToday = Event::IsToday($place->GetPlanet(), $place->GetName(), $eventEntry['placeandtime']);
+       $isToday = Event::IsToday($place->GetPlanet(), $place->GetName(), $eventEntry['placeandtime'], $eventEntry['iseverywhere']);
        if($isToday)
        {
          echo '<br><hr> Hier findet heute ein Event statt!';

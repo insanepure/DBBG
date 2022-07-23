@@ -19,7 +19,7 @@ if ($account->IsLogged())
 ?>
 <div class="regimain borderT borderR borderL borderB">
   <div class="regiheader catGradient borderB">Registrierung</div>
-  <div class="regchar borderT borderL borderR borderB"><img id="image" src="img/rasse.png" width="100%" height="100%" /></div>
+  <div class="regchar borderT borderL borderR borderB" style="position:relative;"><img id="image" style="position:absolute; z-index:0; left:0px;" src="img/rasse.png" width="100%" height="100%" /><img id="imagehair" style="position:absolute; z-index:1; left:0px;" src="img/rasse.png" width="100%" height="100%" /></div>
   <div class="regimput">
     <form name="form1" action="?p=characreate&a=register" method="post">
     <input type="text" name="chara" placeholder="Charakter Name">
@@ -38,10 +38,16 @@ function onRaceSelected(selectObject)
    }
    else
    {
-     for(var i=1; i <= 4; ++i)
+     var num = 4;
+     var race = selectObject.value;
+     if(race == 'Saiyajin' || race == 'Demon')
+       num = 5;
+     
+     
+     for(var i=1; i <= num; ++i)
      {
        var bildName = 'Bild ' + i;
-       var bildRace = selectObject.value + i;
+       var bildRace = race + i;
        imageList.options[imageList.options.length] = new Option(bildName, bildRace);
      }
    }
@@ -54,7 +60,17 @@ function onImageSelected(imageOption)
 function setRaceImage(imageName) 
 {
   var img = document.getElementById("image");
-  img.src = 'img/races/'+imageName+'.png';
+  var img2 = document.getElementById("imagehair");
+  if(imageName == 'Rasse')
+  {
+    img.src = 'img/rasse.png';
+    img2.src = 'img/rasse.png';
+  }
+  else
+  {
+    img.src = 'img/characters/'+imageName+'.png';
+    img2.src = 'img/characters/'+imageName+'Hair.png';
+  }
 }
 </script>
     <select class="select" name="rasse" id="rasse" onchange="onRaceSelected(this)">

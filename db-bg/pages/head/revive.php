@@ -1,6 +1,6 @@
 <?php
 
-if($player->GetPlanet() != 'Jenseits')
+if(!$playerPlanet->IsInJenseits())
 {
 	header('Location: ?p=index');
 	exit();  
@@ -9,7 +9,7 @@ if($player->GetPlanet() != 'Jenseits')
 $reviveTime = $player->GetReviveTime();
 if($reviveTime < 0) $reviveTime = 0;
 
-if(isset($_GET['a']) && $_GET['a'] == 'revive' && $player->GetPlanet() == 'Jenseits')
+if(isset($_GET['a']) && $_GET['a'] == 'revive')
 {
   if($reviveTime != 0)
     $message = 'Du kannst dich noch nicht wiederbeleben.';

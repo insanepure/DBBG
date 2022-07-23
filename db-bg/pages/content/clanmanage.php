@@ -133,7 +133,7 @@ Clan Shoutbox
 		?>
   <tr>
     <td><center><?php echo $msg->GetFrom(); ?>:</center></td>
-    <td align="left" width="70%"><?php echo htmlentities($msg->GetText()); ?></td>
+    <td align="left" width="70%"><?php echo $msg->GetText(); ?></td>
   </tr>
 		<?php
 		++$i;

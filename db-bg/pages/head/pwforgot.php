@@ -11,13 +11,10 @@ if(isset($_GET['a']) && $_GET['a'] == 'change')
       $row = $result->fetch_assoc();
       if($row['password'] == $_GET['code'])
       {
-        $pw1 = $_POST['pw1'];
-        $pw2 = $_POST['pw2'];
-        if($pw1 == $pw2)
+        if($safedPW == $safedPW2)
         {
-		      $pw = $accountDB->EscapeString($pw1);
-          $pw = Account::GetPassword($pw1);
-		      $accountDB->Update('password="'.$pw.'"','users','id = '.$id.'',1);
+		      $safedPW = $accountDB->EscapeString($safedPW);
+		      $accountDB->Update('password="'.$safedPW.'"','users','id = '.$id.'',1);
           $message = 'Das Passwort wurde geändert.';
         }
         else

@@ -2,7 +2,7 @@
 if($player->GetArank() >= 2) 
 {
   
-$validDirectories = array('actions', 'attacks', 'ausruestung', 'events', 'items', 'npc', 'places', 'storyimages', 'planets', 'space', 'marketing', 'verzeichnis', 'gameevents'); 
+$validDirectories = array('actions', 'attacks', 'characters', 'characteritems', 'events', 'items', 'npc', 'places', 'storyimages', 'planets', 'space', 'marketing', 'verzeichnis', 'gameevents'); 
 ?>
 <div class="spacer"></div>
 <div  class="catGradient borderT borderB" style="width:90%;">
@@ -32,7 +32,7 @@ if(isset($_GET['directory']) && in_array($_GET['directory'], $validDirectories))
 ?>
 
 <form name="form1" action="?p=adminimages&directory=<?php echo $_GET['directory']; ?>&a=upload" method="post" enctype="multipart/form-data">   
-<input type="file" name="file_upload" accept=".png"/><input type="hidden" name="image"/>
+<input type="file" name="file_upload[]" accept=".png" multiple/><input type="hidden" name="image"/>
 <br/>
 <br/>
 <input type="submit" value="Hochladen">

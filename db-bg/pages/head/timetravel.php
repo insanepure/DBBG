@@ -1,10 +1,9 @@
 <?php
-if($player->GetPlanet() == 'Jenseits')
+if($playerPlanet->IsInJenseits())
 {
 	header('Location: ?p=index');
   exit();
 }
-$playerPlanet = new Planet($database, $player->GetPlanet());
 
 $isAtTimeTravelPlanet = $player->IsTimeTravelled() == 0 && $player->GetPlanet() == 'Erde' || $player->IsTimeTravelled() == 1;
 $isAtStartingPlace = $player->GetPlace() == $playerPlanet->GetStartingPlace();

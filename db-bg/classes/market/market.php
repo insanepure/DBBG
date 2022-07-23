@@ -218,6 +218,21 @@ class Market
     return null;
   }
   
+  public function GetItemsByStatsID($id)
+  {
+    $items = array();
+    $i = 0;
+    while(isset($this->items[$i]))
+    {
+      if($this->items[$i]->GetStatsID() == $id)
+      {
+        array_push($items, $this->items[$i]);
+      }
+     ++$i; 
+    }
+    return $items;
+  }
+  
   public function GetItem($id)
   {
 		if(count($this->items) > $id)

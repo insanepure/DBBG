@@ -32,10 +32,16 @@ if($previousPlanet != '')
   <tr>
     <td colspan=6 class="catGradient borderT borderB">
 	<?php
-	if($entry['planet'] == "Himmel" OR $entry['planet'] == "Jenseits")
+	if($entry['planet'] == "Himmel" || $entry['planet'] == "Jenseits")
 	{
 	?>
       <b><center><font color="white"><div class="schatten">User im <?php echo $entry['planet']; ?></div></font></center></b>
+	<?php
+	}
+	else if($entry['planet'] == "Hölle")
+	{
+	?>
+      <b><center><font color="white"><div class="schatten">User in der <?php echo $entry['planet']; ?></div></font></center></b>
 	<?php
 	}
 	else

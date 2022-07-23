@@ -21,8 +21,6 @@ if (isset($_GET['a']) && $userRegisterActive)
 		else
 		{
 			$acc = $_POST['acc'];
-			$pw = $_POST['pw'];
-			$pw2 = $_POST['pw2'];
 			$email = $_POST['email'];
 			$email2 = $_POST['email2'];
       $valid = true;
@@ -33,11 +31,10 @@ if (isset($_GET['a']) && $userRegisterActive)
 				$message = 'Du hast die Regeln nicht akzeptiert!';
         $valid = false;
 			}
-			else if($pw != $pw2)
+			else if($safedPW != $safedPW2)
 			{
 			  $message = 'Die Passwörter stimmen nicht überein.';
         $valid = false;
-        
 			}
 			else if($email != $email2)
 			{
@@ -46,7 +43,7 @@ if (isset($_GET['a']) && $userRegisterActive)
 			}
 			else
 			{
-        $resultID = $account->Register($acc, $pw, $email);
+        $resultID = $account->RegisterSafe($acc, $safedPW, $email);
         if($resultID > 0)
         {
           $code = $account->GetCode($acc, $email);

@@ -88,8 +88,7 @@ if(isset($_GET['a']) && $player->IsLogged())
     }
     else
     {
-      $planet = new Planet($database, $player->GetPlanet());
-      if($newFight->GetType() != 0 && !$planet->IsSamePlanet($newFight->GetPlanet()))
+      if($newFight->GetType() != 0 && !$playerPlanet->IsSamePlanet($newFight->GetPlanet()))
       {
         $message = 'Du befindest dich nicht auf den richtigen Planeten.';
       }

@@ -67,7 +67,14 @@ while($entry != null)
     <td class="boxSchatten">
       <center>
       <?php
+      if($entry['zeni'] != 0)
+      {
         echo $entry['zeni'].' Zeni<br/>';
+      }
+      if($entry['dragoncoins'] != 0)
+      {
+        echo $entry['dragoncoins'].' Dragoncoins<br/>';
+      }
       if($entry['items'] != '')
       {
         $items = explode(';',$entry['items']);

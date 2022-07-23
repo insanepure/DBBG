@@ -109,7 +109,7 @@ if ($account->IsLogged() && $userLoginActive)
   <b>Passwort ändern</b><br/><br/>
   <form name="form1" action="?p=charalogin&a=changepw" method="post" enctype="multipart/form-data">
   <table>
-    <tr><td>Passwort:</td><td><input type="password" name="pw1" style="width:250px"></td></tr>
+    <tr><td>Passwort:</td><td><input type="password" name="pw" style="width:250px"></td></tr>
     <tr><td>Wiederholen:</td><td><input type="password" name="pw2" style="width:250px"></td></tr>
     </table>
   <input type="submit" value="Passwort ändern">

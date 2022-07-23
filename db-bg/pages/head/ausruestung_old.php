@@ -156,7 +156,7 @@ function ShowSlotEquippedImage($slot, $inventory, $itemManager, $zindex)
 			return;
 		}
 		?> 
-		<div class="char2" style="z-index:<?php echo $zindex; ?>; background-image:url('img/ausruestung/<?php echo $itemData->GetEquippedImage(); ?>')"></div>
+		<div class="char2" style="z-index:<?php echo $zindex; ?>; background-image:url('img/characteritems/<?php echo $itemData->GetEquippedImage(); ?>')"></div>
 		<?php
   }
 }

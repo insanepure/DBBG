@@ -1,9 +1,4 @@
 <?php
-if($player->GetPlanet() == 'Jenseits')
-{
-	header('Location: ?p=index');
-  exit();
-}
 if(isset($_GET['a']) && $_GET['a'] == 'travel' || isset($_GET['a']) && $_GET['a'] == 'teleport')
 {
 	if(isset($_POST['destination']) )
@@ -43,7 +38,6 @@ if(isset($_GET['a']) && $_GET['a'] == 'travel' || isset($_GET['a']) && $_GET['a'
 				}
         else
         {
-					$playerPlanet = new Planet($database, $player->GetPlanet());
           $travelTime = 0;
           
           $x = $playerPlanet->GetX();

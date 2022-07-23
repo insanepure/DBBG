@@ -28,6 +28,11 @@ class MarketItem
     return $this->data['statstype'];
   }
   
+  public function SetStatsType($value)
+  {
+    $this->data['statstype'] = $value;
+  }
+  
   public function GetUpgrade()
   {
     return $this->data['upgrade'];
@@ -113,6 +118,12 @@ class MarketItem
         return 'der Defensive';
         break;
     }
+  }
+  
+  public function GetOriginalName()
+  {
+    $returnValue = $this->data['name'];
+    return $returnValue;
   }
   
   public function GetName()

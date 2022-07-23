@@ -55,25 +55,6 @@ else if(isset($_GET['a']) && $_GET['a'] == 'search')
     $message = 'Du bist nicht in der Arena.';
   else
   {
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') 
-    {
-      // Build POST request:
-      $recaptcha_url = 'https://www.google.com/recaptcha/api/siteverify';
-      $recaptcha_secret = '6Lcd57wUAAAAAESxu56CVSwlLc2QcNZa31PD3tMr';
-      $recaptcha_response = $_POST['g-recaptcha-response'];
-      // Make and decode POST request:
-      $recaptcha = file_get_contents($recaptcha_url.'?secret='.$recaptcha_secret.'&response='.$recaptcha_response);
-      $recaptcha = json_decode($recaptcha);
-      if($recaptcha && $recaptcha->success)
-      {
-        $account->UpdateRecaptcha($recaptcha);
-        if($recaptcha->score < 0.7)
-        {
-          $text = $player->GetName().' hatte eine Score von '.$recaptcha->score.' in der Arena.';
-          //$PMManager->SendPM(0, '', 'Recaptcha', $player->GetName(), $text, 'PuRe');
-        }
-      }
-    }
     $enemyID = $arena->GetRandomFighter($player->GetID());
     if($enemyID == -1)
       $message = 'Es ist niemand sonst in der Arena kampfbereit.';

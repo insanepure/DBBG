@@ -54,7 +54,10 @@ class PM
   
   public function GetTopic()
   {
-    return html_entity_decode($this->data['topic'],ENT_QUOTES);
+      if($this->IsHTML()) {
+          return $this->data['topic'];
+      }
+      return htmlspecialchars($this->data['topic']);
   }
   
   public function GetTime()

@@ -44,9 +44,9 @@ if(!isset($player) || !$player->IsValid() || $player->GetARank() < 2)
 
 $limitedTables = array('actions', 'attacks', 'items', 'npcs', 'places', 'story', 'events', 'titel', 
                        'patterns', 'planet', 'wishes', 'changelog', 'passives', 'verzeichnis', 'towerfloors',
-                       'eventitems');
+                       'eventitems', 'News', 'itemsets');
 
-if($player->GetARank() < 3 && isset($_GET['table']) && !in_array($_GET['table'], $limitedTables))
+if($player->GetARank() < 3 && isset($_GET['table']) && !in_array($_GET['table'], $limitedTables) || $_GET['table'] == 'adminlog')
 {
 	header('Location: ?p=admin');
 	exit();  

@@ -58,7 +58,7 @@ class Event
     return true;
   }
   
-	static function IsToday($planet, $place, $placeandtime)
+	static function IsToday($planet, $place, $placeandtime, $iseverywhere=0)
 	{
 			//Erde;Wald;1-5;1-31;1-12;0-365;2018-3000@Erde;Canyon;1:2;1:2:3:4;12;0-365;2018
 		$pandts = explode('@',$placeandtime);
@@ -75,7 +75,7 @@ class Event
 			$pandt = explode(';',$pandts[$i]);
 			$pPlanet = $pandt[0]; // Planet
 			$pPlace = $pandt[1]; // Place
-			if($planet != $pPlanet || $place != $pPlace)
+			if(!$iseverywhere && ($planet != $pPlanet || $place != $pPlace))
 			{
 				$isToday = false;
 			}
@@ -181,6 +181,11 @@ class Event
     return $this->data['zeni'];
   }
   
+  public function GetDragonCoins()
+  {
+    return $this->data['dragoncoins'];
+  }
+  
   public function GetItem()
   {
     return $this->data['item'];
@@ -189,6 +194,11 @@ class Event
   public function IsDungeon()
   {
     return $this->data['isdungeon'];
+  }
+  
+  public function IsEverywhere()
+  {
+    return $this->data['iseverywhere'];
   }
   
   public function GetDropChance()

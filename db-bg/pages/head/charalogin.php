@@ -42,17 +42,11 @@ else if(isset($_GET['a']) && $_GET['a'] == 'accdelete')
     exit();  
   }
 }
-else if(isset($_GET['a']) && $_GET['a'] == 'changepw' && isset($_POST['pw1']) && isset($_POST['pw1']))
-{                  
-  $pw1 = $database->EscapeString($_POST['pw1']);       
-  $pw2 = $database->EscapeString($_POST['pw2']);
-  if($pw1 == '')
+else if(isset($_GET['a']) && $_GET['a'] == 'changepw')
+{        
+  if($safedPW == $safedPW2)
   {
-    $message = 'Das Passwort ist ungültig.';
-  }
-  else if($pw1 == $pw2)
-  {
-    $account->ChangePassword($pw1);
+    $account->ChangePasswordSafe($safedPW);
     $message = 'Du hast dein Passwort geändert.';
   }
   else

@@ -119,11 +119,10 @@ else if(isset($_GET['a']) && $_GET['a'] == 'fight' && $story->GetType() == 2)
     $group = $player->GetGroup();
     if($group != null)
     {
-      $planet = new Planet($database, $player->GetPlanet());
       foreach($group as &$gID)
       {
         $gPlayer = new Player($database, $gID, $actionManager);
-        if($planet->IsSamePlanet($gPlayer->GetPlanet())
+        if($playerPlanet->IsSamePlanet($gPlayer->GetPlanet())
            && $gPlayer->GetLP() > ($gPlayer->GetMaxLP() * 0.2)
            && $gPlayer->GetFight() == 0
            && $gPlayer->GetTournament() == 0

@@ -68,6 +68,17 @@ if ($player->IsLogged())
 					<div class="info smallBG borderT borderB borderR borderL boxSchatten">Zeni:
             <?php echo number_format($player->GetZeni(), 0, ',', '.'); ?>
 					</div>
+          <?php 
+          if($player->GetARank() > 0)
+          {
+            ?>
+					<div class="spacer"></div>
+					<div class="info smallBG borderT borderB borderR borderL boxSchatten">Dragoncoins:
+            <?php echo number_format($player->GetDragonCoins(), 0, ',', '.'); ?>
+					</div>
+            <?php
+          }
+          ?>
 					<div class="spacer"></div>
 					<div class="info smallBG borderT borderB borderR borderL boxSchatten">Planet:
 						<?php echo $player->GetPlanet(); ?>
@@ -356,6 +367,9 @@ if($player->GetArank() >= 2)
 										</a>
 										<a id="no-link" href="?p=adminlog">
 											<div style="cursor:pointer;" class="SideMenuButton borderB">Admin Log</div>
+										</a>
+										<a id="no-link" href="?p=adminitemsets">
+											<div style="cursor:pointer;" class="SideMenuButton borderB">Item Sets</div>
 										</a>
 										<a id="no-link" href="?p=adminimages">
 											<div style="cursor:pointer;" class="SideMenuButton borderB">Bilder Verwaltung</div>

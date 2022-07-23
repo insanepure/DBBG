@@ -20,7 +20,7 @@ if($valid)
   <div class="spacer2"></div>
   Du musst nun dein neues Passwort im oberen Feld eingeben und im unteren Feld wiederholen.
   <form method="post" action="?p=pwforgot&a=change&id=<?php echo $_GET['id']; ?>&code=<?php echo $_GET['code']; ?>">
-    <input type="password" name="pw1" placeholder="Passwort">
+    <input type="password" name="pw" placeholder="Passwort">
     <div class="spacer"></div>
     <input type="password" name="pw2" placeholder="Passwort wiederholen">
   <div class="spacer"></div>

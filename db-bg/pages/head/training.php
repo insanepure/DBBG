@@ -10,7 +10,7 @@ if(isset($_GET['a']) && $_GET['a'] == 'train' && isset($_GET['id']) && isset($_P
 {
   $hours = $_POST['hours'];
   $id = $_GET['id'];
-  if(!is_numeric($hours))
+  if(!is_numeric($hours) && $hours != 0)
   {
     $message = 'Die Stundenzahl ist ungültig.';
   }
@@ -27,7 +27,10 @@ if(isset($_GET['a']) && $_GET['a'] == 'train' && isset($_GET['id']) && isset($_P
     $action = $actionManager->GetAction($id);
     $actionPossible = true;
     $actionHours = $action->GetMinutes() / 60;
-    $isRound = $hours % $actionHours;
+    $isRound = false;
+    if($action->GetMinutes() != 0)
+      $isRound = $hours % $actionHours;
+    
     $maxHours = 24 * 30;
     $price = $action->GetPrice() * $hours;
     $item = $action->GetItem();

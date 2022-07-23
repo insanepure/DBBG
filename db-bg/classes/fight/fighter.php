@@ -48,6 +48,11 @@ class Fighters
     return $this->data['patterns'];
   }
   
+  public function GetRandomPatterns()
+  {
+    return $this->data['randompatterns'];
+  }
+  
   public function GetName()
   {
     return $this->data['name'];
@@ -91,6 +96,16 @@ class Fighters
   public function SetPatternIDFailed($value)
   {
     $this->data['patternidfailed'] = $value;
+  }
+  
+  public function GetPatternTriggered()
+  {
+    return $this->data['patterntriggered'];
+  }
+  
+  public function SetPatternTriggered($value)
+  {
+    $this->data['patterntriggered'] = $value;
   }
   
   public function GetApeTail()

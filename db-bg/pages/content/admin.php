@@ -755,6 +755,16 @@ if($player->GetArank() >= 2) {
          </select>
           <?php
         }
+        else if($name == 'procentualcost')
+        {
+          ?>
+          <select class="select" name="<?php echo $name; ?>" style="width:400px;">
+            <option value="0" <?php if($row[$name] == 0) echo 'selected'; ?>>Deaktiviert</option>
+            <option value="1" <?php if($row[$name] == 1) echo 'selected'; ?>>KI</option>
+            <option value="2" <?php if($row[$name] == 2) echo 'selected'; ?>>Max Value</option>
+         </select>
+          <?php
+        }
         else if($name == 'slot')
         {
           ?>
@@ -1392,7 +1402,8 @@ if($player->GetArank() >= 2) {
           <a onclick="AddTableRow('eventitems', 1)">Eintrag hinzufügen</a><br/>
           <?php
         }
-        else if($name == 'itemid' || $name == 'item' || $name == 'statsid' || $name == 'visualid' || $name == 'earnitem' || $name == 'upgradeid' || $name == 'needitem')
+        else if($name == 'itemid' || $name == 'item' || $name == 'statsid' || $name == 'visualid' || $name == 'earnitem' || $name == 'upgradeid' || $name == 'needitem' 
+                || $name == 'schuhe' || $name == 'hose' || $name == 'hemd' || $name == 'handschuhe' || $name == 'waffe' || $name == 'aura' || $name == 'accessoire')
         {
 
           ?>

@@ -63,11 +63,10 @@ if(isset($_GET['a']) && $_GET['a'] == 'fight')
         $group = $player->GetGroup();
         if($group != null)
         {
-          $planet = new Planet($database, $player->GetPlanet());
           foreach($group as &$gID)
           {
             $gPlayer = new Player($database, $gID, $actionManager);
-            if($planet->IsSamePlanet($gPlayer->GetPlanet())
+            if($playerPlanet->IsSamePlanet($gPlayer->GetPlanet())
                && $gPlayer->GetLP() > ($gPlayer->GetMaxLP() * 0.2)
                && $gPlayer->GetFight() == 0
                && $gPlayer->GetTournament() == 0
@@ -85,9 +84,15 @@ if(isset($_GET['a']) && $_GET['a'] == 'fight')
         $type = $_POST['type']; //NPCFight
         $mode = $difficulty.'vs1';
         if($type == 3)
+        {
 		      $zeni = $npc->GetZeni();
+          $dragoncoins = $npc->GetDragonCoins();
+        }
         else
-          $zeni = 0;
+        {
+		      $zeni = 0;
+          $dragoncoins = 0;
+        }
         $name = 'NPCKampf gegen '.$npc->GetName();
         $team = 1;
         if($type == 3)
@@ -102,7 +107,7 @@ if(isset($_GET['a']) && $_GET['a'] == 'fight')
         $healthRatioTeam = $npc->GetHealthRatioTeam();
         $healthRatioWinner = $npc->GetHealthRatioWinner();
         $createdFight = Fight::CreateFight($player, $database, $type, $name, $mode, 0, $actionManager, $zeni, $items,0,0,$survivalteam,$survivalrounds,
-                                           $survivalwinner,0,0,0,0,0,$_GET['id'],$difficulty, $healthRatio, $healthRatioTeam, $healthRatioWinner);
+                                           $survivalwinner,0,0,0,0,0,$_GET['id'],$difficulty, $healthRatio, $healthRatioTeam, $healthRatioWinner, $dragoncoins);
         $createdFight->Join($npc, $team, true);
         $createdFight->Join($player, 0, false);
         

@@ -25,7 +25,7 @@ if(isset($_GET['a']) && $_GET['a'] == 'start')
     {
       $message = 'Das Event kann nicht mit sovielen Spielern starten.';
     }
-    else if(!Event::IsToday($player->GetPlanet(), $player->GetPlace(), $event->GetPlaceAndTime()))
+    else if(!Event::IsToday($player->GetPlanet(), $player->GetPlace(), $event->GetPlaceAndTime(), $event->IsEverywhere()))
     {
       $message = 'Das Event ist nicht heute.';
     }
@@ -45,8 +45,7 @@ if(isset($_GET['a']) && $_GET['a'] == 'start')
     {
       //create Fight and invite group members if not enough, like challenge
       $group = $player->GetGroup();
-      $planet = new Planet($database, $player->GetPlanet());
-      $validPlayers = $event->GetValidPlayers($player, $group, $planet);
+      $validPlayers = $event->GetValidPlayers($player, $group, $playerPlanet);
       $players = $_POST['players'];
       if($validPlayers < $players)
       {
@@ -82,7 +81,7 @@ if(isset($_GET['a']) && $_GET['a'] == 'start')
 				
 				if($players > 1)
 				{
-					$event->Invite($createdFight->GetID(), $group, $player, $planet);
+					$event->Invite($createdFight->GetID(), $group, $player, $playerPlanet);
 				}
         
         if($createdFight->IsStarted())

@@ -17,6 +17,11 @@ class Attack
   {
     return $this->data['id'];
   }
+
+  public function IsCostProcentual()
+  {
+    return $this->data['procentualcost'];
+  }
   
   public function GetName()
   {
@@ -219,12 +224,12 @@ class Attack
 	
 	public function IsProcentual()
 	{
-		return $this->data['procentual'] == 1;
+		return $this->data['procentual'];
 	}
 	
-	public function IsCostProcentual()
+	public function GetCostProcentual()
 	{
-		return $this->data['procentualcost'] == 1;
+    return $this->data['procentualcost'];
 	}
 	
 	public function GetAccuracy()
@@ -290,6 +295,11 @@ class Attack
 	public function GetNPCID()
 	{
 		return $this->data['npcid'];
+	}
+	
+	public function GetMaxNPCAmount()
+	{
+		return $this->data['maxnpcamount'];
 	}
 	
 	public function GetLoadAttack()

@@ -195,8 +195,17 @@ function ShowSlotEquippedImage($slot, $inventory, $zorders, $zordersOnTop)
     else
       $zindex = $zorders[$slot];
 		?> 
-		<div class="char2" style="z-index:<?php echo $zindex; ?>; background-image:url('img/ausruestung/<?php echo $item->GetEquippedImage(); ?>')"></div>
+		<div class="char2" style="z-index:<?php echo $zindex; ?>; background-image:url('img/characteritems/<?php echo $item->GetEquippedImage(); ?>')"></div>
 		<?php
+    
+    if($item->GetEquippedBGImage() != '')
+    {
+      $zindex = $zorders[10];
+		?> 
+		<div class="char2" style="z-index:<?php echo $zindex; ?>; background-image:url('img/characteritems/<?php echo $item->GetEquippedBGImage(); ?>')"></div>
+		<?php
+    }
+      
   }
 }
 

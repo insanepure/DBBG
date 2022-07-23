@@ -17,13 +17,12 @@ $currentID = 0;
 //preSort the arrays, so that we can easily show them
 $id = 0;
 $entry = $list->GetEntry($id);
-$planet = new Planet($database, $player->GetPlanet());
 while($entry != null)
 {
   if($entry['challenge'] != 0 && $player->GetFight() == $entry['id'] ||
      $entry['event'] != 0 && $player->GetFight() == $entry['id'] ||
     $entry['challenge'] == 0 && $entry['state'] == 0 && $entry['event'] == 0 && 
-     ($planet->IsSamePlanet($entry['planet']) || $entry['type'] == 0))
+     ($playerPlanet->IsSamePlanet($entry['planet']) || $entry['type'] == 0))
   {
     $openFights[$openID] = $entry;
     $openID++;

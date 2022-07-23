@@ -21,6 +21,16 @@ Rhine Games
 <b>Rhine Games ist ein Videospiel Indie-Studio gegründet von PuRe.</b>
 </div>
 <div class="spacer2"></div>
+<div style="width:500px" class="borderL borderR borderB">
+<div class="catGradient borderB borderT" style="height:25px">
+OPWX
+</div>
+<div class="spacer"></div>
+<a href="https://opwx.de/"><img src="https://opwx.de/img/marketing/partnerbannerone.png"></img></a>
+<div class="spacer"></div>
+<b>Bei OPWX handelt es sich um ein Text basiertes Browsergame im Universum von One Piece.</b>
+</div>
+<div class="spacer2"></div>
 <hr>
 <h3>
   Partner werden

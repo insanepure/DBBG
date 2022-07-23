@@ -109,10 +109,20 @@ if ($player->IsLogged())
 				<a href="?p=shop" id="no-link">
 					<div style="cursor:pointer;" class="SideMenuButton borderB">Shop</div>
 				</a>
+        <?php
+        if($player->GetARank() >= 2)
+        {
+        ?>
+				<a href="?p=dragoncoinshop" id="no-link">
+					<div style="cursor:pointer;" class="SideMenuButton borderB">DragonCoin Shop</div>
+				</a>
+				<?php
+				}
+        ?>
 				<a href="?p=market" id="no-link">
 					<div style="cursor:pointer;" class="SideMenuButton borderB">Marktplatz</div>
 				</a>
-        <?php if($player->GetPlanet() == 'Jenseits')
+        <?php if($playerPlanet->IsInJenseits())
         {
           ?>
 				<a href="?p=revive" id="no-link">
@@ -206,7 +216,7 @@ if ($player->IsLogged())
 					<div style="cursor:pointer;" class="SideMenuButton borderB">Karte</div>
 				</a>
         <?php
-        if($player->GetPlanet() != 'Jenseits')
+        if(!$playerPlanet->IsInJenseits())
         {
         ?>
 				<a href="?p=spacetravel" id="no-link">
@@ -214,9 +224,17 @@ if ($player->IsLogged())
 				</a>
 				<?php
 				}
+        else
+        {
+        ?>
+				<a href="?p=spacetravel" id="no-link">
+					<div style="cursor:pointer;" class="SideMenuButton borderB">Ewigkeit</div>
+				</a>
+				<?php
+				}
         ?>
         <?php
-        if($player->GetPlanet() != 'Jenseits' && $player->GetARank() >= 2)
+        if(!$playerPlanet->IsInJenseits() && $player->GetARank() >= 2)
         {
         ?>
 				<a href="?p=timetravel" id="no-link">

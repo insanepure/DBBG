@@ -10,13 +10,12 @@ include_once 'classes/wish/wishmanager.php';
 
 $wishManager = new WishManager($database);
 $itemManager = new ItemManager($database);
-$planet = new Planet($database, $player->GetPlanet());
 $radar = new Radar($database, $player);
 
-$dragon = $planet->GetDragon();
-$wishNum = $planet->GetWishNum();
+$dragon = $playerPlanet->GetDragon();
+$wishNum = $playerPlanet->GetWishNum();
 $wishLeft = 0;
-$wishes = $planet->GetWishes();
+$wishes = $playerPlanet->GetWishes();
 
 $dbCount = $radar->GetDBCount();
 $drops = array();

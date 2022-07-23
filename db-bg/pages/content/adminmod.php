@@ -25,13 +25,15 @@ if(isset($_GET['user']) && is_numeric($_GET['user']))
   
     $banned = false;
     $banreason = '';
-		$result = $accountDB->Select('id, banned, banreason','users', 'id = '.$userid.'',1);
+    $gameName = 'dbbg';
+		$result = $accountDB->Select('id, bannedgames, banreason','users', 'id = '.$userid.'',1);
 		if ($result) 
 		{
 		  if ($result->num_rows > 0)
 			{
 				$row = $result->fetch_assoc();
-        $banned = $row['banned'];
+        $bannedGames = explode(';',$row['bannedgames']);
+        $banned = in_array($gameName, $bannedGames);
         $banreason = $row['banreason'];
 			}
 			$result->close();

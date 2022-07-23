@@ -4,10 +4,9 @@ grecaptcha.ready(function() {
 });
 </script>
 <?php
-$planet = new Planet($database, $player->GetPlanet());
 ?>
 <div class="spacer"></div>
-<div class="map boxSchatten borderL borderR borderT borderB" style=" border:1px solid black; background-image: url('img/planets/<?php echo $planet->GetMap(); ?>.png?004')">
+<div class="map boxSchatten borderL borderR borderT borderB" style=" border:1px solid black; background-image: url('img/planets/<?php echo $playerPlanet->GetMap(); ?>.png?005')">
   <?php
   $events = new Generallist($database, 'events', '*', 'isdungeon="0"', '', 9999, 'ASC');
   
@@ -50,9 +49,9 @@ $planet = new Planet($database, $player->GetPlanet());
     while($eventEntry != null)
     {
       $isPlaceAndPlanet = Event::IsPlaceAndPlanet($entry['planet'], $entry['name'], $eventEntry['placeandtime']);
-      if($isPlaceAndPlanet && $player->GetLevel() >= $eventEntry['level'])
+      if(($isPlaceAndPlanet || $eventEntry['iseverywhere']) && $player->GetLevel() >= $eventEntry['level'])
       {
-        $isToday = Event::IsToday($entry['planet'], $entry['name'], $eventEntry['placeandtime']);
+        $isToday = Event::IsToday($entry['planet'], $entry['name'], $eventEntry['placeandtime'], $eventEntry['iseverywhere']);
         if($isToday)
         {
           $placeCSS = 'mapplaceevent';
@@ -179,7 +178,7 @@ if($enabled)
 			$planet = $pandt[0];
 			$place = $pandt[1];
 		
-			$isToday = Event::IsToday($player->GetPlanet(), $place, $entry['placeandtime']);
+			$isToday = Event::IsToday($player->GetPlanet(), $place, $entry['placeandtime'], $entry['iseverywhere']);
 			if(!$isToday || $place == 'Admin Island')
 			{
 				++$i;
