@@ -16,9 +16,9 @@ include_once '/home/users/main/www/classes/session.php';
 include_once '/home/users/main/www/classes/header.php';
 error_reporting(0);
 
-$db = 'DB';
-$user = 'droot';
-$pw = '';
+$db = 'db_bg_db1';
+$user = 'db_bg_db1';
+$pw = 'ghG)sdf3FU!gz';
 $database = new Database($db, $user, $pw);
 
 include_once 'classes/clan/clan.php';
@@ -123,6 +123,7 @@ else if($page == 'update')
 	$database->Update('apetail=apetail+1','accounts','apetail != 0 AND apetail != 3',999999999999);
 	$database->Update('finishedplayers=""','events','dailyreset="1"',999999999999);
 	$database->Delete('pms',' time < NOW() - INTERVAL 30 DAY',9999999999);
+	$database->Delete('adminlog', ' time < NOW() - INTERVAL 60 DAY', 9999999999);
 
   $titelManager = new titelManager($database);
   foreach($titelManager->GetTitels() as &$titel)
