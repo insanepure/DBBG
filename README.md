@@ -14,6 +14,12 @@ Ebenfalls gilt es folgende Personen zu erwähnen, die am Projekt mitgearbeitet h
 * ShinShin
 * Akasora
 * ShadowsAscart
+* Ayame Nikki
+* Vergil
+* Sadi
+* dasGute
+* MajinBuu
+* Yce
 
 Eine genaue Info findet ihr unter: https://db-bg.de/?p=info&info=credits
 
