@@ -3,16 +3,16 @@
 !Falls du dieses System benutzt, so bist du dazu verpflichtet, zu dieser Github-Seite zu verlinken und das Projekt nach GNU General Public License v3.0 zu kennzeichnen!
 Ebenfalls gilt es folgende Personen zu erwähnen, die am Projekt mitgearbeitet haben:
 
-PuRe
-Madusanka
-Sload
-Sati
-Akainu
-Kaito
-Shirobaki
-ShinShin
-Akasora
-ShadowsAscart
+* PuRe
+* Madusanka
+* Sload
+* Sati
+* Akainu
+* Kaito
+* Shirobaki
+* ShinShin
+* Akasora
+* ShadowsAscart
 
 Eine genaue Info findet ihr unter: https://db-bg.de/?p=info&info=credits
 
