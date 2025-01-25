@@ -9,7 +9,8 @@ Ebenfalls gilt es folgende Personen zu erwähnen, die am Projekt mitgearbeitet h
 * Sati
 * Akainu
 * Kaito
-* Shirobaki
+* Shirobaka
+* Fudoshin
 * ShinShin
 * Akasora
 * ShadowsAscart
